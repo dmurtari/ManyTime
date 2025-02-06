@@ -6,29 +6,41 @@
 //
 
 import Cocoa
+import SwiftUI
 
 @main
 class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
-    @IBOutlet weak var statusMenu: NSMenu!
+    var popover: NSPopover!
+    var menuManager: MenuManager?
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        statusItem = NSStatusBar.system.statusItem(
+        let contentView = ContentView()
+        let popover = NSPopover()
+        popover.contentSize = NSSize(width: 400, height: 500)
+        popover.behavior = .transient
+        popover.contentViewController = NSHostingController(rootView: contentView)
+        self.popover = popover
+
+        self.statusItem = NSStatusBar.system.statusItem(
             withLength: NSStatusItem.variableLength
         )
 
-        statusItem?.menu = statusMenu
+        if let button = statusItem?.button {
+            button.title = "Many Time"
+            button.imagePosition = .imageLeading
+            button.image = NSImage(
+                systemSymbolName: "globe",
+                accessibilityDescription: "Many Time"
+            )
 
-        statusItem?.button?.title = "MenuTime"
-        statusItem?.button?.imagePosition = .imageLeading
-        statusItem?.button?.image = NSImage(
-            systemSymbolName: "globe",
-            accessibilityDescription: "Many Time"
-        )
+            button.font = NSFont.menuBarFont(
+                ofSize: NSFont.systemFontSize
+            )
 
-        statusItem?.button?.font = NSFont.menuBarFont(
-            ofSize: NSFont.systemFontSize
-        )
+            button.target = self
+            button.action = #selector(togglePopover(_:))
+        }
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -37,6 +49,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
         return true
+    }
+
+    @objc func togglePopover(_ sender: AnyObject?) {
+        if let button = self.statusItem?.button {
+            if self.popover.isShown {
+                self.popover.performClose(sender)
+            } else {
+                self.popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
+                self.popover.contentViewController?.view.window?.becomeKey()
+            }
+        }
     }
 }
 
