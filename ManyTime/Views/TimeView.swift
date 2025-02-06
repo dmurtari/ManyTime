@@ -9,6 +9,9 @@ import SwiftUI
 
 // TODO: This should probably take desired time as input?
 struct TimeView: View {
+    @State var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State var timeNow = ""
+
     var timeZone: TimeZone
 
     let present = Date()
@@ -25,9 +28,10 @@ struct TimeView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(
-                dateFormatter.string(from: present)
-            )
+            Text(timeNow)
+                .onReceive(timer) {_ in
+                    self.timeNow = self.dateFormatter.string(from: Date())
+                }
             .font(.title)
 
             Text("\(timeZone.identifier) GMT\(timeZone.secondsFromGMT() / 60 / 60)")

@@ -10,10 +10,10 @@ import Combine
 
 class TimeManager {
     var timeZones: [String] = ["America/Denver", "Asia/Tokyo"]
-    var timerCancellable: AnyCancellable?
+    var appTimer: AnyCancellable?
 
     init() {
-        timerCancellable = Timer.publish(
+        appTimer = Timer.publish(
             every: 1,
             on: .current,
             in: .common

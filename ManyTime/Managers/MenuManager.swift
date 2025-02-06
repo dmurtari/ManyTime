@@ -7,12 +7,12 @@
 
 import AppKit
 
-class MenuManager: NSObject, NSMenuDelegate {
-    let statusMenu: NSMenu
+class MenuManager: NSObject, NSPopoverDelegate {
+    let popover: NSPopover?
 
     let timeManager = TimeManager()
 
-    init(statusMenu: NSMenu) {
-        self.statusMenu = statusMenu
+    init(popover: NSPopover) {
+        self.popover = popover
     }
 }
