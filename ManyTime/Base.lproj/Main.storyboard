@@ -31,6 +31,7 @@
                 </application>
                 <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ManyTime" customModuleProvider="target">
                     <connections>
+                        <outlet property="showRightClickMenu" destination="uQy-DD-JDr" id="ERd-0w-vQg"/>
                         <outlet property="statusMenu" destination="uQy-DD-JDr" id="3nF-95-v5N"/>
                     </connections>
                 </customObject>
