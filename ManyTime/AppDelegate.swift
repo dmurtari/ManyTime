@@ -14,6 +14,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var popover: NSPopover!
     var menuManager: MenuManager?
 
+    private let settingsWindowController = SettingsWindowController()
+
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         let contentView = ContentView()
         let popover = NSPopover()
@@ -62,6 +64,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    @objc private func openSettings() {
+        settingsWindowController.showSettings()
+    }
+
     func togglePopover(_ sender: AnyObject?) {
         if let button = self.statusItem?.button {
             if self.popover.isShown {
@@ -75,6 +81,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showRightClickMenu() {
         let menu = NSMenu()
+        
+        menu.addItem(NSMenuItem(title: "Settings", action: #selector(openSettings), keyEquivalent: ","))
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
 
         if let statusItem {
