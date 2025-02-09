@@ -39,7 +39,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             )
 
             button.target = self
-            button.action = #selector(togglePopover(_:))
+            button.action = #selector(handleMenuButtonClick(sender:))
+            button.sendAction(on: [.leftMouseDown, .rightMouseDown])
         }
     }
 
@@ -51,7 +52,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         return true
     }
 
-    @objc func togglePopover(_ sender: AnyObject?) {
+    @objc func handleMenuButtonClick(sender: NSStatusItem) {
+        let event = NSApp.currentEvent!
+
+        if event.type == .rightMouseDown {
+            showRightClickMenu()
+        } else {
+            togglePopover(sender)
+        }
+    }
+
+    func togglePopover(_ sender: AnyObject?) {
         if let button = self.statusItem?.button {
             if self.popover.isShown {
                 self.popover.performClose(sender)
@@ -60,6 +71,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self.popover.contentViewController?.view.window?.becomeKey()
             }
         }
+    }
+
+    func showRightClickMenu() {
+        let menu = NSMenu()
+        menu.addItem(NSMenuItem(title: "Quit", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+
+        if let statusItem {
+            // Set the menu to the status item and trigger a click event
+            statusItem.menu = menu
+            statusItem.button?.performClick(nil)
+
+            // Clear the menu to ensure it doesn't stay attached
+            statusItem.menu = nil
+        }
+
     }
 }
 
