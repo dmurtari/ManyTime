@@ -20,10 +20,21 @@ struct TimeView: View {
     // TODO: This needs to only happen once
     var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm:ss a z"
+        formatter.dateFormat = "h:mm:ss"
         formatter.locale = userLocale
         formatter.timeZone = timeZone
         return formatter
+    }
+
+    var offset: String {
+        let offsetInHours = timeZone.secondsFromGMT() / 3600
+        let formattedOffset = if offsetInHours > 0 {
+            "GMT+\(offsetInHours)"
+        } else {
+            "GMT-\(abs(offsetInHours))"
+        }
+
+        return formattedOffset
     }
 
     var body: some View {
@@ -34,7 +45,7 @@ struct TimeView: View {
                 }
             .font(.title)
 
-            Text("\(timeZone.identifier) GMT\(timeZone.secondsFromGMT() / 60 / 60)")
+            Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(self.offset)")
         }
     }
 }
