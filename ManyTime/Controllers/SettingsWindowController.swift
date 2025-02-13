@@ -15,16 +15,8 @@ class SettingsWindowController {
             let settingsView = SettingsView()
             let hostingController = NSHostingController(rootView: settingsView)
 
-            settingsWindow = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 400, height: 300),
-                styleMask: [.titled, .closable],
-                backing: .buffered,
-                defer: false
-            )
-
-            settingsWindow?.center()
+            settingsWindow = NSWindow(contentViewController: hostingController)
             settingsWindow?.title = "Settings"
-            settingsWindow?.contentViewController = hostingController
         }
 
         settingsWindow?.makeKeyAndOrderFront(nil)
