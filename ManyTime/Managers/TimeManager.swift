@@ -9,7 +9,6 @@ import Foundation
 import Combine
 
 class TimeManager {
-    var timeZones: [String] = ["America/Denver", "Asia/Tokyo"]
     var appTimer: AnyCancellable?
 
     init() {
@@ -19,10 +18,10 @@ class TimeManager {
             in: .common
         )
         .autoconnect()
-        .sink{
-            t in print(
-                t
-            )
-        }
+        .sink{ _ in }
+    }
+
+    var availableTimeZoneIdentifiers: [String] {
+        TimeZone.knownTimeZoneIdentifiers;
     }
 }
