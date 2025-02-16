@@ -16,6 +16,10 @@ struct MenuBarView: View {
     var body: some View {
         if let primaryZone = timeZoneManager.savedTimeZones.first {
             Text(timeString(for: primaryZone.timeZoneObject))
+                .onReceive(timer) { _ in
+                    date = Date()
+                }
+                .monospacedDigit()
         } else {
             Image(systemName: "clock")
         }
