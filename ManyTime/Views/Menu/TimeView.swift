@@ -9,8 +9,9 @@ import SwiftUI
 
 // TODO: This should probably take desired time as input?
 struct TimeView: View {
-    @State var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     @State var timeNow = ""
+
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var timeZone: TimeZone
 
@@ -43,7 +44,7 @@ struct TimeView: View {
                 .onReceive(timer) {_ in
                     self.timeNow = self.dateFormatter.string(from: Date())
                 }
-            .font(.title)
+                .font(.title).monospacedDigit()
 
             Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(self.offset)")
         }

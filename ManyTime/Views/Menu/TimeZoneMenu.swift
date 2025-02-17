@@ -21,7 +21,7 @@ struct TimeZoneMenu: View {
                     .foregroundColor(.secondary)
             } else {
                 ForEach(timeZoneManager.savedTimeZones) { item in
-                    MenuTimeZoneRow(item: item, date: date)
+                    TimeRowView(timeZone: item)
                 }
             }
 
