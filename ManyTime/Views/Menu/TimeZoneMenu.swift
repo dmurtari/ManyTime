@@ -20,9 +20,12 @@ struct TimeZoneMenu: View {
                 Text("No Time Zones Added")
                     .foregroundColor(.secondary)
             } else {
-                ForEach(timeZoneManager.savedTimeZones) { item in
-                    TimeRowView(timeZone: item)
+                VStack(spacing: 16) {
+                    ForEach(timeZoneManager.savedTimeZones) { item in
+                        TimeRowView(timeZone: item)
+                    }
                 }
+                .padding()
             }
 
             Divider()

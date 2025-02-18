@@ -14,6 +14,7 @@ struct TimeView: View {
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var timeZone: TimeZone
+    var date: Date
 
     let present = Date()
     let userLocale = Locale.autoupdatingCurrent
@@ -42,7 +43,7 @@ struct TimeView: View {
         VStack(alignment: .leading) {
             Text(timeNow)
                 .onReceive(timer) {_ in
-                    self.timeNow = self.dateFormatter.string(from: Date())
+                    self.timeNow = self.dateFormatter.string(from: date)
                 }
                 .font(.title).monospacedDigit()
 
@@ -52,13 +53,13 @@ struct TimeView: View {
 }
 
 #Preview("Local") {
-    TimeView(timeZone: TimeZone.current)
+    TimeView(timeZone: TimeZone.current, date: Date())
 }
 
 #Preview("Los Angeles") {
-    TimeView(timeZone: TimeZone(identifier: "America/Los_Angeles")!)
+    TimeView(timeZone: TimeZone(identifier: "America/Los_Angeles")!, date: Date())
 }
 
 #Preview("Japan") {
-    TimeView(timeZone: TimeZone(identifier: "Asia/Tokyo")!)
+    TimeView(timeZone: TimeZone(identifier: "Asia/Tokyo")!, date: Date())
 }
