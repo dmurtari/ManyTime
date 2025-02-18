@@ -31,6 +31,10 @@ class TimeZoneManager: ObservableObject {
         loadTimeZones()
     }
 
+    var availableTimeZoneIdentifiers: [String] {
+        TimeZone.knownTimeZoneIdentifiers;
+    }
+
     func addTimeZone(_ timeZone: TimeZone, displayName: String?) {
         let newItem = TimeZoneItem(timeZone: timeZone, displayName: displayName)
         savedTimeZones.append(newItem)

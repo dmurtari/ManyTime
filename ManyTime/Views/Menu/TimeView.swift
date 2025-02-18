@@ -11,22 +11,14 @@ import SwiftUI
 struct TimeView: View {
     @State var timeNow = ""
 
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @EnvironmentObject private var timeManager: TimeManager
+    @StateObject private var preferences = AppPreferences.shared
 
     var timeZone: TimeZone
     var date: Date
 
     let present = Date()
     let userLocale = Locale.autoupdatingCurrent
-
-    // TODO: This needs to only happen once
-    var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "h:mm:ss"
-        formatter.locale = userLocale
-        formatter.timeZone = timeZone
-        return formatter
-    }
 
     var offset: String {
         let offsetInHours = timeZone.secondsFromGMT() / 3600
@@ -41,14 +33,28 @@ struct TimeView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(timeNow)
-                .onReceive(timer) {_ in
-                    self.timeNow = self.dateFormatter.string(from: date)
-                }
+            Text(timeString(for: timeZone))
                 .font(.title).monospacedDigit()
 
             Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(self.offset)")
         }
+    }
+
+    private func timeString(for timeZone: TimeZone) -> String {
+        let formatter = DateFormatter()
+        formatter.timeZone = timeZone
+
+        if preferences.showDate {
+            formatter.dateStyle = .short
+        }
+
+        formatter.timeStyle = preferences.showSeconds ? .medium : .short
+
+        if !preferences.use24Hour {
+            formatter.dateFormat = formatter.dateFormat?.replacingOccurrences(of: "HH", with: "h")
+        }
+
+        return formatter.string(from: timeManager.displayDate)
     }
 }
 

@@ -9,16 +9,14 @@ import SwiftUI
 
 struct MenuBarView: View {
     @ObservedObject var timeZoneManager: TimeZoneManager
+    @EnvironmentObject private var timeManager: TimeManager
+
     @StateObject private var preferences = AppPreferences.shared
-    @State private var date = Date()
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
 
     var body: some View {
         if let primaryZone = timeZoneManager.savedTimeZones.first {
             Text(timeString(for: primaryZone.timeZoneObject))
-                .onReceive(timer) { _ in
-                    date = Date()
-                }
                 .monospacedDigit()
         } else {
             Image(systemName: "clock")
@@ -39,7 +37,7 @@ struct MenuBarView: View {
             formatter.dateFormat = formatter.dateFormat?.replacingOccurrences(of: "HH", with: "h")
         }
 
-        return formatter.string(from: date)
+        return formatter.string(from: timeManager.displayDate)
     }
 }
 
