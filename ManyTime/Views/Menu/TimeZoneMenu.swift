@@ -10,9 +10,8 @@ import SwiftUI
 struct TimeZoneMenu: View {
     @ObservedObject var timeZoneManager: TimeZoneManager
     @Environment(\.openWindow) private var openWindow
+    @EnvironmentObject private var timeManager: TimeManager
     @State private var date = Date()
-
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         Group {
@@ -22,7 +21,7 @@ struct TimeZoneMenu: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(timeZoneManager.savedTimeZones) { item in
-                        TimeRowView(timeZone: item)
+                        TimeRowView(timeZone: item, date: timeManager.currentDate)
                     }
                 }
                 .padding()
@@ -52,9 +51,6 @@ struct TimeZoneMenu: View {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q", modifiers: .command)
-        }
-        .onReceive(timer) { _ in
-            date = Date()
         }
     }
 }

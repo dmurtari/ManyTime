@@ -10,10 +10,11 @@ import SwiftUI
 // TODO: Could take: timezone
 struct TimeRowView: View {
     var timeZone: TimeZoneItem
+    var date: Date
 
     var body: some View {
         HStack {
-            TimeView(timeZone: timeZone.timeZoneObject, date: Date())
+            TimeView(timeZone: timeZone.timeZoneObject, date: date)
 
             Spacer()
 
@@ -23,5 +24,5 @@ struct TimeRowView: View {
 }
 
 #Preview {
-    TimeRowView(timeZone: .init(timeZone: .current, displayName: nil))
+    TimeRowView(timeZone: .init(timeZone: .current, displayName: nil), date: Date())
 }

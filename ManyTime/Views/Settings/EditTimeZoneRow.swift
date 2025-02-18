@@ -13,9 +13,11 @@ struct EditTimeZoneRow: View {
     @State private var date = Date()
     @State private var isEditing = false
     @State private var editedName: String
-    let onDisplayNameUpdate: (String) -> Void
+    @EnvironmentObject private var timeManager: TimeManager
+    @StateObject private var preferences = AppPreferences.shared
 
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    let onDisplayNameUpdate: (String) -> Void
 
     init(timeZone: TimeZone, displayName: String, onDisplayNameUpdate: @escaping (String) -> Void) {
         self.timeZone = timeZone
@@ -39,17 +41,24 @@ struct EditTimeZoneRow: View {
                     }
             }
             Spacer()
-            Text(date, formatter: dateFormatter(for: timeZone))
-        }
-        .onReceive(timer) { _ in
-            date = Date()
+            Text(timeString(for: timeZone))
         }
     }
 
-    private func dateFormatter(for timeZone: TimeZone) -> DateFormatter {
+    private func timeString(for timeZone: TimeZone) -> String {
         let formatter = DateFormatter()
         formatter.timeZone = timeZone
-        formatter.timeStyle = .medium
-        return formatter
+
+        if preferences.showDate {
+            formatter.dateStyle = .short
+        }
+
+        formatter.timeStyle = preferences.showSeconds ? .medium : .short
+
+        if !preferences.use24Hour {
+            formatter.dateFormat = formatter.dateFormat?.replacingOccurrences(of: "HH", with: "h")
+        }
+
+        return formatter.string(from: timeManager.displayDate)
     }
 }
