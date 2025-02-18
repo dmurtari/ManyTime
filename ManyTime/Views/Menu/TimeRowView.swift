@@ -13,13 +13,12 @@ struct TimeRowView: View {
 
     var body: some View {
         HStack {
-            TimeView(timeZone: timeZone.timeZoneObject)
+            TimeView(timeZone: timeZone.timeZoneObject, date: Date())
 
             Spacer()
 
             // Time scroller
         }
-        .padding()
     }
 }
 
