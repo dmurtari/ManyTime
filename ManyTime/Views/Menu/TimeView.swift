@@ -33,39 +33,28 @@ struct TimeView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(timeString(for: timeZone))
+            Text(TimeFormatterService.shared.string(
+                from: timeManager.displayDate,
+                timeZone: timeZone
+            ))
                 .font(.title).monospacedDigit()
 
             Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(self.offset)")
         }
     }
-
-    private func timeString(for timeZone: TimeZone) -> String {
-        let formatter = DateFormatter()
-        formatter.timeZone = timeZone
-
-        if preferences.showDate {
-            formatter.dateStyle = .short
-        }
-
-        formatter.timeStyle = preferences.showSeconds ? .medium : .short
-
-        if !preferences.use24Hour {
-            formatter.dateFormat = formatter.dateFormat?.replacingOccurrences(of: "HH", with: "h")
-        }
-
-        return formatter.string(from: timeManager.displayDate)
-    }
 }
 
 #Preview("Local") {
     TimeView(timeZone: TimeZone.current, date: Date())
+        .environment(TimeManager())
 }
 
 #Preview("Los Angeles") {
-    TimeView(timeZone: TimeZone(identifier: "America/Los_Angeles")!, date: Date())
+    TimeView(timeZone: TimeZone(identifier: "America/Los_Angeles")!, date: Date())        
+        .environment(TimeManager())
 }
 
 #Preview("Japan") {
     TimeView(timeZone: TimeZone(identifier: "Asia/Tokyo")!, date: Date())
+        .environment(TimeManager())
 }

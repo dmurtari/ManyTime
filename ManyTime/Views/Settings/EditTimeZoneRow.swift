@@ -41,24 +41,10 @@ struct EditTimeZoneRow: View {
                     }
             }
             Spacer()
-            Text(timeString(for: timeZone))
+            Text(TimeFormatterService.shared.menuBarString(
+                from: timeManager.displayDate,
+                timeZone: timeZone
+            ))
         }
-    }
-
-    private func timeString(for timeZone: TimeZone) -> String {
-        let formatter = DateFormatter()
-        formatter.timeZone = timeZone
-
-        if preferences.showDate {
-            formatter.dateStyle = .short
-        }
-
-        formatter.timeStyle = preferences.showSeconds ? .medium : .short
-
-        if !preferences.use24Hour {
-            formatter.dateFormat = formatter.dateFormat?.replacingOccurrences(of: "HH", with: "h")
-        }
-
-        return formatter.string(from: timeManager.displayDate)
     }
 }
