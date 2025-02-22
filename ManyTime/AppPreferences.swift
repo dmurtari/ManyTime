@@ -40,15 +40,3 @@ struct PreferencesWindow: Scene {
     }
 }
 
-struct PreferencesView: View {
-    @StateObject private var preferences = AppPreferences.shared
-
-    var body: some View {
-        Form {
-            Toggle("Show Date", isOn: $preferences.showDate)
-            Toggle("Use 24-Hour Time", isOn: $preferences.use24Hour)
-            Toggle("Show Seconds", isOn: $preferences.showSeconds)
-        }
-        .padding()
-    }
-}

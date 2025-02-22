@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// TODO: Could take: timezone
 struct TimeRowView: View {
     var timeZone: TimeZoneItem
     var date: Date
