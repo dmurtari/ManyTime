@@ -65,10 +65,7 @@ struct TimeZonePickerView: View {
     }
 
     private var currentTimeString: String {
-        let formatter = DateFormatter()
-        formatter.timeZone = selectedTimeZone
-        formatter.timeStyle = .medium
-        return formatter.string(from: Date())
+        TimeFormatterService.shared.string(from: Date(), timeZone: selectedTimeZone)
     }
 }
 

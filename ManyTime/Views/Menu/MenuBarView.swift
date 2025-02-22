@@ -16,28 +16,14 @@ struct MenuBarView: View {
 
     var body: some View {
         if let primaryZone = timeZoneManager.savedTimeZones.first {
-            Text(timeString(for: primaryZone.timeZoneObject))
-                .monospacedDigit()
+            Text(TimeFormatterService.shared.menuBarString(
+                from: timeManager.displayDate,
+                timeZone: primaryZone.timeZoneObject
+            ))
+              .monospacedDigit()
         } else {
             Image(systemName: "clock")
         }
-    }
-
-    private func timeString(for timeZone: TimeZone) -> String {
-        let formatter = DateFormatter()
-        formatter.timeZone = timeZone
-
-        if preferences.showDate {
-            formatter.dateStyle = .short
-        }
-
-        formatter.timeStyle = preferences.showSeconds ? .medium : .short
-
-        if !preferences.use24Hour {
-            formatter.dateFormat = formatter.dateFormat?.replacingOccurrences(of: "HH", with: "h")
-        }
-
-        return formatter.string(from: timeManager.displayDate)
     }
 }
 
