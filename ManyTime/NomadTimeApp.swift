@@ -25,7 +25,8 @@ struct TimeZoneApp: App {
             .environment(timeManager)
 
         Settings {
-            PreferencesView()
+            SettingsView()
+                .environment(timeManager)
         }
     }
 }
