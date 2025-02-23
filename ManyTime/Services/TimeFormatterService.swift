@@ -11,7 +11,7 @@ class TimeFormatterService {
     static let shared = TimeFormatterService()
 
     private var formatters: [String: DateFormatter] = [:]
-    private var currentMenuBarFormat: Format = .short
+    private var currentFormat: Format = .short
 
     enum Format: String {
         case short = "h:mm a"
@@ -41,12 +41,12 @@ class TimeFormatterService {
         formatter(for: format, timeZone: timeZone).string(from: date)
     }
 
-    func menuBarString(from date: Date, timeZone: TimeZone) -> String {
-        formatter(for: currentMenuBarFormat, timeZone: timeZone).string(from: date)
+    func appTimeFormat(from date: Date, timeZone: TimeZone) -> String {
+        formatter(for: currentFormat, timeZone: timeZone).string(from: date)
     }
 
-    func updateMenuBarFormat(use24Hour: Bool, showSeconds: Bool) {
-        currentMenuBarFormat = if use24Hour {
+    func updateTimeFormat(use24Hour: Bool, showSeconds: Bool) {
+        currentFormat = if use24Hour {
             showSeconds ? .medium24 : .short24
         } else {
             showSeconds ? .medium : .short

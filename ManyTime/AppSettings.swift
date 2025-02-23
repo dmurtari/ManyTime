@@ -8,8 +8,6 @@
 import SwiftUI
 
 class AppPreferences: ObservableObject {
-    @AppStorage("showDate") var showDate = false
-
     @AppStorage("showSeconds") var showSeconds = false {
         didSet {
             updateTimeFormat()
@@ -21,8 +19,12 @@ class AppPreferences: ObservableObject {
         }
     }
 
+    init() {
+        updateTimeFormat()
+    }
+
     private func updateTimeFormat() {
-        TimeFormatterService.shared.updateMenuBarFormat(
+        TimeFormatterService.shared.updateTimeFormat(
             use24Hour: use24Hour,
             showSeconds: showSeconds
         )
@@ -30,13 +32,3 @@ class AppPreferences: ObservableObject {
 
     static let shared = AppPreferences()
 }
-
-struct PreferencesWindow: Scene {
-    var body: some Scene {
-        Window("Preferences", id: "preferences") {
-            PreferencesView()
-        }
-        .defaultSize(width: 300, height: 200)
-    }
-}
-

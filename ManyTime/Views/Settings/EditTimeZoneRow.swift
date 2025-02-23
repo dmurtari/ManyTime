@@ -41,7 +41,7 @@ struct EditTimeZoneRow: View {
                     }
             }
             Spacer()
-            Text(TimeFormatterService.shared.menuBarString(
+            Text(TimeFormatterService.shared.appTimeFormat(
                 from: timeManager.displayDate,
                 timeZone: timeZone
             ))

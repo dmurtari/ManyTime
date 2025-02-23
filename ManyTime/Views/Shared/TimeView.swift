@@ -9,16 +9,11 @@ import SwiftUI
 
 // TODO: This should probably take desired time as input?
 struct TimeView: View {
-    @State var timeNow = ""
-
     @EnvironmentObject private var timeManager: TimeManager
     @StateObject private var preferences = AppPreferences.shared
 
     var timeZone: TimeZone
     var date: Date
-
-    let present = Date()
-    let userLocale = Locale.autoupdatingCurrent
 
     var offset: String {
         let offsetInHours = timeZone.secondsFromGMT() / 3600
@@ -33,13 +28,13 @@ struct TimeView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(TimeFormatterService.shared.string(
+            Text(TimeFormatterService.shared.appTimeFormat(
                 from: timeManager.displayDate,
                 timeZone: timeZone
             ))
                 .font(.title).monospacedDigit()
 
-            Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(self.offset)")
+            Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(offset)")
         }
     }
 }
