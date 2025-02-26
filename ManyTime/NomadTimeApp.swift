@@ -27,6 +27,8 @@ struct TimeZoneApp: App {
         Settings {
             SettingsView()
                 .environment(timeManager)
+                .frame(minWidth: 350)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
