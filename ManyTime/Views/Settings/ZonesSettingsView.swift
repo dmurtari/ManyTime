@@ -8,11 +8,25 @@
 import SwiftUI
 
 struct ZonesSettingsView: View {
+    @ObservedObject var timeZoneManager: TimeZoneManager
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack {
+            HStack(spacing: 16) {
+                ForEach(timeZoneManager.savedTimeZones) { item in
+                    SettingsTimeView(timeZone: item.timeZoneObject)
+                        .frame(maxWidth: .infinity)
+                        .fixedSize(horizontal: true, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity)
+        }
     }
 }
 
 #Preview {
-    ZonesSettingsView()
+    ZonesSettingsView(timeZoneManager: TimeZoneManager())
+        .environment(TimeManager())
 }
+
+
