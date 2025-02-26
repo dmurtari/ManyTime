@@ -24,4 +24,5 @@ struct TimeRowView: View {
 
 #Preview {
     TimeRowView(timeZone: .init(timeZone: .current, displayName: nil), date: Date())
+        .environment(TimeManager())
 }
