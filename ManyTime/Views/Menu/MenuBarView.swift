@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct MenuBarView: View {
-    @ObservedObject var timeZoneManager: TimeZoneManager
+    @EnvironmentObject private var timeZoneManager: TimeZoneManager
     @EnvironmentObject private var timeManager: TimeManager
 
     @StateObject private var preferences = AppPreferences.shared
-
 
     var body: some View {
         if let primaryZone = timeZoneManager.savedTimeZones.first {
@@ -28,5 +27,7 @@ struct MenuBarView: View {
 }
 
 #Preview {
-    MenuBarView(timeZoneManager: TimeZoneManager())
+    MenuBarView()
+        .environmentObject(TimeManager())
+        .environmentObject(TimeZoneManager())
 }

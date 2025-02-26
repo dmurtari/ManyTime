@@ -23,7 +23,7 @@ struct TimeZoneItem: Identifiable, Codable {
     }
 }
 
-class TimeZoneManager: ObservableObject {
+class TimeZoneManager: ObservableObject, Observable {
     @Published var savedTimeZones: [TimeZoneItem] = []
     private let saveKey = "SavedTimeZones"
 
