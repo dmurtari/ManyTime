@@ -7,28 +7,24 @@ struct TimeZoneApp: App {
 
     var body: some Scene {
         MenuBarExtra {
-            TimeZoneMenu(timeZoneManager: timeZoneManager)
+            TimeZoneMenu()
                 .environment(timeManager)
+                .environment(timeZoneManager)
         } label: {
-            MenuBarView(timeZoneManager: timeZoneManager)
+            MenuBarView()
                 .environment(timeManager)
+                .environment(timeZoneManager)
         }
         .menuBarExtraStyle(.window)
         .environment(timeManager)
-
-
-        TimeZonePickerWindow(onSave: { timeZone, displayName in
-            timeZoneManager.addTimeZone(timeZone, displayName: displayName)
-        })
-
-        EditTimeZonesWindow(timeZoneManager: timeZoneManager)
-            .environment(timeManager)
+        .environment(timeZoneManager)
 
         Settings {
             SettingsView()
-                .environment(timeManager)
                 .frame(minWidth: 350)
                 .fixedSize(horizontal: false, vertical: true)
         }
+        .environment(timeManager)
+        .environment(timeZoneManager)
     }
 }

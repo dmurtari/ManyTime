@@ -8,10 +8,8 @@
 import SwiftUI
 
 struct TimeZoneMenu: View {
-    @Environment(\.openWindow) private var openWindow
     @EnvironmentObject private var timeManager: TimeManager
-
-    @ObservedObject var timeZoneManager: TimeZoneManager
+    @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
     @State private var date = Date()
 
@@ -31,21 +29,6 @@ struct TimeZoneMenu: View {
 
             Divider()
 
-            Button("Add Time Zone...") {
-                NSApplication.shared.activate(ignoringOtherApps: true)
-                openWindow(id: "timezone-picker")
-            }
-            .keyboardShortcut("n", modifiers: .command)
-
-            if !timeZoneManager.savedTimeZones.isEmpty {
-                Button("Edit Time Zones...") {
-                    NSApplication.shared.activate(ignoringOtherApps: true)
-                    openWindow(id: "edit-timezones")
-                }
-            }
-
-            Divider()
-
             SettingsLink {
                 Text("Settings...")
             }
@@ -60,6 +43,7 @@ struct TimeZoneMenu: View {
 }
 
 #Preview {
-    TimeZoneMenu(timeZoneManager: TimeZoneManager())
+    TimeZoneMenu()
         .environment(TimeManager())
+        .environment(TimeZoneManager())
 }

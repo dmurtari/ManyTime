@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ZonesSettingsView: View {
-    @ObservedObject var timeZoneManager: TimeZoneManager
+    @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
     var body: some View {
         VStack {
@@ -25,8 +25,9 @@ struct ZonesSettingsView: View {
 }
 
 #Preview {
-    ZonesSettingsView(timeZoneManager: TimeZoneManager())
+    ZonesSettingsView()
         .environment(TimeManager())
+        .environment(TimeZoneManager())
 }
 
 

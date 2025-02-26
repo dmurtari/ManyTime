@@ -31,7 +31,7 @@ struct SettingsView: View {
                     Label("General", systemImage: "gear")
                 }
 
-            ZonesSettingsView(timeZoneManager: TimeZoneManager())
+            ZonesSettingsView()
                 .background(
                     GeometryReader { geometry in
                         Color.clear
