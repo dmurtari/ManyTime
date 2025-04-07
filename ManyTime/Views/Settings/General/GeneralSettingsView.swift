@@ -12,7 +12,10 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         VStack {
-            SettingsTimeView(timeZone: TimeZone.current)
+            SettingsTimeView(timeZone: TimeZoneItem(
+                timeZone: TimeZone.current,
+                displayName: TimeZone.current.description
+            ))
 
             Form {
                 Toggle("Use 24-Hour Time", isOn: $preferences.use24Hour)

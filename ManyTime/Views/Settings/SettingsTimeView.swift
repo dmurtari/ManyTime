@@ -8,19 +8,21 @@
 import SwiftUI
 
 struct SettingsTimeView: View {
-    @State var timeZone: TimeZone
-    
+    @EnvironmentObject var timeZoneManager: TimeZoneManager
+
+    @State var timeZone: TimeZoneItem
+
     var body: some View {
-        TimeView(timeZone: timeZone, date: Date())
-            .padding()
-            .background(
-                VisualEffectView(material: .hudWindow, blendingMode: .behindWindow)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .strokeBorder(Color.white.opacity(0.3), lineWidth: 1)
-                    )
-            )
+        TimeView(
+            timeZone: timeZone.timeZoneObject,
+            date: Date(),
+            showDelete: true,
+            onDelete: handleDelete
+        )
+    }
+
+    func handleDelete() {
+        timeZoneManager.removeTimeZone(id: timeZone.id)
     }
 }
 
@@ -43,7 +45,13 @@ struct VisualEffectView: NSViewRepresentable {
 }
 
 #Preview {
-    SettingsTimeView(timeZone: TimeZone.current)
+    SettingsTimeView(
+        timeZone: TimeZoneItem(
+            timeZone: TimeZone.current,
+            displayName: TimeZone.current.description
+        )
+    )
         .environment(TimeManager())
+        .environment(TimeZoneManager())
         .frame(width: 300, height: 200)
 }

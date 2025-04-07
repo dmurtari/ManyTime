@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TimeZoneItem: Identifiable, Codable {
+struct TimeZoneItem: Identifiable, Codable, Equatable {
     let id: UUID
     let timeZone: String
     var displayName: String
@@ -48,9 +48,16 @@ class TimeZoneManager: ObservableObject, Observable {
         }
     }
 
-    func removeTimeZone(at offsets: IndexSet) {
+    func removeTimeZoneAt(at offsets: IndexSet) {
         savedTimeZones.remove(atOffsets: offsets)
         saveTimeZones()
+    }
+
+    func removeTimeZone(id: UUID) {
+        if let index = savedTimeZones.firstIndex(where: { $0.id == id }) {
+            savedTimeZones.remove(at: index)
+            saveTimeZones()
+        }
     }
 
     func moveTimeZone(from source: IndexSet, to destination: Int) {
