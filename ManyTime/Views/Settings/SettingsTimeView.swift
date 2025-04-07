@@ -45,4 +45,5 @@ struct VisualEffectView: NSViewRepresentable {
 #Preview {
     SettingsTimeView(timeZone: TimeZone.current)
         .environment(TimeManager())
+        .frame(width: 300, height: 200)
 }

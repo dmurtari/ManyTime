@@ -8,19 +8,23 @@
 import SwiftUI
 
 class TimeFormatterService {
+    private var preferences = AppPreferences.shared
+
     static let shared = TimeFormatterService()
 
     private var formatters: [String: DateFormatter] = [:]
     private var currentFormat: Format = .short
 
     enum Format: String {
-        case short = "h:mm a"
-        case medium = "h:mm:ss a"
+        case short = "hh:mm a"
+        case medium = "hh:mm:ss a"
         case short24 = "HH:mm"
         case medium24 = "HH:mm:ss"
     }
 
-    private init() {}
+    private init() {
+        updateTimeFormat()
+    }
 
     private func formatter(for format: Format, timeZone: TimeZone) -> DateFormatter {
         let key = "\(format.rawValue)_\(timeZone.identifier)"
@@ -45,7 +49,10 @@ class TimeFormatterService {
         formatter(for: currentFormat, timeZone: timeZone).string(from: date)
     }
 
-    func updateTimeFormat(use24Hour: Bool, showSeconds: Bool) {
+    func updateTimeFormat() {
+        let use24Hour = preferences.use24Hour
+        let showSeconds = preferences.showSeconds
+
         currentFormat = if use24Hour {
             showSeconds ? .medium24 : .short24
         } else {
