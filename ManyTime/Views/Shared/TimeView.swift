@@ -13,6 +13,8 @@ struct TimeView: View {
 
     var timeZone: TimeZone
     var date: Date
+    var showDelete: Bool = false
+    var onDelete: (() -> Void)? = nil
 
     var offset: String {
         let offsetInHours = timeZone.secondsFromGMT() / 3600
@@ -27,11 +29,23 @@ struct TimeView: View {
 
     var body: some View {
         VStack(alignment: .leading) {
-            Text(TimeFormatterService.shared.appTimeFormat(
-                from: timeManager.displayDate,
-                timeZone: timeZone
-            ))
+            HStack {
+                Text(TimeFormatterService.shared.appTimeFormat(
+                    from: timeManager.displayDate,
+                    timeZone: timeZone
+                ))
                 .font(.title).monospacedDigit()
+
+                if (showDelete) {
+                    Spacer()
+
+                    Button(action: {
+                        onDelete?()
+                    }) {
+                        Image(systemName: "trash")
+                    }
+                }
+            }
 
             Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(offset)")
         }
@@ -39,7 +53,7 @@ struct TimeView: View {
 }
 
 #Preview("Local") {
-    TimeView(timeZone: TimeZone.current, date: Date())
+    TimeView(timeZone: TimeZone.current, date: Date(), showDelete: true)
         .environment(TimeManager())
 }
 

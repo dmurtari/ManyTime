@@ -14,15 +14,18 @@ struct ZonesSettingsView: View {
         VStack {
             HStack(spacing: 16) {
                 ForEach(timeZoneManager.savedTimeZones) { item in
-                    SettingsTimeView(timeZone: item.timeZoneObject)
+                    SettingsTimeView(timeZone: item)
                         .frame(maxWidth: .infinity)
                         .fixedSize(horizontal: true, vertical: true)
                 }
             }
             .frame(maxWidth: .infinity)
+            .padding()
 
             TimeZoneAddView()
+                .frame(width: 300)
         }
+        .padding()
     }
 }
 

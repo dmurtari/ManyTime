@@ -29,14 +29,19 @@ struct TimeZoneMenu: View {
 
             Divider()
 
-            SettingsLink {
-                Text("Settings...")
-            }
-            .keyboardShortcut(",", modifiers: .command)
+            HStack {
+                SettingsLink {
+                    Text("Settings...")
+                }
+                .keyboardShortcut(",", modifiers: .command)
 
-            Button("Quit") {
-                NSApplication.shared.terminate(nil)
+                Spacer()
+
+                Button("Quit") {
+                    NSApplication.shared.terminate(nil)
+                }
             }
+            .padding()
             .keyboardShortcut("q", modifiers: .command)
         }
     }
