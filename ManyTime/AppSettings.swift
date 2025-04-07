@@ -10,24 +10,17 @@ import SwiftUI
 class AppPreferences: ObservableObject {
     @AppStorage("showSeconds") var showSeconds = false {
         didSet {
-            updateTimeFormat()
+            notifyTimeFormatChanged()
         }
     }
     @AppStorage("use24Hour") var use24Hour = false {
         didSet {
-            updateTimeFormat()
+            notifyTimeFormatChanged()
         }
     }
 
-    init() {
-        updateTimeFormat()
-    }
-
-    private func updateTimeFormat() {
-        TimeFormatterService.shared.updateTimeFormat(
-            use24Hour: use24Hour,
-            showSeconds: showSeconds
-        )
+    private func notifyTimeFormatChanged() {
+        TimeFormatterService.shared.updateTimeFormat()
     }
 
     static let shared = AppPreferences()

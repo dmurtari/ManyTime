@@ -11,8 +11,6 @@ struct MenuBarView: View {
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
     @EnvironmentObject private var timeManager: TimeManager
 
-    @StateObject private var preferences = AppPreferences.shared
-
     var body: some View {
         if let primaryZone = timeZoneManager.savedTimeZones.first {
             Text(TimeFormatterService.shared.appTimeFormat(
@@ -30,4 +28,5 @@ struct MenuBarView: View {
     MenuBarView()
         .environmentObject(TimeManager())
         .environmentObject(TimeZoneManager())
+        .frame(width: 250, height: 50)
 }
