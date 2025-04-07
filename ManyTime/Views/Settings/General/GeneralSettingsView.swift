@@ -16,6 +16,7 @@ struct GeneralSettingsView: View {
                 timeZone: TimeZone.current,
                 displayName: TimeZone.current.description
             ))
+            .frame(width: 250)
 
             Form {
                 Toggle("Use 24-Hour Time", isOn: $preferences.use24Hour)

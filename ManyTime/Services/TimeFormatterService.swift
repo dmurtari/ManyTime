@@ -34,8 +34,22 @@ class TimeFormatterService {
         }
 
         let formatter = DateFormatter()
-        formatter.dateFormat = format.rawValue
         formatter.timeZone = timeZone
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+
+        switch format {
+        case .short, .short24:
+            formatter.timeStyle = .short
+        case .medium, .medium24:
+            formatter.timeStyle = .medium
+        }
+
+        if format == .short24 || format == .medium24 {
+            formatter.setLocalizedDateFormatFromTemplate(format == .medium24 ? "HH:mm:ss" : "HH:mm")
+        } else {
+            formatter.setLocalizedDateFormatFromTemplate(format == .medium ? "hh:mm:ss a" : "hh:mm a")
+        }
+
         formatters[key] = formatter
 
         return formatter
