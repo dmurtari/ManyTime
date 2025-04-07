@@ -20,14 +20,16 @@ struct ZonesSettingsView: View {
                 }
             }
             .frame(maxWidth: .infinity)
+
+            TimeZoneAddView()
         }
     }
 }
 
 #Preview {
     ZonesSettingsView()
-        .environment(TimeManager())
         .environment(TimeZoneManager())
+        .environment(TimeManager())
 }
 
 
