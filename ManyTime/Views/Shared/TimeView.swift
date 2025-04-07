@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-// TODO: This should probably take desired time as input?
 struct TimeView: View {
     @EnvironmentObject private var timeManager: TimeManager
+    @State private var isHovering = false
 
     var timeZone: TimeZone
     var date: Date
@@ -36,19 +36,22 @@ struct TimeView: View {
                 ))
                 .font(.title).monospacedDigit()
 
-                if (showDelete) {
-                    Spacer()
-
+                if showDelete {
                     Button(action: {
                         onDelete?()
                     }) {
                         Image(systemName: "trash")
                     }
+                    .opacity(isHovering ? 1 : 0)
                 }
             }
 
             Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(offset)")
         }
+        .onHover { hovering in
+            isHovering = hovering
+        }
+        .animation(.easeInOut(duration: 0.2), value: isHovering)
     }
 }
 

@@ -12,12 +12,19 @@ struct SettingsTimeView: View {
 
     @State var timeZone: TimeZoneItem
 
+    var showDelete: Bool = false
+
     var body: some View {
         TimeView(
             timeZone: timeZone.timeZoneObject,
             date: Date(),
-            showDelete: true,
+            showDelete: showDelete,
             onDelete: handleDelete
+        )
+        .padding(8)
+        .overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.gray.opacity(0.25), lineWidth: 2)
         )
     }
 
@@ -49,7 +56,8 @@ struct VisualEffectView: NSViewRepresentable {
         timeZone: TimeZoneItem(
             timeZone: TimeZone.current,
             displayName: TimeZone.current.description
-        )
+        ),
+        showDelete: true
     )
         .environment(TimeManager())
         .environment(TimeZoneManager())
