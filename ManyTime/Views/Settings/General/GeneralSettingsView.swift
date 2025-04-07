@@ -11,7 +11,7 @@ struct GeneralSettingsView: View {
     @StateObject private var preferences = AppPreferences.shared
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             SettingsTimeView(timeZone: TimeZoneItem(
                 timeZone: TimeZone.current,
                 displayName: TimeZone.current.description

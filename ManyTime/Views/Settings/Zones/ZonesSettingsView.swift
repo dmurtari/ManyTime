@@ -11,21 +11,19 @@ struct ZonesSettingsView: View {
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
     var body: some View {
-        VStack {
+        VStack(spacing: 16) {
             HStack(spacing: 16) {
                 ForEach(timeZoneManager.savedTimeZones) { item in
-                    SettingsTimeView(timeZone: item)
+                    SettingsTimeView(timeZone: item, showDelete: true)
                         .frame(maxWidth: .infinity)
                         .fixedSize(horizontal: true, vertical: true)
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding()
 
             TimeZoneAddView()
                 .frame(width: 300)
         }
-        .padding()
     }
 }
 
