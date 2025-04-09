@@ -14,7 +14,7 @@ struct TimeZoneMenu: View {
     @State private var date = Date()
 
     var body: some View {
-        Group {
+        VStack(spacing: 0) {
             if timeZoneManager.savedTimeZones.isEmpty {
                 Text("No Time Zones Added")
                     .foregroundColor(.secondary)
@@ -31,7 +31,7 @@ struct TimeZoneMenu: View {
 
             HStack {
                 SettingsLink {
-                    Text("Settings...")
+                    Image(systemName: "gear")
                 }
                 .keyboardShortcut(",", modifiers: .command)
 
@@ -41,7 +41,7 @@ struct TimeZoneMenu: View {
                     NSApplication.shared.terminate(nil)
                 }
             }
-            .padding()
+            .padding([.all], 7)
             .keyboardShortcut("q", modifiers: .command)
         }
     }

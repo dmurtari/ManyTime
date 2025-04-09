@@ -11,6 +11,7 @@ struct SettingsTimeView: View {
     @EnvironmentObject var timeZoneManager: TimeZoneManager
 
     @State var timeZone: TimeZoneItem
+    @State private var isHovering = false
 
     var showDelete: Bool = false
 
@@ -18,14 +19,27 @@ struct SettingsTimeView: View {
         TimeView(
             timeZone: timeZone.timeZoneObject,
             date: Date(),
-            showDelete: showDelete,
-            onDelete: handleDelete
         )
         .padding(8)
         .overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color.gray.opacity(0.25), lineWidth: 2)
         )
+        .overlay(alignment: .topTrailing) {
+            if showDelete {
+                Button(action: {
+                    handleDelete()
+                }) {
+                    Image(systemName: "trash")
+                }
+                .opacity(isHovering ? 1 : 0)
+                .padding([.top, .trailing], 5)
+            }
+        }
+        .onHover { hovering in
+            isHovering = hovering
+        }
+        .animation(.easeInOut(duration: 0.2), value: isHovering)
     }
 
     func handleDelete() {
