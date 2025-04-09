@@ -18,63 +18,131 @@ struct TimeZoneItem: Identifiable, Codable, Equatable {
         self.displayName = displayName ?? timeZone.identifier
     }
 
+    // Added for testing purposes
+    init(id: UUID = UUID(), timeZoneIdentifier: String, displayName: String) {
+        self.id = id
+        self.timeZone = timeZoneIdentifier
+        self.displayName = displayName
+    }
+
     var timeZoneObject: TimeZone {
         TimeZone(identifier: timeZone) ?? TimeZone.current
     }
 }
 
+// Protocol for UserDefaults-like storage
+protocol UserDefaultsProtocol {
+    func data(forKey: String) -> Data?
+    func set(_ value: Any?, forKey: String)
+}
+
+// Extension to make UserDefaults conform to our protocol
+extension UserDefaults: UserDefaultsProtocol {}
+
+// Protocol for TimeZone-related operations
+protocol TimeZoneProviding {
+    var knownTimeZoneIdentifiers: [String] { get }
+    func timeZone(identifier: String) -> TimeZone?
+    var current: TimeZone { get }
+}
+
+// Default implementation using system TimeZone
+class SystemTimeZoneProvider: TimeZoneProviding {
+    var knownTimeZoneIdentifiers: [String] {
+        TimeZone.knownTimeZoneIdentifiers
+    }
+
+    func timeZone(identifier: String) -> TimeZone? {
+        TimeZone(identifier: identifier)
+    }
+
+    var current: TimeZone {
+        TimeZone.current
+    }
+}
+
 class TimeZoneManager: ObservableObject, Observable {
     @Published var savedTimeZones: [TimeZoneItem] = []
-    private let saveKey = "SavedTimeZones"
+    private let saveKey: String
+    private let userDefaults: UserDefaultsProtocol
+    private let timeZoneProvider: TimeZoneProviding
 
-    init() {
+    init(
+        userDefaults: UserDefaultsProtocol = UserDefaults.standard,
+        timeZoneProvider: TimeZoneProviding = SystemTimeZoneProvider(),
+        saveKey: String = "SavedTimeZones"
+    ) {
+        self.userDefaults = userDefaults
+        self.timeZoneProvider = timeZoneProvider
+        self.saveKey = saveKey
         loadTimeZones()
     }
 
     var availableTimeZoneIdentifiers: [String] {
-        TimeZone.knownTimeZoneIdentifiers;
+        timeZoneProvider.knownTimeZoneIdentifiers
     }
 
-    func addTimeZone(_ timeZone: TimeZone, displayName: String?) {
+    func timeZone(identifier: String) -> TimeZone? {
+        timeZoneProvider.timeZone(identifier: identifier)
+    }
+
+    func addTimeZone(_ timeZone: TimeZone, displayName: String?) -> Bool {
         let newItem = TimeZoneItem(timeZone: timeZone, displayName: displayName)
         savedTimeZones.append(newItem)
-        saveTimeZones()
+        return saveTimeZones()
     }
 
-    func updateDisplayName(for id: UUID, newName: String) {
-        if let index = savedTimeZones.firstIndex(where: { $0.id == id }) {
-            savedTimeZones[index].displayName = newName
-            saveTimeZones()
+    func updateDisplayName(for id: UUID, newName: String) -> Bool {
+        guard let index = savedTimeZones.firstIndex(where: { $0.id == id }) else {
+            return false
         }
+
+        savedTimeZones[index].displayName = newName
+        return saveTimeZones()
     }
 
-    func removeTimeZoneAt(at offsets: IndexSet) {
+    func removeTimeZoneAt(at offsets: IndexSet) -> Bool {
         savedTimeZones.remove(atOffsets: offsets)
-        saveTimeZones()
+        return saveTimeZones()
     }
 
-    func removeTimeZone(id: UUID) {
-        if let index = savedTimeZones.firstIndex(where: { $0.id == id }) {
-            savedTimeZones.remove(at: index)
-            saveTimeZones()
+    func removeTimeZone(id: UUID) -> Bool {
+        guard let index = savedTimeZones.firstIndex(where: { $0.id == id }) else {
+            return false
         }
+
+        savedTimeZones.remove(at: index)
+        return saveTimeZones()
     }
 
-    func moveTimeZone(from source: IndexSet, to destination: Int) {
+    func moveTimeZone(from source: IndexSet, to destination: Int) -> Bool {
         savedTimeZones.move(fromOffsets: source, toOffset: destination)
-        saveTimeZones()
+        return saveTimeZones()
     }
 
-    private func saveTimeZones() {
-        if let encoded = try? JSONEncoder().encode(savedTimeZones) {
-            UserDefaults.standard.set(encoded, forKey: saveKey)
+    @discardableResult
+    private func saveTimeZones() -> Bool {
+        do {
+            let encoded = try JSONEncoder().encode(savedTimeZones)
+            userDefaults.set(encoded, forKey: saveKey)
+            return true
+        } catch {
+            print("Failed to save time zones: \(error)")
+            return false
         }
     }
 
     private func loadTimeZones() {
-        if let data = UserDefaults.standard.data(forKey: saveKey),
-           let decoded = try? JSONDecoder().decode([TimeZoneItem].self, from: data) {
-            savedTimeZones = decoded
+        guard let data = userDefaults.data(forKey: saveKey) else {
+            savedTimeZones = []
+            return
+        }
+
+        do {
+            savedTimeZones = try JSONDecoder().decode([TimeZoneItem].self, from: data)
+        } catch {
+            print("Failed to load time zones: \(error)")
+            savedTimeZones = []
         }
     }
 }
