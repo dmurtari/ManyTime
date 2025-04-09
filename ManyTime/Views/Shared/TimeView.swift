@@ -13,8 +13,6 @@ struct TimeView: View {
 
     var timeZone: TimeZone
     var date: Date
-    var showDelete: Bool = false
-    var onDelete: (() -> Void)? = nil
 
     var offset: String {
         let offsetInHours = timeZone.secondsFromGMT() / 3600
@@ -35,28 +33,15 @@ struct TimeView: View {
                     timeZone: timeZone
                 ))
                 .font(.title).monospacedDigit()
-
-                if showDelete {
-                    Button(action: {
-                        onDelete?()
-                    }) {
-                        Image(systemName: "trash")
-                    }
-                    .opacity(isHovering ? 1 : 0)
-                }
             }
 
             Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(offset)")
         }
-        .onHover { hovering in
-            isHovering = hovering
-        }
-        .animation(.easeInOut(duration: 0.2), value: isHovering)
     }
 }
 
 #Preview("Local") {
-    TimeView(timeZone: TimeZone.current, date: Date(), showDelete: true)
+    TimeView(timeZone: TimeZone.current, date: Date())
         .environment(TimeManager())
 }
 
