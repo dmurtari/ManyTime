@@ -12,14 +12,12 @@ struct ZonesSettingsView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            HStack(spacing: 16) {
+            VStack(spacing: 16) {
                 ForEach(timeZoneManager.savedTimeZones) { item in
                     SettingsTimeView(timeZone: item, showDelete: true)
-                        .frame(maxWidth: .infinity)
-                        .fixedSize(horizontal: true, vertical: true)
                 }
             }
-            .frame(maxWidth: .infinity)
+            .frame(width: 300)
 
             TimeZoneAddView()
                 .frame(width: 300)

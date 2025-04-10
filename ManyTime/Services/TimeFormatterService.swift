@@ -73,7 +73,6 @@ class TimeFormatterService {
             showSeconds ? .medium : .short
         }
 
-        // Clear existing formatters to force recreation
         formatters.removeAll()
     }
 }

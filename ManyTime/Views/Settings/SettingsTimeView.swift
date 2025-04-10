@@ -20,11 +20,6 @@ struct SettingsTimeView: View {
             timeZone: timeZone.timeZoneObject,
             date: Date(),
         )
-        .padding(8)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(Color.gray.opacity(0.25), lineWidth: 2)
-        )
         .overlay(alignment: .topTrailing) {
             if showDelete {
                 Button(action: {

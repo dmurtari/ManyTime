@@ -25,17 +25,45 @@ struct TimeView: View {
         return formattedOffset
     }
 
+    var readableDate: String {
+        let relevantDate = Calendar.current.startOfDay(for: timeManager.displayDate)
+        return relevantDate.formatted(
+            Date.FormatStyle()
+                .weekday(.abbreviated)
+                .month()
+                .day()
+        )
+    }
+
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack {
-                Text(TimeFormatterService.shared.appTimeFormat(
-                    from: timeManager.displayDate,
-                    timeZone: timeZone
-                ))
-                .font(.title).monospacedDigit()
+        HStack {
+            VStack(alignment: .leading) {
+                Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " "))")
+                    .font(.system(size: 20))
+                    .fontWeight(.semibold)
+
+                Text("\(offset)")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.secondary)
             }
 
-            Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " ")) \(offset)")
+            Spacer()
+
+            VStack(alignment: .trailing) {
+                HStack {
+                    Text(TimeFormatterService.shared.appTimeFormat(
+                        from: timeManager.displayDate,
+                        timeZone: timeZone
+                    ))
+                    .font(.system(size: 20))
+                    .fontWeight(.semibold)
+                    .monospacedDigit()
+                }
+
+                Text("\(readableDate)")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }
@@ -47,10 +75,5 @@ struct TimeView: View {
 
 #Preview("Los Angeles") {
     TimeView(timeZone: TimeZone(identifier: "America/Los_Angeles")!, date: Date())        
-        .environment(TimeManager())
-}
-
-#Preview("Japan") {
-    TimeView(timeZone: TimeZone(identifier: "Asia/Tokyo")!, date: Date())
         .environment(TimeManager())
 }
