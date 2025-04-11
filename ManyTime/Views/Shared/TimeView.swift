@@ -11,11 +11,11 @@ struct TimeView: View {
     @EnvironmentObject private var timeManager: TimeManager
     @State private var isHovering = false
 
-    var timeZone: TimeZone
+    var timeZone: TimeZoneItem
     var date: Date
 
     var offset: String {
-        let offsetInHours = timeZone.secondsFromGMT() / 3600
+        let offsetInHours = timeZone.timeZoneObject.secondsFromGMT() / 3600
         let formattedOffset = if offsetInHours > 0 {
             "GMT+\(offsetInHours)"
         } else {
@@ -38,9 +38,9 @@ struct TimeView: View {
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text("\(timeZone.identifier.replacingOccurrences(of: "_", with: " "))")
+                Text("\(timeZone.displayName)")
                     .font(.system(size: 20))
-                    .fontWeight(.semibold)
+                    .fontWeight(.bold)
 
                 Text("\(offset)")
                     .font(.system(size: 14))
@@ -53,7 +53,7 @@ struct TimeView: View {
                 HStack {
                     Text(TimeFormatterService.shared.appTimeFormat(
                         from: timeManager.displayDate,
-                        timeZone: timeZone
+                        timeZone: timeZone.timeZoneObject
                     ))
                     .font(.system(size: 20))
                     .fontWeight(.semibold)
@@ -69,11 +69,17 @@ struct TimeView: View {
 }
 
 #Preview("Local") {
-    TimeView(timeZone: TimeZone.current, date: Date())
+    TimeView(timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"), date: Date())
         .environment(TimeManager())
 }
 
 #Preview("Los Angeles") {
-    TimeView(timeZone: TimeZone(identifier: "America/Los_Angeles")!, date: Date())        
+    TimeView(
+        timeZone: TimeZoneItem(
+            timeZone: TimeZone(identifier: "America/Los_Angeles")!,
+            displayName: nil
+        ),
+        date: Date()
+    )
         .environment(TimeManager())
 }

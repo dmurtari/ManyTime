@@ -17,7 +17,7 @@ struct SettingsTimeView: View {
 
     var body: some View {
         TimeView(
-            timeZone: timeZone.timeZoneObject,
+            timeZone: timeZone,
             date: Date(),
         )
         .overlay(alignment: .topTrailing) {
