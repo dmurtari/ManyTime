@@ -16,6 +16,7 @@ struct TimeZoneItem: Identifiable, Codable, Equatable {
         self.id = UUID()
         self.timeZone = timeZone.identifier
         self.displayName = displayName ?? timeZone.identifier
+            .replacingOccurrences(of: "_", with: " ")
     }
 
     // Added for testing purposes
