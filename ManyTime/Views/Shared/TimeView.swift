@@ -26,12 +26,15 @@ struct TimeView: View {
     }
 
     var readableDate: String {
-        let relevantDate = Calendar.current.startOfDay(for: timeManager.displayDate)
-        return relevantDate.formatted(
-            Date.FormatStyle()
-                .weekday(.abbreviated)
-                .month()
-                .day()
+        var format = Date.FormatStyle()
+            .weekday(.abbreviated)
+            .month()
+            .day()
+
+        format.timeZone = timeZone.timeZoneObject
+
+        return timeManager.displayDate.formatted(
+            format
         )
     }
 

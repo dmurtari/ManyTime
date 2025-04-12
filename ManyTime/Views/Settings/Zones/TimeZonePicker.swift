@@ -14,11 +14,7 @@ struct TimeZonePicker: View {
         Picker("Time Zone", selection: $selectedTimeZone) {
             ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) { identifier in
                 Text(formatTimeZone(identifier))
-                    .tag(
-                        TimeZone(
-                            identifier: identifier
-                        )
-                    )
+                    .tag(TimeZone(identifier: identifier) ?? TimeZone.current)
             }
         }
         .pickerStyle(.menu)

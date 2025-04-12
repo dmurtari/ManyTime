@@ -23,7 +23,6 @@ struct TimeZoneAddView: View {
     }
 
     private func save() {
-        print("Adding time zone '\(timeZone.identifier) with name '\(timeZone.description)'")
         timeZoneManager.addTimeZone(timeZone, displayName: timeZone.description)
     }
 }
