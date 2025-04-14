@@ -12,10 +12,13 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            SettingsTimeView(timeZone: TimeZoneItem(
-                timeZone: TimeZone.current,
-                displayName: TimeZone.current.description
-            ))
+            TimeView(
+                timeZone: TimeZoneItem(
+                    timeZone: TimeZone.current,
+                    displayName: TimeZone.current.description
+                ),
+                date: Date()
+            )
             .frame(width: 250)
 
             Form {
