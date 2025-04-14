@@ -31,23 +31,19 @@ struct TimeZoneItem: Identifiable, Codable, Equatable {
     }
 }
 
-// Protocol for UserDefaults-like storage
 protocol UserDefaultsProtocol {
     func data(forKey: String) -> Data?
     func set(_ value: Any?, forKey: String)
 }
 
-// Extension to make UserDefaults conform to our protocol
 extension UserDefaults: UserDefaultsProtocol {}
 
-// Protocol for TimeZone-related operations
 protocol TimeZoneProviding {
     var knownTimeZoneIdentifiers: [String] { get }
     func timeZone(identifier: String) -> TimeZone?
     var current: TimeZone { get }
 }
 
-// Default implementation using system TimeZone
 class SystemTimeZoneProvider: TimeZoneProviding {
     var knownTimeZoneIdentifiers: [String] {
         TimeZone.knownTimeZoneIdentifiers
@@ -102,11 +98,13 @@ class TimeZoneManager: ObservableObject, Observable {
         return saveTimeZones()
     }
 
+    @discardableResult
     func removeTimeZoneAt(at offsets: IndexSet) -> Bool {
         savedTimeZones.remove(atOffsets: offsets)
         return saveTimeZones()
     }
 
+    @discardableResult
     func removeTimeZone(id: UUID) -> Bool {
         guard let index = savedTimeZones.firstIndex(where: { $0.id == id }) else {
             return false
@@ -116,6 +114,7 @@ class TimeZoneManager: ObservableObject, Observable {
         return saveTimeZones()
     }
 
+    @discardableResult
     func moveTimeZone(from source: IndexSet, to destination: Int) -> Bool {
         savedTimeZones.move(fromOffsets: source, toOffset: destination)
         return saveTimeZones()

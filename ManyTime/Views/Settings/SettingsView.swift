@@ -57,3 +57,9 @@ struct SettingsView: View {
         selectedTab == 0 ? generalHeight : zonesHeight
     }
 }
+
+#Preview {
+    SettingsView()
+        .environment(TimeZoneManager())
+        .environment(TimeManager())
+}

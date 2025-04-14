@@ -9,7 +9,6 @@ import SwiftUI
 
 struct TimeView: View {
     @EnvironmentObject private var timeManager: TimeManager
-    @State private var isHovering = false
 
     var timeZone: TimeZoneItem
     var date: Date
