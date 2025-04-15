@@ -8,28 +8,24 @@
 import SwiftUI
 
 struct ZonesSettingsView: View {
-    @EnvironmentObject private var timeZoneManager: TimeZoneManager
-    @State private var timeZones: [TimeZoneItem] = []
+    @EnvironmentObject var timeZoneManager: TimeZoneManager
 
     var body: some View {
         VStack(spacing: 16) {
             VStack(spacing: 16) {
-                TimeZoneListView(timeZones: $timeZones)
+                TimeZoneListView()
             }
             .frame(width: 300)
 
             TimeZoneAddView()
                 .frame(width: 300)
         }
-        .onAppear() {
-            timeZones = timeZoneManager.savedTimeZones
-        }
     }
 }
 
 #Preview {
     ZonesSettingsView()
-        .environment(TimeZoneManager())
+        .environmentObject(TimeZoneManager())
         .environment(TimeManager())
 }
 

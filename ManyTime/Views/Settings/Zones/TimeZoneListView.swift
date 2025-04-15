@@ -10,16 +10,15 @@ import SwiftUI
 struct TimeZoneListView: View {
     @EnvironmentObject var timeZoneManager: TimeZoneManager
 
-    @Binding var timeZones: [TimeZoneItem]
-
     var body: some View {
-        List{
-            ForEach(timeZones) { timeZone in
+        List {
+            ForEach(timeZoneManager.savedTimeZones) { timeZone in
                 TimeView(timeZone: timeZone, date: Date())
             }
             .onMove(perform: onMove)
             .onDelete(perform: onDelete)
         }
+        .frame(height: 200)
     }
 
     private func onDelete(_ offsets: IndexSet) {
@@ -32,8 +31,7 @@ struct TimeZoneListView: View {
 }
 
 #Preview {
-    TimeZoneListView(timeZones: .constant([
-        TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
-    ]))
+    TimeZoneListView()
+        .environmentObject(TimeZoneManager())
         .environment(TimeManager())
 }

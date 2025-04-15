@@ -9,15 +9,15 @@ struct TimeZoneApp: App {
         MenuBarExtra {
             TimeZoneMenu()
                 .environment(timeManager)
-                .environment(timeZoneManager)
+                .environmentObject(timeZoneManager)
         } label: {
             MenuBarView()
                 .environment(timeManager)
-                .environment(timeZoneManager)
+                .environmentObject(timeZoneManager)
         }
         .menuBarExtraStyle(.window)
         .environment(timeManager)
-        .environment(timeZoneManager)
+        .environmentObject(timeZoneManager)
 
         Settings {
             SettingsView()
@@ -25,6 +25,6 @@ struct TimeZoneApp: App {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .environment(timeManager)
-        .environment(timeZoneManager)
+        .environmentObject(timeZoneManager)
     }
 }
