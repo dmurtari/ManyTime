@@ -60,6 +60,7 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
+        .frame(minWidth: 350, minHeight: 300)
         .environment(TimeZoneManager())
         .environment(TimeManager())
 }
