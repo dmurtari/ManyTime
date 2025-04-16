@@ -9,9 +9,14 @@ import SwiftUI
 
 struct TimeView: View {
     @EnvironmentObject private var timeManager: TimeManager
+    @EnvironmentObject private var timeZoneManager: TimeZoneManager
+
+    @State private var isEditingDisplayName: Bool = false
+    @State private var editableDisplayName: String = ""
 
     var timeZone: TimeZoneItem
     var date: Date
+    var editable: Bool = false
 
     var offset: String {
         let offsetInHours = timeZone.timeZoneObject.secondsFromGMT() / 3600
@@ -37,12 +42,37 @@ struct TimeView: View {
         )
     }
 
+    var displayName: String {
+        return timeZone.displayName ?? timeZone
+            .timeZoneObject
+            .identifier
+            .replacingOccurrences(of: "_", with: " ")
+    }
+
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text("\(timeZone.displayName)")
-                    .font(.system(size: 20))
-                    .fontWeight(.bold)
+
+                if (!isEditingDisplayName) {
+                    Text("\(displayName)")
+                        .font(.system(size: 20))
+                        .fontWeight(.bold)
+                        .onTapGesture {
+                            handleDisplayNameSelect()
+                        }
+                } else {
+                    TextField("Display Name", text: $editableDisplayName)
+                        .textFieldStyle(.plain)
+                        .font(.system(size: 20))
+                        .fontWeight(.bold)
+                        .onKeyPress(keys: [.return]) { _ in
+                            handleDisplayNameSave()
+                        }
+                        .onKeyPress(keys: [.escape]) { _ in
+                            handleDisplayNameBlur()
+                        }
+                }
+
 
                 Text("\(offset)")
                     .font(.system(size: 14))
@@ -68,11 +98,40 @@ struct TimeView: View {
             }
         }
     }
+
+    func handleDisplayNameSelect() -> Void {
+        if (editable) {
+            isEditingDisplayName = true
+            editableDisplayName = displayName
+        }
+    }
+
+    func handleDisplayNameSave() -> KeyPress.Result {
+        Task {
+            timeZoneManager.updateDisplayName(
+                for: timeZone.id,
+                newName: editableDisplayName
+            )
+            isEditingDisplayName = false
+            editableDisplayName = ""
+        }
+        return .handled
+    }
+
+    func handleDisplayNameBlur() -> KeyPress.Result {
+        isEditingDisplayName = false
+        return .handled
+    }
 }
 
 #Preview("Local") {
-    TimeView(timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"), date: Date())
+    TimeView(
+        timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
+        date: Date(),
+        editable: true
+    )
         .environment(TimeManager())
+        .environmentObject(TimeZoneManager())
 }
 
 #Preview("Los Angeles") {
@@ -84,4 +143,6 @@ struct TimeView: View {
         date: Date()
     )
         .environment(TimeManager())
+        .environmentObject(TimeZoneManager())
+
 }

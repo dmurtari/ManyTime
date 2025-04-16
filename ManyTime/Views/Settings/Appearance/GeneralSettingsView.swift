@@ -21,10 +21,14 @@ struct GeneralSettingsView: View {
             )
             .frame(width: 250)
 
+            Divider()
+
             Form {
                 Toggle("Use 24-Hour Time", isOn: $preferences.use24Hour)
                 Toggle("Show Seconds", isOn: $preferences.showSeconds)
             }
+            .padding(12)
+            .roundedBorder(shadowRadius: 2)
         }
     }
 }

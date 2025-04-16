@@ -10,13 +10,12 @@ import SwiftUI
 struct TimeZoneItem: Identifiable, Codable, Equatable {
     let id: UUID
     let timeZone: String
-    var displayName: String
+    var displayName: String?
 
     init(timeZone: TimeZone, displayName: String?) {
         self.id = UUID()
         self.timeZone = timeZone.identifier
-        self.displayName = displayName ?? timeZone.identifier
-            .replacingOccurrences(of: "_", with: " ")
+        self.displayName = displayName
     }
 
     // Added for testing purposes
@@ -90,12 +89,18 @@ class TimeZoneManager: ObservableObject, Observable {
         return saveTimeZones()
     }
 
-    func updateDisplayName(for id: UUID, newName: String) -> Bool {
+    @discardableResult
+    func updateDisplayName(for id: UUID, newName: String?) -> Bool {
         guard let index = savedTimeZones.firstIndex(where: { $0.id == id }) else {
             return false
         }
 
-        savedTimeZones[index].displayName = newName
+        if (newName != nil) {
+            savedTimeZones[index].displayName = newName
+        } else {
+            savedTimeZones[index].displayName = nil
+        }
+
         return saveTimeZones()
     }
 
@@ -119,6 +124,11 @@ class TimeZoneManager: ObservableObject, Observable {
     func moveTimeZone(from source: IndexSet, to destination: Int) -> Bool {
         savedTimeZones.move(fromOffsets: source, toOffset: destination)
         return saveTimeZones()
+    }
+
+    @discardableResult
+    func resetTimeZone(_ timeZoneItem: TimeZoneItem) -> Bool {
+        return updateDisplayName(for: timeZoneItem.id, newName: nil)
     }
 
     @discardableResult
