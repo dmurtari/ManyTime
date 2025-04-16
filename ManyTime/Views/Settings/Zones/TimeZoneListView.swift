@@ -13,20 +13,39 @@ struct TimeZoneListView: View {
     var body: some View {
         List {
             ForEach(timeZoneManager.savedTimeZones) { timeZone in
-                TimeView(timeZone: timeZone, date: Date())
+                TimeView(
+                    timeZone: timeZone,
+                    date: Date(),
+                    editable: true
+                )
+                .swipeActions(edge: .trailing) {
+                    Button(role: .destructive) {
+                        onDelete(timeZone)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
+                    Button {
+                        onReset(timeZone)
+                    } label: {
+                        Label("Reset", systemImage: "arrow.clockwise")
+                    }
+                }
             }
             .onMove(perform: onMove)
-            .onDelete(perform: onDelete)
         }
         .frame(height: 200)
     }
 
-    private func onDelete(_ offsets: IndexSet) {
-        timeZoneManager.removeTimeZoneAt(at: offsets)
+    private func onDelete(_ timeZoneItem: TimeZoneItem) {
+        timeZoneManager.removeTimeZone(id: timeZoneItem.id)
     }
 
     private func onMove(_ indices: IndexSet, to destination: Int) {
         timeZoneManager.moveTimeZone(from: indices, to: destination)
+    }
+
+    private func onReset(_ timeZoneItem: TimeZoneItem) {
+        timeZoneManager.resetTimeZone(timeZoneItem)
     }
 }
 
