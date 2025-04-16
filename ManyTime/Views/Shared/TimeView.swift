@@ -43,7 +43,11 @@ struct TimeView: View {
     }
 
     var displayName: String {
-        return timeZone.displayName ?? timeZone
+        return timeZone.displayName ?? readableTimeZone
+    }
+
+    var readableTimeZone: String {
+        return timeZone
             .timeZoneObject
             .identifier
             .replacingOccurrences(of: "_", with: " ")
@@ -73,10 +77,15 @@ struct TimeView: View {
                         }
                 }
 
-
-                Text("\(offset)")
-                    .font(.system(size: 14))
-                    .foregroundStyle(.secondary)
+                if (timeZone.displayName != nil) {
+                    Text("\(offset) (\(readableTimeZone))")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("\(offset)")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Spacer()
