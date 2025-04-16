@@ -11,19 +11,34 @@ struct TimeZoneAddView: View {
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
     @State private var timeZone: TimeZone = .current
+    @State private var displayName: String = ""
 
     var body: some View {
-        HStack {
+        Form {
             TimeZonePicker(selectedTimeZone: $timeZone)
 
-            Button("Add") {
-                save()
+            TextField("Display Name", text: $displayName)
+
+            HStack {
+                Spacer()
+
+                Button("Add") {
+                    save()
+                }
             }
         }
     }
 
     private func save() {
-        timeZoneManager.addTimeZone(timeZone, displayName: timeZone.description)
+        let targetDisplayName = displayName.isEmpty ? timeZone.description : displayName
+
+        timeZoneManager.addTimeZone(
+            timeZone,
+            displayName: targetDisplayName
+        )
+
+        displayName = ""
+        timeZone = .current
     }
 }
 

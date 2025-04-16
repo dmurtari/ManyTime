@@ -12,19 +12,24 @@ struct ZonesSettingsView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            VStack(spacing: 16) {
+            Group {
                 TimeZoneListView()
+
             }
             .frame(width: 300)
+            .roundedBorder(shadowRadius: 2)
 
             TimeZoneAddView()
+                .padding(12)
                 .frame(width: 300)
+                .roundedBorder(shadowRadius: 2)
         }
     }
 }
 
 #Preview {
     ZonesSettingsView()
+        .frame(width: 350, height: 400)
         .environmentObject(TimeZoneManager())
         .environment(TimeManager())
 }
