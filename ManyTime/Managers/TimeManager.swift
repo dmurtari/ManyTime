@@ -34,6 +34,10 @@ class TimeManager: ObservableObject, Observable {
         setupTimer()
     }
 
+    deinit {
+        timer?.invalidate()
+    }
+
     private func setupTimer() {
         timer?.invalidate()
 
@@ -62,9 +66,5 @@ class TimeManager: ObservableObject, Observable {
     func switchToCurrent() {
         timeMode = .current
         setupTimer()
-    }
-
-    deinit {
-        timer?.invalidate()
     }
 }

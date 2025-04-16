@@ -83,6 +83,7 @@ class TimeZoneManager: ObservableObject, Observable {
         timeZoneProvider.timeZone(identifier: identifier)
     }
 
+    @discardableResult
     func addTimeZone(_ timeZone: TimeZone, displayName: String?) -> Bool {
         let newItem = TimeZoneItem(timeZone: timeZone, displayName: displayName)
         savedTimeZones.append(newItem)
