@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AppKit
 
 struct RoundedBorderContainerModifier: ViewModifier {
     var cornerRadius: CGFloat = 15
@@ -14,17 +15,26 @@ struct RoundedBorderContainerModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .background(Color.init(NSColor.controlBackgroundColor))
+            .clipShape(
+                RoundedRectangle(
+                    cornerRadius: cornerRadius,
+                    style: .continuous
+                )
+            )
             .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(Color.secondary.opacity(0.3), lineWidth: lineWidth)
+                RoundedRectangle(
+                    cornerRadius: cornerRadius
+                )
+                .stroke(
+                    Color.secondary.opacity(0.3),
+                    lineWidth: lineWidth
+                )
             )
             .shadow(radius: shadowRadius)
     }
 }
 
-// Extension to make it easier to use
 extension View {
     func roundedBorder(
         cornerRadius: CGFloat = 15,
