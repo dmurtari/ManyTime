@@ -13,6 +13,7 @@ struct TimeView: View {
 
     @State private var isEditingDisplayName: Bool = false
     @State private var editableDisplayName: String = ""
+    @FocusState private var isDisplayNameFocused: Bool
 
     var timeZone: TimeZoneItem
     var date: Date
@@ -60,6 +61,7 @@ struct TimeView: View {
                 if (!isEditingDisplayName) {
                     Text("\(displayName)")
                         .font(.system(size: 20))
+                        .frame(height: 20)
                         .fontWeight(.bold)
                         .onTapGesture {
                             handleDisplayNameSelect()
@@ -67,14 +69,14 @@ struct TimeView: View {
                 } else {
                     TextField("Display Name", text: $editableDisplayName)
                         .textFieldStyle(.plain)
+                        .focused($isDisplayNameFocused)
                         .font(.system(size: 20))
+                        .frame(height: 20)
                         .fontWeight(.bold)
                         .onKeyPress(keys: [.return]) { _ in
                             handleDisplayNameSave()
                         }
-                        .onKeyPress(keys: [.escape]) { _ in
-                            handleDisplayNameBlur()
-                        }
+                        .onExitCommand(perform: handleDisplayNameBlur)
                 }
 
                 if (timeZone.displayName != nil) {
@@ -111,6 +113,7 @@ struct TimeView: View {
     func handleDisplayNameSelect() -> Void {
         if (editable) {
             isEditingDisplayName = true
+            isDisplayNameFocused = true
             editableDisplayName = displayName
         }
     }
@@ -127,9 +130,9 @@ struct TimeView: View {
         return .handled
     }
 
-    func handleDisplayNameBlur() -> KeyPress.Result {
+    func handleDisplayNameBlur() -> Void {
         isEditingDisplayName = false
-        return .handled
+        isDisplayNameFocused = false
     }
 }
 

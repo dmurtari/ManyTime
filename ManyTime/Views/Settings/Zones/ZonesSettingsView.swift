@@ -16,12 +16,10 @@ struct ZonesSettingsView: View {
                 TimeZoneListView()
 
             }
-            .frame(width: 300)
             .roundedBorder(shadowRadius: 2)
 
             TimeZoneAddView()
                 .padding(12)
-                .frame(width: 300)
                 .roundedBorder(shadowRadius: 2)
         }
     }
