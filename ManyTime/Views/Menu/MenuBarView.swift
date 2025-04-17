@@ -13,11 +13,7 @@ struct MenuBarView: View {
 
     var body: some View {
         if let primaryZone = timeZoneManager.savedTimeZones.first {
-            Text(TimeFormatterService.shared.appTimeFormat(
-                from: timeManager.displayDate,
-                timeZone: primaryZone.timeZoneObject
-            ))
-              .monospacedDigit()
+            MenuBarTimeView(timeZoneItem: primaryZone)
         } else {
             Image(systemName: "clock")
         }

@@ -43,10 +43,6 @@ struct TimeView: View {
         )
     }
 
-    var displayName: String {
-        return timeZone.displayName ?? readableTimeZone
-    }
-
     var readableTimeZone: String {
         return timeZone
             .timeZoneObject
@@ -59,7 +55,7 @@ struct TimeView: View {
             VStack(alignment: .leading) {
 
                 if (!isEditingDisplayName) {
-                    Text("\(displayName)")
+                    Text("\(timeZone.normalizedDisplayName)")
                         .font(.system(size: 20))
                         .frame(height: 20)
                         .fontWeight(.bold)
@@ -114,7 +110,7 @@ struct TimeView: View {
         if (editable) {
             isEditingDisplayName = true
             isDisplayNameFocused = true
-            editableDisplayName = displayName
+            editableDisplayName = timeZone.normalizedDisplayName
         }
     }
 
