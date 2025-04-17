@@ -28,6 +28,12 @@ struct TimeZoneItem: Identifiable, Codable, Equatable {
     var timeZoneObject: TimeZone {
         TimeZone(identifier: timeZone) ?? TimeZone.current
     }
+
+    var normalizedDisplayName: String {
+        displayName ?? timeZoneObject
+            .identifier
+            .replacingOccurrences(of: "_", with: " ")
+    }
 }
 
 protocol UserDefaultsProtocol {

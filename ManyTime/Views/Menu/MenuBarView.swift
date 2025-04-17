@@ -6,26 +6,39 @@
 //
 
 import SwiftUI
+import Combine
 
 struct MenuBarView: View {
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
     @EnvironmentObject private var timeManager: TimeManager
 
-    var body: some View {
+    var sizePassthrough: PassthroughSubject<CGSize, Never>
+
+    @ViewBuilder
+    var mainContent: some View {
         if let primaryZone = timeZoneManager.savedTimeZones.first {
-            Text(TimeFormatterService.shared.appTimeFormat(
-                from: timeManager.displayDate,
-                timeZone: primaryZone.timeZoneObject
-            ))
-              .monospacedDigit()
+            MenuBarTimeView(timeZoneItem: primaryZone)
         } else {
             Image(systemName: "clock")
         }
     }
+
+    var body: some View {
+        mainContent
+            .overlay(
+                GeometryReader { geometryProxy in
+                    Color.clear
+                        .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
+                }
+            )
+            .onPreferenceChange(SizePreferenceKey.self, perform: { size in
+                sizePassthrough.send(size)
+            })
+    }
 }
 
 #Preview {
-    MenuBarView()
+    MenuBarView(sizePassthrough: PassthroughSubject<CGSize, Never>())
         .environmentObject(TimeManager())
         .environmentObject(TimeZoneManager())
         .frame(width: 250, height: 50)

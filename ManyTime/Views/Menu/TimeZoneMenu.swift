@@ -26,23 +26,6 @@ struct TimeZoneMenu: View {
                 }
                 .padding()
             }
-
-            Divider()
-
-            HStack {
-                SettingsLink {
-                    Image(systemName: "gear")
-                }
-                .keyboardShortcut(",", modifiers: .command)
-
-                Spacer()
-
-                Button("Quit") {
-                    NSApplication.shared.terminate(nil)
-                }
-            }
-            .padding([.all], 7)
-            .keyboardShortcut("q", modifiers: .command)
         }
     }
 }
