@@ -28,7 +28,13 @@ struct MenuBarView: View {
             .overlay(
                 GeometryReader { geometryProxy in
                     Color.clear
-                        .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
+                        .preference(
+                            key: SizePreferenceKey.self,
+                            value: CGSize(
+                                width: geometryProxy.size.width + 10, // + 10 for some extra padding
+                                height: geometryProxy.size.height
+                            )
+                        )
                 }
             )
             .onPreferenceChange(SizePreferenceKey.self, perform: { size in
