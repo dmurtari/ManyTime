@@ -40,16 +40,11 @@ class TimeManager: ObservableObject, Observable {
 
     private func setupTimer() {
         timer?.invalidate()
-
-        // Only run timer if we're in current time mode
-        if case .current = timeMode {
-            timer = Timer.scheduledTimer(
-                withTimeInterval: 1.0,
-                repeats: true
-            ) { [weak self] _ in
-                self?.currentDate = Date()
-            }
-            RunLoop.current.add(timer!, forMode: .common)
+        timer = Timer.scheduledTimer(
+            withTimeInterval: 1.0,
+            repeats: true
+        ) { [weak self] _ in
+            self?.currentDate = Date()
         }
     }
 

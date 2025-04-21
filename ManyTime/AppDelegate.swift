@@ -5,6 +5,8 @@ import SwiftUI
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var popover: NSPopover!
+    private var settingsWindow: NSWindow?
+    private var menu: NSMenu?
 
     private var hostingView: NSHostingView<AnyView>?
     private var sizePassthrough = PassthroughSubject<CGSize, Never>()
@@ -12,8 +14,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var timeZoneManager = TimeZoneManager()
     private var timeManager = TimeManager()
-    private var settingsWindow: NSWindow?
-    private var menu: NSMenu?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupStatusItem()
@@ -141,7 +141,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         window.contentViewController = settingsController
         window.center()
         window.title = "Settings"
-
         window.isReleasedWhenClosed = false
         window.delegate = self
 
