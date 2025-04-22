@@ -44,9 +44,15 @@ class TimeManager: ObservableObject, Observable {
         let now = Date()
         let timeInterval = ceil(now.timeIntervalSinceReferenceDate) - now.timeIntervalSinceReferenceDate
 
-        timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
+        timer = Timer.scheduledTimer(
+            withTimeInterval: timeInterval,
+            repeats: false
+        ) { [weak self] _ in
             self?.currentDate = Date()
-            self?.timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.timer = Timer.scheduledTimer(
+                withTimeInterval: 1.0,
+                repeats: true
+            ) { [weak self] _ in
                 self?.currentDate = Date()
             }
             self?.timer?.tolerance = 0.1
