@@ -93,11 +93,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if event.type == .rightMouseUp {
             statusItem.menu = menu
             statusItem.button?.performClick(nil)
-            statusItem.menu?.popUp(
-                positioning: nil,
-                at: NSPoint(x: 0, y: 0),
-                in: sender
-            )
             statusItem.menu = nil
         } else if event.type == .leftMouseUp {
             togglePopover()
