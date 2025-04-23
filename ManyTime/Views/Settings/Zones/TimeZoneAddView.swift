@@ -1,11 +1,5 @@
-//
-//  TimeZoneAddView.swift
-//  ManyTime
-//
-//  Created by Domenic Murtari on 2025/04/07.
-//
-
 import SwiftUI
+import MapKit
 
 struct TimeZoneAddView: View {
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
