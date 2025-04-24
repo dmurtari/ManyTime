@@ -58,9 +58,12 @@ struct LocationSearchField: NSViewRepresentable {
             resultsPublisher
                 .receive(on: RunLoop.main)
                 .sink { [weak searchField] searchResults in
-                    guard let currentEvent = NSApp.currentEvent,
-                          let searchField = searchField,
+                    guard let searchField = searchField,
                           let searchMenu = searchField.searchMenuTemplate else { return }
+
+                    if (searchField.stringValue.isEmpty) {
+                        return
+                    }
 
                     searchMenu.removeAllItems()
 
@@ -72,10 +75,10 @@ struct LocationSearchField: NSViewRepresentable {
                         )
                         searchMenu.addItem(emptyMenuItem)
                     } else {
-                        for result in searchResults {
+                        for result in searchResults[...4] {
                             let menuItem = NSMenuItem(
                                 title: result.title,
-                                action: nil,
+                                action: #selector(self.menuItemSelected(_:)),
                                 keyEquivalent: ""
                             )
 
@@ -85,17 +88,21 @@ struct LocationSearchField: NSViewRepresentable {
                         }
                     }
 
-                    print("Menu has \(searchMenu.numberOfItems) items")
-
-                    NSMenu.popUpContextMenu(
-                        searchMenu,
-                        with: currentEvent,
-                        for: searchField
+                    searchMenu.popUp(
+                        positioning: searchMenu.item(at: 0),
+                        at: NSPoint(x: 0, y: 28),
+                        in: searchField
                     )
+
+                    searchField.window?.makeFirstResponder(searchField.currentEditor())
                 }
                 .store(in: &cancellables)
         }
 
+        @objc func menuItemSelected(_ sender: NSMenuItem) {
+            guard let result = sender.representedObject as? MKLocalSearchCompletion else { return }
+            parent.viewModel.selectResult(result)
+        }
 
         func controlTextDidChange(_ notification: Notification) {
             guard let searchField = notification.object as? NSSearchField else { return }
@@ -134,6 +141,10 @@ class LocationSearchFieldViewModel: ObservableObject {
             searchResults = []
             return;
         }
+    }
+
+    func selectResult(_ result: MKLocalSearchCompletion) {
+        searchQuery = result.title
     }
 }
 
