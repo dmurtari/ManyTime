@@ -3,13 +3,16 @@ import MapKit
 
 struct TimeZoneAddView: View {
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
-
+    @ObservedObject private var locationSearchFieldViewModel = LocationSearchFieldViewModel()
     @State private var timeZone: TimeZone = .current
     @State private var displayName: String = ""
 
     var body: some View {
+        
         Form {
             TimeZonePicker(selectedTimeZone: $timeZone)
+
+            LocationSearchField(viewModel: locationSearchFieldViewModel)
 
             TextField("Display Name", text: $displayName)
 
