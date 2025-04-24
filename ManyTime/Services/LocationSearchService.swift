@@ -20,7 +20,7 @@ class LocationSearchService: NSObject, ObservableObject {
         searchCompleter.resultTypes = [.address, .pointOfInterest]
 
         $searchQuery
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [weak self] query in
                 if !query.isEmpty {
                     self?.searchCompleter.queryFragment = query
@@ -29,6 +29,12 @@ class LocationSearchService: NSObject, ObservableObject {
                 }
             }
             .store(in: &cancellables)
+    }
+
+    deinit {
+        cancellables.forEach { sub in
+            sub.cancel()
+        }
     }
 
     func getDetails(
