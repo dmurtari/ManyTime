@@ -45,6 +45,7 @@ class LocationSearchService: NSObject, ObservableObject {
         let search = MKLocalSearch(request: searchRequest)
 
         search.start { (response, error) in
+            print("Got search response: \(String(describing: response))")
             handler(response?.mapItems.first)
         }
     }

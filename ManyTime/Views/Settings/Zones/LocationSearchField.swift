@@ -77,7 +77,7 @@ struct LocationSearchField: NSViewRepresentable {
                     } else {
                         for result in searchResults[...4] {
                             let menuItem = NSMenuItem(
-                                title: result.title,
+                                title: "\(result.title) (\(result.subtitle))",
                                 action: #selector(self.menuItemSelected(_:)),
                                 keyEquivalent: ""
                             )
@@ -116,6 +116,8 @@ struct LocationSearchField: NSViewRepresentable {
 class LocationSearchFieldViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var searchResults: [MKLocalSearchCompletion] = []
+    @Published var selectedResult: TimeZoneItem?
+    @Published var isSearching: Bool = false
 
     private var locationSearchService: LocationSearchService!
     private var cancellables: Set<AnyCancellable> = []
@@ -143,8 +145,20 @@ class LocationSearchFieldViewModel: ObservableObject {
         }
     }
 
-    func selectResult(_ result: MKLocalSearchCompletion) {
-        searchQuery = result.title
+    func selectResult(_ result: MKLocalSearchCompletion) -> Void {
+        isSearching = true
+        
+        locationSearchService.getDetails(for: result) { [weak self] item in
+            self?.isSearching = false
+            guard let timeZone = item?.timeZone else { return }
+
+            print("Setting selected result: \(String(describing: item))")
+            self?.searchQuery = result.title
+            self!.selectedResult = TimeZoneItem(
+                timeZone: timeZone,
+                displayName: result.title
+            )
+        }
     }
 }
 
