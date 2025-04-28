@@ -8,16 +8,27 @@
 import SwiftUI
 
 struct TimeZonePicker: View {
-    @Binding var selectedTimeZone: TimeZone
+    @Binding var selectedTimeZone: String
 
     var body: some View {
         Picker("Time Zone", selection: $selectedTimeZone) {
-            ForEach(TimeZone.knownTimeZoneIdentifiers, id: \.self) { identifier in
+            Text("Select...").tag("")
+                .foregroundStyle(.gray)
+
+            Divider()
+
+            ForEach(timeZoneIdentifiers, id: \.self) { identifier in
                 Text(formatTimeZone(identifier))
-                    .tag(TimeZone(identifier: identifier) ?? TimeZone.current)
+                    .tag(
+                        identifier
+                    )
             }
         }
         .pickerStyle(.menu)
+    }
+
+    private var timeZoneIdentifiers : [String] {
+        return TimeZone.knownTimeZoneIdentifiers
     }
 
     private func formatTimeZone(_ identifier: String) -> String {
@@ -30,7 +41,6 @@ struct TimeZonePicker: View {
     }
 }
 
-#Preview("Standalone") {
-    TimeZonePicker(selectedTimeZone: .constant(TimeZone.current))
+#Preview {
+    TimeZonePicker(selectedTimeZone: .constant("Asia/Tokyo"))
 }
-

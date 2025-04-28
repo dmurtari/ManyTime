@@ -13,7 +13,9 @@ struct LocationSearchField: NSViewRepresentable {
     @ObservedObject var viewModel: LocationSearchFieldViewModel
 
     func makeNSView(context: Context) -> NSSearchField {
-        let searchField = NSSearchField(frame: .zero)
+        let searchField = NSSearchField(
+            frame: .zero,
+        )
         searchField.delegate = context.coordinator
 
         let resultsMenu = NSMenu()
