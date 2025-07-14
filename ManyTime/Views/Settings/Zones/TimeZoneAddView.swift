@@ -12,7 +12,15 @@ struct TimeZoneAddView: View {
 
     var body: some View {
         Form {
-            LocationSearchField(viewModel: locationSearchFieldViewModel)
+            ZStack {
+                Map()
+                    .mapControlVisibility(.hidden)
+
+                LocationSearchField(viewModel: locationSearchFieldViewModel)
+                    .shadow(radius: 5)
+                    .position(x: -90, y: 20)
+                    .frame(width: 200)
+            }
 
             HStack {
                 TimeZonePicker(selectedTimeZone: $timeZoneIdentifier)
