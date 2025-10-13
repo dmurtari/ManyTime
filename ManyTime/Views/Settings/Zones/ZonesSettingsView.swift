@@ -12,22 +12,32 @@ struct ZonesSettingsView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Group {
-                TimeZoneListView()
+            VStack(alignment: .leading) {
+                Text("Active Time Zones")
+                    .font(.system(size: 14, weight: .bold))
 
+                Divider()
+
+                Group {
+                    TimeZoneListView()
+                }
             }
-            .roundedBorder(shadowRadius: 2)
 
-            TimeZoneAddView()
-                .padding(12)
-                .roundedBorder(shadowRadius: 2)
+            VStack(alignment: .leading) {
+                Text("Add New")
+                    .font(.system(size: 14, weight: .bold))
+
+                Divider()
+
+                TimeZoneAddView()
+                    .padding([.vertical])
+            }
         }
     }
 }
 
 #Preview {
     ZonesSettingsView()
-        .frame(width: 350, height: 400)
         .environmentObject(TimeZoneManager())
         .environment(TimeManager())
 }
