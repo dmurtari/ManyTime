@@ -20,6 +20,9 @@ struct TimeZonesApp: App {
 
         Window("Settings", id: "settings") {
             SettingsView()
+                .frame(minWidth: 350, minHeight: 300)
+                .environmentObject(timeManager)
+                .environmentObject(timeZoneManager)
         }
         .windowStyle(.hiddenTitleBar)
         .windowResizability(.contentSize)
