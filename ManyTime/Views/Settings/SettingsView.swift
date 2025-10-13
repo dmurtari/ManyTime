@@ -8,59 +8,21 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @State private var selectedTab = 0
-    @State private var generalHeight: CGFloat = 0
-    @State private var zonesHeight: CGFloat = 0
-
     var body: some View {
-        TabView(selection: $selectedTab) {
-            GeneralSettingsView()
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear
-                            .onAppear {
-                                generalHeight = geometry.size.height
-                            }
-                            .onChange(of: geometry.size.height) { oldHeight, newHeight in
-                                generalHeight = newHeight
-                            }
-                    }
-                )
-                .tag(0)
-                .tabItem {
-                    Label("General", systemImage: "gear")
-                }
-
+        VStack {
             ZonesSettingsView()
-                .background(
-                    GeometryReader { geometry in
-                        Color.clear
-                            .onAppear {
-                                zonesHeight = geometry.size.height
-                            }
-                            .onChange(of: geometry.size.height) { oldHeight, newHeight in
-                                zonesHeight = newHeight
-                            }
-                    }
-                )
-                .tag(1)
-                .tabItem {
-                    Label("Time Zones", systemImage: "clock")
-                }
+                .frame(width: 275)
+            GeneralSettingsView()
+                .frame(width: 275)
         }
-        .scenePadding()
-        .frame(minWidth: 350, idealHeight: currentHeight + 40)
+        .frame(width: 300)
+        .aspectRatio(1, contentMode: .fit)
         .fixedSize(horizontal: false, vertical: true)
-    }
-
-    var currentHeight: CGFloat {
-        selectedTab == 0 ? generalHeight : zonesHeight
     }
 }
 
 #Preview {
     SettingsView()
-        .frame(minWidth: 350, minHeight: 300)
         .environment(TimeZoneManager())
         .environment(TimeManager())
 }

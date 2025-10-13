@@ -12,23 +12,17 @@ struct GeneralSettingsView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            TimeView(
-                timeZone: TimeZoneItem(
-                    timeZone: TimeZone.current,
-                    displayName: TimeZone.current.description
-                ),
-                date: Date()
-            )
-            .frame(width: 250)
+            VStack(alignment: .leading) {
+                Text("Format")
+                    .font(.system(size: 14, weight: .bold))
+                Divider()
 
-            Divider()
-
-            Form {
-                Toggle("Use 24-Hour Time", isOn: $preferences.use24Hour)
-                Toggle("Show Seconds", isOn: $preferences.showSeconds)
+                Form {
+                    Toggle("Use 24-Hour Time", isOn: $preferences.use24Hour)
+                    Toggle("Show Seconds", isOn: $preferences.showSeconds)
+                }
+                .padding( [.vertical], 12)
             }
-            .padding(12)
-            .roundedBorder(shadowRadius: 2)
         }
     }
 }

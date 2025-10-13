@@ -57,8 +57,7 @@ struct TimeView: View {
                 if (!isEditingDisplayName) {
                     Text("\(timeZone.normalizedDisplayName)")
                         .font(.system(size: 20))
-                        .frame(height: 20)
-                        .fontWeight(.bold)
+                        .fontWeight(.semibold)
                         .onTapGesture {
                             handleDisplayNameSelect()
                         }
@@ -68,7 +67,6 @@ struct TimeView: View {
                         .focused($isDisplayNameFocused)
                         .font(.system(size: 20))
                         .frame(height: 20)
-                        .fontWeight(.bold)
                         .onKeyPress(keys: [.return]) { _ in
                             handleDisplayNameSave()
                         }

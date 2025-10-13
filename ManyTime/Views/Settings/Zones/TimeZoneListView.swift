@@ -33,7 +33,9 @@ struct TimeZoneListView: View {
             }
             .onMove(perform: onMove)
         }
-        .frame(height: 200)
+        .padding(EdgeInsets(top: -10, leading: -16, bottom: -10, trailing: -16))
+        .clipShape(Rectangle())
+        .frame(height: CGFloat(timeZoneManager.savedTimeZones.count * 50))
     }
 
     private func onDelete(_ timeZoneItem: TimeZoneItem) {
