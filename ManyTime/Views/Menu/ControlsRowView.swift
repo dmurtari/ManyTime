@@ -12,7 +12,6 @@ struct ControlsRowView: View {
 
     var body: some View {
         HStack(alignment: .center) {
-
             Spacer()
 
             Button(
@@ -29,7 +28,7 @@ struct ControlsRowView: View {
                 NSApp.activate(ignoringOtherApps: true)
                 openWindow(id: "settings")
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.glass)
         }
     }
 }
