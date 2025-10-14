@@ -12,7 +12,15 @@ struct ControlsRowView: View {
 
     var body: some View {
         HStack(alignment: .center) {
+
             Spacer()
+
+            Button(
+                "Quit",
+            ) {
+                NSApp.terminate(nil)
+            }
+            .buttonStyle(.accessoryBar)
 
             Button(
                 "Preferences",
