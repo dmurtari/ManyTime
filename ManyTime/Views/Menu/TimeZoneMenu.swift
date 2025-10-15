@@ -28,7 +28,8 @@ struct TimeZoneMenu: View {
             }
 
             ControlsRowView()
-                .padding([.horizontal, .bottom])
+                .padding([.bottom], 8)
+                .padding([.horizontal])
         }
     }
 }
