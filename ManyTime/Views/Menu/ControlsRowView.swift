@@ -14,21 +14,26 @@ struct ControlsRowView: View {
         HStack(alignment: .center) {
             Spacer()
 
-            Button(
-                "Quit",
-            ) {
-                NSApp.terminate(nil)
-            }
-            .buttonStyle(.accessoryBar)
+            Menu {
+                Button("Preferences", systemImage: "gear.circle.fill") {
+                    NSApp.activate(ignoringOtherApps: true)
+                    openWindow(id: "settings")
+                }
+                .keyboardShortcut(",", modifiers: .command)
 
-            Button(
-                "Preferences",
-                systemImage: "gear.circle.fill"
-            ) {
-                NSApp.activate(ignoringOtherApps: true)
-                openWindow(id: "settings")
+                Divider()
+
+                Button("Quit", systemImage: "power") {
+                    NSApp.terminate(nil)
+                }
+                .keyboardShortcut("Q", modifiers: .command)
+            } label: {
+                Label("Options", systemImage: "ellipsis.circle")
+                    .labelStyle(.titleOnly)
             }
+            .menuStyle(.automatic)
             .buttonStyle(.glass)
+            .labelsHidden()
         }
     }
 }

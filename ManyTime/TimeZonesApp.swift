@@ -21,11 +21,12 @@ struct TimeZonesApp: App {
         Window("Settings", id: "settings") {
             SettingsView()
                 .frame(minWidth: 350, minHeight: 300)
+                .padding([.vertical], 12)
                 .environmentObject(timeManager)
                 .environmentObject(timeZoneManager)
         }
-        .windowStyle(.hiddenTitleBar)
-        .windowResizability(.contentSize)
+        .windowResizability(.contentMinSize)
+        .windowIdealSize(.fitToContent)
         .defaultPosition(.center)
     }
 }
