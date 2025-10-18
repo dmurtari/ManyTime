@@ -66,15 +66,28 @@ struct TimeView: View {
                         .font(.system(size: 20))
                         .fontWeight(.semibold)
                 } else {
-                    TextField("Display Name", text: $editableDisplayName)
-                        .textFieldStyle(.plain)
-                        .focused($isDisplayNameFocused)
-                        .font(.system(size: 20))
-                        .frame(height: 20)
-                        .onKeyPress(keys: [.return]) { _ in
+                    HStack {
+                        TextField("Display Name", text: $editableDisplayName)
+                            .textFieldStyle(.roundedBorder)
+                            .focused($isDisplayNameFocused)
+                            .onExitCommand(perform: handleDisplayNameBlur)
+                            .onSubmit {
+                                handleDisplayNameSave()
+                            }
+
+                        Button("Cancel", systemImage: "x.circle") {
+                            handleDisplayNameBlur()
+                        }
+                        .buttonStyle(.glass)
+                        .labelStyle(.iconOnly)
+
+                        Button("Save", systemImage: "checkmark") {
                             handleDisplayNameSave()
                         }
-                        .onExitCommand(perform: handleDisplayNameBlur)
+                        .buttonStyle(.glassProminent)
+                        .labelStyle(.iconOnly)
+
+                    }
                 }
 
                 if (timeZone.displayName != nil) {
@@ -122,7 +135,7 @@ struct TimeView: View {
         editableDisplayName = timeZone.normalizedDisplayName
     }
 
-    func handleDisplayNameSave() -> KeyPress.Result {
+    func handleDisplayNameSave() -> Void {
         Task {
             timeZoneManager.updateDisplayName(
                 for: timeZone.id,
@@ -131,7 +144,6 @@ struct TimeView: View {
             isEditing = false
             editableDisplayName = ""
         }
-        return .handled
     }
 
     func handleDisplayNameBlur() -> Void {
@@ -142,7 +154,7 @@ struct TimeView: View {
 
 #Preview("Local") {
     TimeView(
-        isEditing: .constant(false), timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
+        isEditing: .constant(true), timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
         date: Date()
     )
         .environment(TimeManager())
