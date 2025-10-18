@@ -11,21 +11,28 @@ struct TimeView: View {
     @EnvironmentObject private var timeManager: TimeManager
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
-    @State private var isEditingDisplayName: Bool = false
     @State private var editableDisplayName: String = ""
     @FocusState private var isDisplayNameFocused: Bool
+    @Binding var isEditing: Bool
 
     var timeZone: TimeZoneItem
     var date: Date
-    var editable: Bool = false
+
+    init(
+        isEditing: Binding<Bool> = .constant(false),
+        timeZone: TimeZoneItem,
+        date: Date
+    ) {
+        self._isEditing = isEditing
+        self.timeZone = timeZone
+        self.date = date
+    }
 
     var offset: String {
         let offsetInHours = timeZone.timeZoneObject.secondsFromGMT() / 3600
-        let formattedOffset = if offsetInHours > 0 {
-            "GMT+\(offsetInHours)"
-        } else {
-            "GMT-\(abs(offsetInHours))"
-        }
+        let formattedOffset = offsetInHours > 0
+            ? "GMT+\(offsetInHours)"
+            : "GMT-\(abs(offsetInHours))"
 
         return formattedOffset
     }
@@ -54,13 +61,10 @@ struct TimeView: View {
         HStack {
             VStack(alignment: .leading) {
 
-                if (!isEditingDisplayName) {
+                if (!isEditing) {
                     Text("\(timeZone.normalizedDisplayName)")
                         .font(.system(size: 20))
                         .fontWeight(.semibold)
-                        .onTapGesture {
-                            handleDisplayNameSelect()
-                        }
                 } else {
                     TextField("Display Name", text: $editableDisplayName)
                         .textFieldStyle(.plain)
@@ -102,14 +106,20 @@ struct TimeView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .onChange(of: isEditing) { _, newValue in
+            if newValue {
+                // Defer to next runloop to ensure TextField is in view hierarchy
+                DispatchQueue.main.async { isDisplayNameFocused = true }
+                editableDisplayName = timeZone.normalizedDisplayName
+            } else {
+                isDisplayNameFocused = false
+            }
+        }
     }
 
-    func handleDisplayNameSelect() -> Void {
-        if (editable) {
-            isEditingDisplayName = true
-            isDisplayNameFocused = true
-            editableDisplayName = timeZone.normalizedDisplayName
-        }
+    func handleDisplayNameEdit() -> Void {
+        isEditing = true
+        editableDisplayName = timeZone.normalizedDisplayName
     }
 
     func handleDisplayNameSave() -> KeyPress.Result {
@@ -118,23 +128,22 @@ struct TimeView: View {
                 for: timeZone.id,
                 newName: editableDisplayName
             )
-            isEditingDisplayName = false
+            isEditing = false
             editableDisplayName = ""
         }
         return .handled
     }
 
     func handleDisplayNameBlur() -> Void {
-        isEditingDisplayName = false
+        isEditing = false
         isDisplayNameFocused = false
     }
 }
 
 #Preview("Local") {
     TimeView(
-        timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
-        date: Date(),
-        editable: true
+        isEditing: .constant(false), timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
+        date: Date()
     )
         .environment(TimeManager())
         .environmentObject(TimeZoneManager())
@@ -142,7 +151,7 @@ struct TimeView: View {
 
 #Preview("Los Angeles") {
     TimeView(
-        timeZone: TimeZoneItem(
+        isEditing: .constant(false), timeZone: TimeZoneItem(
             timeZone: TimeZone(identifier: "America/Los_Angeles")!,
             displayName: nil
         ),
