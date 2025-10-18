@@ -30,7 +30,7 @@ struct ZonesSettingsView: View {
                 Divider()
 
                 TimeZoneAddView()
-                    .padding([.vertical])
+                    .padding([.vertical], 6)
             }
         }
     }
