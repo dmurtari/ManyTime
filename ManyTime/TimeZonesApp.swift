@@ -20,12 +20,10 @@ struct TimeZonesApp: App {
 
         Window("Settings", id: "settings") {
             SettingsView()
-                .frame(minWidth: 350, minHeight: 300)
-                .padding([.vertical], 12)
                 .environmentObject(timeManager)
                 .environmentObject(timeZoneManager)
         }
-        .windowResizability(.contentMinSize)
+        .windowResizability(.contentSize)
         .windowIdealSize(.fitToContent)
         .defaultPosition(.center)
     }
