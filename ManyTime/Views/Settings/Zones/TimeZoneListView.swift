@@ -9,15 +9,33 @@ import SwiftUI
 
 struct TimeZoneListView: View {
     @EnvironmentObject var timeZoneManager: TimeZoneManager
+    @State private var editingTimeZoneId: UUID?
 
     var body: some View {
         List {
             ForEach(timeZoneManager.savedTimeZones) { timeZone in
                 TimeView(
+                    isEditing: Binding(
+                        get: { editingTimeZoneId == timeZone.id },
+                        set: { isEditing in
+                            editingTimeZoneId = isEditing ? timeZone.id : nil
+                        }
+                    ),
                     timeZone: timeZone,
-                    date: Date(),
-                    editable: true
+                    date: Date()
                 )
+                .contextMenu {
+                    Button("Edit") {
+                        editingTimeZoneId = timeZone.id
+                    }
+                    Divider()
+                    Button("Reset") {
+                        onReset(timeZone)
+                    }
+                    Button("Delete", role: .destructive) {
+                        onDelete(timeZone)
+                    }
+                }
                 .swipeActions(edge: .trailing) {
                     Button(role: .destructive) {
                         onDelete(timeZone)
