@@ -31,7 +31,7 @@ struct ZonesSettingsView: View {
 
                 TimeZoneAddView()
                     .padding([.vertical], 6)
-            }
+             }
         }
     }
 }
