@@ -16,6 +16,7 @@ struct SettingsView: View {
                 .frame(width: 275)
         }
         .frame(width: 300)
+        .padding([.top], 12)
         .aspectRatio(1, contentMode: .fit)
         .fixedSize(horizontal: false, vertical: true)
     }
