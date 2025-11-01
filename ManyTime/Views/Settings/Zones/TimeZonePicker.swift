@@ -17,27 +17,18 @@ struct TimeZonePicker: View {
 
             Divider()
 
-            ForEach(timeZoneIdentifiers, id: \.self) { identifier in
-                Text(formatTimeZone(identifier))
+            ForEach(rawTimeZones, id: \.self) { identifier in
+                Text(identifier.rawFormat)
                     .tag(
-                        identifier
+                        identifier.name
                     )
             }
         }
         .pickerStyle(.menu)
     }
 
-    private var timeZoneIdentifiers : [String] {
-        return TimeZone.knownTimeZoneIdentifiers
-    }
-
-    private func formatTimeZone(_ identifier: String) -> String {
-        let name = identifier.replacingOccurrences(of: "_", with: " ")
-        if let timeZone = TimeZone(identifier: identifier) {
-            let offset = timeZone.secondsFromGMT() / 3600
-            return "\(name) (GMT\(offset >= 0 ? "+" : "")\(offset))"
-        }
-        return name
+    private var rawTimeZones: [RawTimeZone] {
+        return TimeZoneListService.shared.getTimeZones()
     }
 }
 
