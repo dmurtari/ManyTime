@@ -20,6 +20,21 @@ class TimeZoneListService {
         return self.timeZones
     }
 
+    func getCityTimeZones() -> [CityTimeZone] {
+        return self.timeZones.flatMap { tz in
+            tz.mainCities.map { city in
+                CityTimeZone(
+                    id: "\(city)|\(tz.countryCode)|\(tz.name)",
+                    city: city,
+                    countryCode: tz.countryCode,
+                    name: tz.name,
+                    rawOffsetInMinutes: tz.rawOffsetInMinutes,
+                    rawFormat: tz.rawFormat
+                )
+            }
+        }
+    }
+
     private func readTimeZones() -> [RawTimeZone] {
         guard let url = Bundle.main.url(forResource: "RawTimeZones", withExtension: "json") else {
             print("[TimeZoneListService] Could not find RawTimeZones.json in bundle.")

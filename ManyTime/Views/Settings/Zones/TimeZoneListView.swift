@@ -25,27 +25,12 @@ struct TimeZoneListView: View {
                     date: Date()
                 )
                 .contextMenu {
-                    Button("Edit") {
+                    Button("Edit Name", systemImage: "pencil") {
                         editingTimeZoneId = timeZone.id
                     }
                     Divider()
-                    Button("Reset") {
-                        onReset(timeZone)
-                    }
-                    Button("Delete", role: .destructive) {
+                    Button("Delete", systemImage: "trash", role: .destructive) {
                         onDelete(timeZone)
-                    }
-                }
-                .swipeActions(edge: .trailing) {
-                    Button(role: .destructive) {
-                        onDelete(timeZone)
-                    } label: {
-                        Label("Delete", systemImage: "trash")
-                    }
-                    Button {
-                        onReset(timeZone)
-                    } label: {
-                        Label("Reset", systemImage: "arrow.clockwise")
                     }
                 }
             }
@@ -62,10 +47,6 @@ struct TimeZoneListView: View {
 
     private func onMove(_ indices: IndexSet, to destination: Int) {
         timeZoneManager.moveTimeZone(from: indices, to: destination)
-    }
-
-    private func onReset(_ timeZoneItem: TimeZoneItem) {
-        timeZoneManager.resetTimeZone(timeZoneItem)
     }
 }
 
