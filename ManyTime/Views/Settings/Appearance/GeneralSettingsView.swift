@@ -20,8 +20,10 @@ struct GeneralSettingsView: View {
                 Form {
                     Toggle("Use 24-Hour Time", isOn: $preferences.use24Hour)
                     Toggle("Show Seconds", isOn: $preferences.showSeconds)
+                    Toggle("Show Time Bar", isOn: $preferences.showTimeBar)
                 }
-                .padding( [.vertical], 12)
+                .padding( [.top], 6)
+                .padding( [.bottom], 12)
             }
         }
     }

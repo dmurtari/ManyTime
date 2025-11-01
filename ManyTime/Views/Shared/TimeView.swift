@@ -11,6 +11,8 @@ struct TimeView: View {
     @EnvironmentObject private var timeManager: TimeManager
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
+    @StateObject private var preferences = AppPreferences.shared
+
     @State private var editableDisplayName: String = ""
     @FocusState private var isDisplayNameFocused: Bool
     @Binding var isEditing: Bool
@@ -58,65 +60,71 @@ struct TimeView: View {
     }
 
     var body: some View {
-        HStack {
-            VStack(alignment: .leading) {
+        VStack {
+            HStack {
+                VStack(alignment: .leading) {
 
-                if (!isEditing) {
-                    Text("\(timeZone.normalizedDisplayName)")
-                        .font(.system(size: 20))
-                        .fontWeight(.semibold)
-                } else {
-                    HStack {
-                        TextField("Display Name", text: $editableDisplayName)
-                            .textFieldStyle(.roundedBorder)
-                            .focused($isDisplayNameFocused)
-                            .onExitCommand(perform: handleDisplayNameBlur)
-                            .onSubmit {
+                    if (!isEditing) {
+                        Text("\(timeZone.normalizedDisplayName)")
+                            .font(.system(size: 20))
+                            .fontWeight(.semibold)
+                    } else {
+                        HStack {
+                            TextField("Display Name", text: $editableDisplayName)
+                                .textFieldStyle(.roundedBorder)
+                                .focused($isDisplayNameFocused)
+                                .onExitCommand(perform: handleDisplayNameBlur)
+                                .onSubmit {
+                                    handleDisplayNameSave()
+                                }
+
+                            Button("Cancel", systemImage: "x.circle") {
+                                handleDisplayNameBlur()
+                            }
+                            .buttonStyle(.glass)
+                            .labelStyle(.iconOnly)
+
+                            Button("Save", systemImage: "checkmark") {
                                 handleDisplayNameSave()
                             }
+                            .buttonStyle(.glassProminent)
+                            .labelStyle(.iconOnly)
 
-                        Button("Cancel", systemImage: "x.circle") {
-                            handleDisplayNameBlur()
                         }
-                        .buttonStyle(.glass)
-                        .labelStyle(.iconOnly)
+                    }
 
-                        Button("Save", systemImage: "checkmark") {
-                            handleDisplayNameSave()
-                        }
-                        .buttonStyle(.glassProminent)
-                        .labelStyle(.iconOnly)
-
+                    if (timeZone.displayName != nil) {
+                        Text("\(offset) (\(readableTimeZone))")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("\(offset)")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.secondary)
                     }
                 }
 
-                if (timeZone.displayName != nil) {
-                    Text("\(offset) (\(readableTimeZone))")
-                        .font(.system(size: 14))
-                        .foregroundStyle(.secondary)
-                } else {
-                    Text("\(offset)")
+                Spacer()
+
+                VStack(alignment: .trailing) {
+                    HStack {
+                        Text(TimeFormatterService.shared.appTimeFormat(
+                            from: timeManager.displayDate,
+                            timeZone: timeZone.timeZoneObject
+                        ))
+                        .font(.system(size: 20))
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                    }
+
+                    Text("\(readableDate)")
                         .font(.system(size: 14))
                         .foregroundStyle(.secondary)
                 }
             }
 
-            Spacer()
-
-            VStack(alignment: .trailing) {
-                HStack {
-                    Text(TimeFormatterService.shared.appTimeFormat(
-                        from: timeManager.displayDate,
-                        timeZone: timeZone.timeZoneObject
-                    ))
-                    .font(.system(size: 20))
-                    .fontWeight(.semibold)
-                    .monospacedDigit()
-                }
-
-                Text("\(readableDate)")
-                    .font(.system(size: 14))
-                    .foregroundStyle(.secondary)
+            if preferences.showTimeBar {
+                TimeBarView(timeZone: .constant(timeZone.timeZoneObject), width: .constant(9))
             }
         }
         .onChange(of: isEditing) { _, newValue in
