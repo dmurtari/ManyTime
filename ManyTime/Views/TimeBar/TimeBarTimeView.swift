@@ -9,20 +9,63 @@ import SwiftUI
 
 struct TimeBarTimeView: View {
     @Binding var dimension: Int
-    @Binding var hour: Int
+    @Binding var date: Date
+    @Binding var timeZone: TimeZone
+
 
     var body: some View {
         Rectangle()
             .foregroundStyle(backgroundColor)
             .frame(width: CGFloat(dimension), height: CGFloat(dimension))
             .overlay {
-                Text("\(hour)")
-                    .bold()
-                    .foregroundStyle(textColor)
+                displayContent
             }
     }
 
-    var backgroundColor : Color {
+    private var displayContent: some View {
+        Group {
+            if hour == 0 {
+                VStack(spacing: 0) {
+                    Text(monthText)
+                        .bold()
+                        .foregroundStyle(textColor)
+                        .font(.caption)
+                    Text(dateText)
+                        .bold()
+                        .foregroundStyle(textColor)
+                        .font(.caption2)
+                }
+            } else {
+                Text("\(hour)")
+                    .bold()
+                    .foregroundStyle(textColor)
+                    .font(.caption)
+            }
+        }
+    }
+
+    private var monthText: String {
+        let formatter = DateFormatter()
+        formatter.timeZone = timeZone
+        formatter.dateFormat = "MMM"
+        return formatter.string(from: date)
+    }
+
+    private var dateText: String {
+        let formatter = DateFormatter()
+        formatter.timeZone = timeZone
+        formatter.dateFormat = "d"
+        return formatter.string(from: date)
+    }
+
+
+    private var hour: Int {
+        var calendar = Calendar.current
+        calendar.timeZone = timeZone
+        return calendar.component(.hour, from: date)
+    }
+
+    var backgroundColor: Color {
         if (hour <= 5 || hour >= 22) {
             return .indigo
         } else if ((hour > 5 && hour < 8) || (hour > 18 && hour < 22)) {
@@ -32,18 +75,44 @@ struct TimeBarTimeView: View {
         }
     }
 
-    var textColor : Color {
+    var textColor: Color {
         if (hour < 8 || hour > 18) {
             return .white
         } else {
-            return .indigo
+            return Color(red: 88/255, green: 86/255, blue: 214/255)
         }
     }
 }
 
-#Preview {
-    TimeBarTimeView(dimension: .constant(30), hour: .constant(24))
-    TimeBarTimeView(dimension: .constant(30), hour: .constant(6))
-    TimeBarTimeView(dimension: .constant(30), hour: .constant(12))
 
+#Preview {
+    VStack {
+        // Midnight (shows date)
+        TimeBarTimeView(
+            dimension: .constant(30),
+            date: .constant(Date()),
+            timeZone: .constant(TimeZone.current)
+        )
+
+        // 6 AM
+        TimeBarTimeView(
+            dimension: .constant(30),
+            date: .constant(Calendar.current.date(bySettingHour: 6, minute: 0, second: 0, of: Date()) ?? Date()),
+            timeZone: .constant(TimeZone.current)
+        )
+
+        // Noon
+        TimeBarTimeView(
+            dimension: .constant(30),
+            date: .constant(Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date()) ?? Date()),
+            timeZone: .constant(TimeZone.current)
+        )
+
+        // Midnight (to show date display)
+        TimeBarTimeView(
+            dimension: .constant(30),
+            date: .constant(Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: Date()) ?? Date()),
+            timeZone: .constant(TimeZone.current)
+        )
+    }
 }

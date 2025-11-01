@@ -18,6 +18,7 @@ class AppPreferences: ObservableObject {
             notifyTimeFormatChanged()
         }
     }
+    @AppStorage("showTimeBar") var showTimeBar = true
 
     private func notifyTimeFormatChanged() {
         TimeFormatterService.shared.updateTimeFormat()
