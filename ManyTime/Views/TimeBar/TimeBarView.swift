@@ -26,6 +26,18 @@ struct TimeBarView: View {
                     date: .constant(date),
                     timeZone: .constant(timeZone),
                 )
+                .clipShape(
+                    getHour(from: date) == 23 ? AnyShape(
+                        UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 6, topTrailing: 6))) : AnyShape(
+                            Rectangle()
+                        )
+                )
+                .clipShape(
+                    getHour(from: date) == 0 ? AnyShape(
+                        UnevenRoundedRectangle(cornerRadii: .init(topLeading: 6, bottomLeading: 6))) : AnyShape(
+                            Rectangle()
+                        )
+                )
                 .overlay {
                     let hour = getHour(from: date)
                     if hour == currentHour {
