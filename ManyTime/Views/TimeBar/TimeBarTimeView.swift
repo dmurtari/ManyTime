@@ -7,11 +7,18 @@
 
 import SwiftUI
 
+extension Color {
+    static let nightForeground = Color(red: 255/255, green: 255/255, blue: 255/255)
+    static let dayForeground = Color(red: 88/255, green: 86/255, blue: 214/255)
+    static let nightBackground = Color(red: 53/255, green: 51/255, blue: 107/255)
+    static let duskBackground = Color(red: 106/255, green: 113/255, blue: 165/255)
+    static let dayBackground = Color(red: 255/255, green: 236/255, blue: 156/255)
+}
+
 struct TimeBarTimeView: View {
     @Binding var dimension: Int
     @Binding var date: Date
     @Binding var timeZone: TimeZone
-
 
     var body: some View {
         Rectangle()
@@ -66,20 +73,20 @@ struct TimeBarTimeView: View {
     }
 
     var backgroundColor: Color {
-        if (hour <= 5 || hour >= 22) {
-            return .indigo
-        } else if ((hour > 5 && hour < 8) || (hour > 18 && hour < 22)) {
-            return .blue
+        if (hour <= 5 || hour >= 21) {
+            return .nightBackground
+        } else if ((hour > 5 && hour < 8) || (hour > 18 && hour < 21)) {
+            return .duskBackground
         } else {
-            return .yellow
+            return .dayBackground
         }
     }
 
     var textColor: Color {
         if (hour < 8 || hour > 18) {
-            return .white
+            return .nightForeground
         } else {
-            return Color(red: 88/255, green: 86/255, blue: 214/255)
+            return .dayForeground
         }
     }
 }
@@ -87,28 +94,24 @@ struct TimeBarTimeView: View {
 
 #Preview {
     VStack {
-        // Midnight (shows date)
         TimeBarTimeView(
             dimension: .constant(30),
             date: .constant(Date()),
             timeZone: .constant(TimeZone.current)
         )
 
-        // 6 AM
         TimeBarTimeView(
             dimension: .constant(30),
             date: .constant(Calendar.current.date(bySettingHour: 6, minute: 0, second: 0, of: Date()) ?? Date()),
             timeZone: .constant(TimeZone.current)
         )
 
-        // Noon
         TimeBarTimeView(
             dimension: .constant(30),
             date: .constant(Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date()) ?? Date()),
             timeZone: .constant(TimeZone.current)
         )
 
-        // Midnight (to show date display)
         TimeBarTimeView(
             dimension: .constant(30),
             date: .constant(Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: Date()) ?? Date()),
