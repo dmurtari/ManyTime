@@ -64,17 +64,14 @@ struct TimeBarView: View {
 
         var result: [Date] = []
 
-        // Add hours before current
         for i in stride(from: hoursBeforeCurrent, to: 0, by: -1) {
             if let date = calendar.date(byAdding: .hour, value: -i, to: currentTime) {
                 result.append(date)
             }
         }
 
-        // Add current hour
         result.append(currentTime)
 
-        // Add hours after current
         for i in 1...hoursAfterCurrent {
             if let date = calendar.date(byAdding: .hour, value: i, to: currentTime) {
                 result.append(date)
