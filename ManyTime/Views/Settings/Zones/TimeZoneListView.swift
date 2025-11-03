@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TimeZoneListView: View {
     @EnvironmentObject var timeZoneManager: TimeZoneManager
+    @StateObject private var preferences = AppPreferences.shared
     @State private var editingTimeZoneId: UUID?
 
     var body: some View {
@@ -35,10 +36,11 @@ struct TimeZoneListView: View {
                 }
             }
             .onMove(perform: onMove)
+            .listRowSeparator(.hidden)
         }
         .padding(EdgeInsets(top: -10, leading: -16, bottom: -10, trailing: -16))
         .clipShape(Rectangle())
-        .frame(height: CGFloat(timeZoneManager.savedTimeZones.count * 50))
+        .frame(height: CGFloat(timeZoneManager.savedTimeZones.count * (preferences.showTimeBar ? 90 : 50) ))
     }
 
     private func onDelete(_ timeZoneItem: TimeZoneItem) {
