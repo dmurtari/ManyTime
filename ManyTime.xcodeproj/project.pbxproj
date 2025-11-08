@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B04FFAC72EBF01E0006B5DA6 /* Readme.md in Sources */ = {isa = PBXBuildFile; fileRef = B04FFAC62EBF01DB006B5DA6 /* Readme.md */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		B09D36D62D545403004AD597 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,12 +28,31 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		B04FFAC62EBF01DB006B5DA6 /* Readme.md */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Readme.md; sourceTree = "<group>"; };
 		B09D36C42D545402004AD597 /* ManyTime.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ManyTime.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B09D36D52D545403004AD597 /* ManyTimeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ManyTimeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B09D36DF2D545403004AD597 /* ManyTimeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ManyTimeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B04FFACA2EBF02AA006B5DA6 /* Exceptions for "images" folder in "ManyTime" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				screenshot.png,
+			);
+			target = B09D36C32D545402004AD597 /* ManyTime */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		B04FFAC82EBF02A0006B5DA6 /* images */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B04FFACA2EBF02AA006B5DA6 /* Exceptions for "images" folder in "ManyTime" target */,
+			);
+			path = images;
+			sourceTree = "<group>";
+		};
 		B09D36C62D545402004AD597 /* ManyTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ManyTime;
@@ -75,6 +98,8 @@
 		B09D36BB2D545402004AD597 = {
 			isa = PBXGroup;
 			children = (
+				B04FFAC62EBF01DB006B5DA6 /* Readme.md */,
+				B04FFAC82EBF02A0006B5DA6 /* images */,
 				B09D36C62D545402004AD597 /* ManyTime */,
 				B09D36D82D545403004AD597 /* ManyTimeTests */,
 				B09D36E22D545403004AD597 /* ManyTimeUITests */,
@@ -108,6 +133,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				B04FFAC82EBF02A0006B5DA6 /* images */,
 				B09D36C62D545402004AD597 /* ManyTime */,
 			);
 			name = ManyTime;
@@ -236,6 +262,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B04FFAC72EBF01E0006B5DA6 /* Readme.md in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
