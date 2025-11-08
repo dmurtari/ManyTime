@@ -7,14 +7,6 @@
 
 import SwiftUI
 
-extension Color {
-    static let nightForeground = Color(red: 255/255, green: 255/255, blue: 255/255)
-    static let dayForeground = Color(red: 88/255, green: 86/255, blue: 214/255)
-    static let nightBackground = Color(red: 53/255, green: 51/255, blue: 107/255)
-    static let duskBackground = Color(red: 106/255, green: 113/255, blue: 165/255)
-    static let dayBackground = Color(red: 255/255, green: 236/255, blue: 156/255)
-}
-
 struct TimeBarTimeView: View {
     @Binding var dimension: Int
     @Binding var date: Date
@@ -74,19 +66,19 @@ struct TimeBarTimeView: View {
 
     var backgroundColor: Color {
         if (hour <= 5 || hour >= 21) {
-            return .nightBackground
+            return .indigo
         } else if ((hour > 5 && hour < 8) || (hour > 18 && hour < 21)) {
-            return .duskBackground
+            return .blue
         } else {
-            return .dayBackground
+            return .yellow
         }
     }
 
     var textColor: Color {
         if (hour < 8 || hour > 18) {
-            return .nightForeground
+            return .white
         } else {
-            return .dayForeground
+            return .black
         }
     }
 }
