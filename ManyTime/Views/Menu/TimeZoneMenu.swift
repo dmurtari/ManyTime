@@ -36,6 +36,7 @@ struct TimeZoneMenu: View {
 
 #Preview {
     TimeZoneMenu()
+        .frame(width: 300)
         .environment(TimeManager())
         .environment(TimeZoneManager())
 }
