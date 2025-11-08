@@ -7,6 +7,17 @@
 
 import SwiftUI
 
+extension Locale {
+    var is12HourTimeFormat: Bool {
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .short
+        dateFormatter.dateStyle = .none
+        dateFormatter.locale = self
+        let dateString = dateFormatter.string(from: Date())
+        return dateString.contains(dateFormatter.amSymbol) || dateString.contains(dateFormatter.pmSymbol)
+    }
+}
+
 class TimeFormatterService {
     private var preferences = AppPreferences.shared
 
@@ -64,13 +75,12 @@ class TimeFormatterService {
     }
 
     func updateTimeFormat() {
-        let use24Hour = preferences.use24Hour
         let showSeconds = preferences.showSeconds
 
-        currentFormat = if use24Hour {
-            showSeconds ? .medium24 : .short24
-        } else {
+        currentFormat = if Locale.current.is12HourTimeFormat {
             showSeconds ? .medium : .short
+        } else {
+            showSeconds ? .medium24 : .short24
         }
 
         formatters.removeAll()

@@ -91,4 +91,7 @@ struct TimeBarView: View {
 #Preview {
     TimeBarView(timeZone: .constant(TimeZone.current), width: .constant(10))
     TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!), width: .constant(10))
+        .colorScheme(.light)
+    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!), width: .constant(10))
+        .colorScheme(.dark)
 }

@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct TimeBarTimeView: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     @Binding var dimension: Int
     @Binding var date: Date
     @Binding var timeZone: TimeZone
@@ -66,11 +68,23 @@ struct TimeBarTimeView: View {
 
     var backgroundColor: Color {
         if (hour <= 5 || hour >= 21) {
-            return .indigo
+            return colorScheme == .light ? Color(red: 109/255, green: 83/255, blue: 242/255) : Color(
+                red: 121/255,
+                green: 122/255,
+                blue: 252/255
+            )
         } else if ((hour > 5 && hour < 8) || (hour > 18 && hour < 21)) {
-            return .blue
+            return colorScheme == .light ? Color(red: 16/255, green: 133/255, blue: 252/255) : Color(
+                red: 63/255,
+                green: 142/255,
+                blue: 252/255
+            )
         } else {
-            return .yellow
+            return colorScheme == .light ? Color(red: 249/255, green: 206/255, blue: 46/255) : Color(
+                red: 249/255,
+                green: 216/255,
+                blue: 16/255
+            )
         }
     }
 

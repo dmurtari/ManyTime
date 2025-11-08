@@ -13,13 +13,11 @@ struct GeneralSettingsView: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading) {
-                Text("Format")
+                Text("Appearance")
                     .font(.system(size: 14, weight: .bold))
                 Divider()
 
                 Form {
-                    Toggle("Use 24-Hour Time", isOn: $preferences.use24Hour)
-                    Toggle("Show Seconds", isOn: $preferences.showSeconds)
                     Toggle("Show Time Bar", isOn: $preferences.showTimeBar)
                 }
                 .padding( [.top], 6)
