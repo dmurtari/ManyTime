@@ -13,13 +13,10 @@ struct MenuBarTimeView: View {
     var timeZoneItem: TimeZoneItem
 
     var body: some View {
-        HStack {
-            Text(TimeFormatterService.shared.appTimeFormat(
-                from: timeManager.currentDate,
-                timeZone: timeZoneItem.timeZoneObject
-            ))
-            .monospacedDigit()
-        }
+        Text(TimeFormatterService.shared.appTimeFormat(
+            from: timeManager.currentDate,
+            timeZone: timeZoneItem.timeZoneObject
+        ))
     }
 }
 

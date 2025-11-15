@@ -20,8 +20,8 @@ struct TimeZoneMenu: View {
                     .foregroundColor(.secondary)
             } else {
                 VStack(spacing: 16) {
-                    ForEach(timeZoneManager.savedTimeZones) { item in
-                        TimeRowView(timeZone: item, date: timeManager.currentDate)
+                    ForEach(timeZoneManager.savedTimeZones) { timeZone in
+                        TimeView(timeZone: timeZone, date: date)
                     }
                 }
                 .padding()
