@@ -129,7 +129,6 @@ struct TimeView: View {
         }
         .onChange(of: isEditing) { _, newValue in
             if newValue {
-                // Defer to next runloop to ensure TextField is in view hierarchy
                 DispatchQueue.main.async { isDisplayNameFocused = true }
                 editableDisplayName = timeZone.normalizedDisplayName
             } else {

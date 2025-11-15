@@ -9,10 +9,10 @@ import SwiftUI
 
 struct TimeBarTimeView: View {
     @Environment(\.colorScheme) private var colorScheme
-
-    @Binding var dimension: Int
     @Binding var date: Date
-    @Binding var timeZone: TimeZone
+
+    var dimension: Int
+    var timeZone: TimeZone
 
     var body: some View {
         Rectangle()
@@ -101,27 +101,27 @@ struct TimeBarTimeView: View {
 #Preview {
     VStack {
         TimeBarTimeView(
-            dimension: .constant(30),
             date: .constant(Date()),
-            timeZone: .constant(TimeZone.current)
+            dimension: 30,
+            timeZone: TimeZone.current
         )
 
         TimeBarTimeView(
-            dimension: .constant(30),
             date: .constant(Calendar.current.date(bySettingHour: 6, minute: 0, second: 0, of: Date()) ?? Date()),
-            timeZone: .constant(TimeZone.current)
+            dimension: 30,
+            timeZone: TimeZone.current
         )
 
         TimeBarTimeView(
-            dimension: .constant(30),
             date: .constant(Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date()) ?? Date()),
-            timeZone: .constant(TimeZone.current)
+            dimension: 30,
+            timeZone: TimeZone.current
         )
 
         TimeBarTimeView(
-            dimension: .constant(30),
             date: .constant(Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: Date()) ?? Date()),
-            timeZone: .constant(TimeZone.current)
+            dimension: 30,
+            timeZone: TimeZone.current
         )
     }
 }

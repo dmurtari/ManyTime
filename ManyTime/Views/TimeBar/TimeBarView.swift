@@ -22,9 +22,9 @@ struct TimeBarView: View {
         HStack(spacing: 0) {
             ForEach(generateDateArray(currentTime: currentTime, length: width), id: \.timeIntervalSince1970) { date in
                 TimeBarTimeView(
-                    dimension: .constant(30),
                     date: .constant(date),
-                    timeZone: .constant(timeZone),
+                    dimension: 30,
+                    timeZone: timeZone,
                 )
                 .clipShape(
                     getHour(from: date) == 23 ? AnyShape(
