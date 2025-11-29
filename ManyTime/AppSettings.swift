@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import ServiceManagement
 
 class AppPreferences: ObservableObject {
     @AppStorage("showSeconds") var showSeconds = false {
@@ -19,6 +20,15 @@ class AppPreferences: ObservableObject {
         }
     }
     @AppStorage("showTimeBar") var showTimeBar = true
+    @AppStorage("launchOnLogin") var launchOnLogin = false {
+        didSet {
+            if launchOnLogin == true {
+                try? SMAppService.mainApp.register()
+            } else {
+                try? SMAppService.mainApp.unregister()
+            }
+        }
+    }
 
     private func notifyTimeFormatChanged() {
         TimeFormatterService.shared.updateTimeFormat()
