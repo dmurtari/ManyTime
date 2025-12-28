@@ -18,7 +18,7 @@ struct TimeZonesApp: App {
         }
         .menuBarExtraStyle(.window)
 
-        Window("Settings", id: "settings") {
+        Window("", id: "settings") {
             SettingsView()
                 .environmentObject(timeManager)
                 .environmentObject(timeZoneManager)

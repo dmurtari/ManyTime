@@ -42,8 +42,10 @@ struct TimeZoneAddView: View {
             }
         }
         .onReceive(locationSearchFieldViewModel.$selectedResult) { result in
-            guard let result else { return }
-            print("Setting location in Add View: \(result.timeZone)")
+            guard let result else {
+                print("No result received from LocationSearchFieldViewModel")
+                return
+            }
             timeZoneIdentifier = result.timeZone
 
             if (result.displayName != nil) {
