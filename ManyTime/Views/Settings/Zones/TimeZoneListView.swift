@@ -26,45 +26,53 @@ struct TimeZoneListView: View {
             }
             .padding(.vertical)
         } else {
-            List {
-                ForEach(timeZoneManager.savedTimeZones) { timeZone in
-                    TimeView(
-                        isEditing: Binding(
-                            get: { editingTimeZoneId == timeZone.id },
-                            set: { isEditing in
-                                editingTimeZoneId = isEditing ? timeZone.id : nil
+            VStack(alignment: .leading, spacing: 16) {
+                Text(
+                    "Reorder Time Zones by dragging. The first Time Zone will be shown in the Menu Bar."
+                )
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                
+                List {
+                    ForEach(timeZoneManager.savedTimeZones) { timeZone in
+                        TimeView(
+                            isEditing: Binding(
+                                get: { editingTimeZoneId == timeZone.id },
+                                set: { isEditing in
+                                    editingTimeZoneId = isEditing ? timeZone.id : nil
+                                }
+                            ),
+                            timeZone: timeZone,
+                            date: Date()
+                        )
+                        .contextMenu {
+                            Button("Edit Display Name", systemImage: "pencil") {
+                                editingTimeZoneId = timeZone.id
                             }
-                        ),
-                        timeZone: timeZone,
-                        date: Date()
-                    )
-                    .contextMenu {
-                        Button("Edit Name", systemImage: "pencil") {
-                            editingTimeZoneId = timeZone.id
-                        }
-                        Divider()
-                        Button(
-                            "Delete",
-                            systemImage: "trash",
-                            role: .destructive
-                        ) {
-                            onDelete(timeZone)
+                            Divider()
+                            Button(
+                                "Delete",
+                                systemImage: "trash",
+                                role: .destructive
+                            ) {
+                                onDelete(timeZone)
+                            }
                         }
                     }
+                    .onMove(perform: onMove)
+                    .listRowSeparator(.hidden)
                 }
-                .onMove(perform: onMove)
-                .listRowSeparator(.hidden)
-            }
-            .padding(
-                EdgeInsets(top: -10, leading: -16, bottom: -10, trailing: -16)
-            )
-            .clipShape(Rectangle())
-            .frame(
-                height: CGFloat(
-                    timeZoneManager.savedTimeZones
-                        .count * (preferences.showTimeBar ? 90 : 50)
+                .padding(
+                    EdgeInsets(top: -10, leading: -16, bottom: -10, trailing: -16)
                 )
-            )
+                .clipShape(Rectangle())
+                .frame(
+                    height: CGFloat(
+                        timeZoneManager.savedTimeZones
+                            .count * (preferences.showTimeBar ? 90 : 50)
+                    )
+                )
+            }
         }
     }
 
