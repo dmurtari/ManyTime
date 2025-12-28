@@ -16,8 +16,16 @@ struct TimeZoneMenu: View {
     var body: some View {
         VStack(spacing: 0) {
             if timeZoneManager.savedTimeZones.isEmpty {
-                Text("No Time Zones Added")
-                    .foregroundColor(.secondary)
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Nothing to show yet!")
+                        .font(.callout)
+
+                    
+                    Text("Click Options > Preferences to get started by adding a Time Zone")
+                        .foregroundColor(.secondary)
+                        .font(.callout)
+                }
+                .padding()
             } else {
                 VStack(spacing: 16) {
                     ForEach(timeZoneManager.savedTimeZones) { timeZone in

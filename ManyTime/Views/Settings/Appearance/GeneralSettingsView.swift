@@ -19,7 +19,7 @@ struct GeneralSettingsView: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Toggle("Show Time Bar", isOn: $preferences.showTimeBar)
-                    Text("Show a bar visualizing time")
+                    Text("Help compare times across timezones with a visual bar")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
@@ -27,7 +27,7 @@ struct GeneralSettingsView: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Toggle("Launch at login", isOn: $preferences.launchOnLogin)
-                    Text("Launch when you Login to your Mac")
+                    Text("Automatically start when you login to your Mac")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
