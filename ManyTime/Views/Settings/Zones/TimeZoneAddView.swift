@@ -4,7 +4,6 @@ import Combine
 
 struct TimeZoneAddView: View {
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
-    @ObservedObject private var locationSearchFieldViewModel = LocationSearchFieldViewModel()
 
     @State private var timeZoneIdentifier: String = ""
     @State private var displayName: String = ""
@@ -41,19 +40,14 @@ struct TimeZoneAddView: View {
                 .disabled(disableFields)
             }
         }
-        .onReceive(locationSearchFieldViewModel.$selectedResult) { result in
-            guard let result else {
-                print("No result received from LocationSearchFieldViewModel")
+        .onChange(of: timeZoneIdentifier) { _, newId in
+            let timeZone = TimeZone(identifier: timeZoneIdentifier)
+
+            guard let timeZone else {
                 return
             }
-            timeZoneIdentifier = result.timeZone
-
-            if (result.displayName != nil) {
-                displayName = result.displayName!
-            }
-        }
-        .onReceive(locationSearchFieldViewModel.$isSearching) { isSearching in
-            disableFields = isSearching
+            
+            self.displayName = !self.displayName.isEmpty ? self.displayName : timeZone.description
         }
     }
 
