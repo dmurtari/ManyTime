@@ -28,6 +28,8 @@ struct TimeZonePicker: View {
         .onAppear {
             if selectedTimeZone != "" {
                 selectedId = idByName[selectedTimeZone] ?? ""
+            } else {
+                selectedId = ""
             }
         }
         .onChange(of: selectedId) { _, newId in
@@ -39,10 +41,8 @@ struct TimeZonePicker: View {
                 selectedTimeZone = name
             }
         }
-        .onChange(of: selectedTimeZone) { _, newTZ in
-            if let newId = idByName[newTZ] {
-                if selectedId != newId { selectedId = newId }
-            } else if !newTZ.isEmpty {
+        .onChange(of: selectedTimeZone) { _, newTimeZone in
+            if newTimeZone == "" {
                 selectedId = ""
             }
         }
