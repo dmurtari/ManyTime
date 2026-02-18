@@ -7,7 +7,7 @@
 
 import Foundation
 
-class TimeZoneListService {
+@MainActor class TimeZoneListService {
     static let shared = TimeZoneListService()
 
     private var timeZones: [RawTimeZone] = []

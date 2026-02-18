@@ -8,7 +8,7 @@
 import MapKit
 import Combine
 
-class LocationSearchService: NSObject, ObservableObject {
+@MainActor class LocationSearchService: NSObject, ObservableObject {
     @Published var searchQuery = ""
     @Published var searchResults: [MKLocalSearchCompletion] = []
     private var searchCompleter = MKLocalSearchCompleter()
@@ -31,27 +31,24 @@ class LocationSearchService: NSObject, ObservableObject {
             .store(in: &cancellables)
     }
 
-    deinit {
-        cancellables.forEach { sub in
-            sub.cancel()
-        }
-    }
-
     func getDetails(
         for completion: MKLocalSearchCompletion,
-        completion handler: @escaping (MKMapItem?) -> Void
+        completion handler: @MainActor @escaping (MKMapItem?) -> Void
     ) {
         let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
 
         search.start { (response, error) in
             print("Got search response: \(String(describing: response))")
-            handler(response?.mapItems.first)
+            let firstItem = response?.mapItems.first
+            Task { @MainActor in
+                handler(firstItem)
+            }
         }
     }
 }
 
-extension LocationSearchService: MKLocalSearchCompleterDelegate {
+@MainActor extension LocationSearchService: @MainActor MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
         searchResults = completer.results
     }
@@ -63,3 +60,4 @@ extension LocationSearchService: MKLocalSearchCompleterDelegate {
         print("Search error: \(error)")
     }
 }
+
