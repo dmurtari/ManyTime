@@ -8,7 +8,7 @@
 import SwiftUI
 import ServiceManagement
 
-class AppPreferences: ObservableObject {
+@MainActor class AppPreferences: ObservableObject {
     @AppStorage("showSeconds") var showSeconds = false {
         didSet {
             notifyTimeFormatChanged()
@@ -36,3 +36,4 @@ class AppPreferences: ObservableObject {
 
     static let shared = AppPreferences()
 }
+

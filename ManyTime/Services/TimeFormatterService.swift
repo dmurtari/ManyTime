@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-extension Locale {
+@MainActor extension Locale {
     var is12HourTimeFormat: Bool {
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = .short
@@ -18,7 +18,7 @@ extension Locale {
     }
 }
 
-class TimeFormatterService {
+@MainActor class TimeFormatterService {
     private var preferences = AppPreferences.shared
 
     static let shared = TimeFormatterService()

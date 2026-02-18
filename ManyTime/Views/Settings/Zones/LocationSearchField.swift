@@ -39,18 +39,12 @@ struct LocationSearchField: NSViewRepresentable {
         Coordinator(self)
     }
 
-    class Coordinator: NSObject, NSSearchFieldDelegate {
+    @MainActor class Coordinator: NSObject, NSSearchFieldDelegate {
         var parent: LocationSearchField
         private var cancellables = Set<AnyCancellable>()
 
         init(_ parent: LocationSearchField) {
             self.parent = parent
-        }
-
-        deinit {
-            cancellables.forEach { sub in
-                sub.cancel()
-            }
         }
 
         func setupSearchResultsSubscription(
@@ -77,7 +71,8 @@ struct LocationSearchField: NSViewRepresentable {
                         )
                         searchMenu.addItem(emptyMenuItem)
                     } else {
-                        for result in searchResults[...4] {
+                        let maxCount = min(searchResults.count, 5)
+                        for result in searchResults.prefix(maxCount) {
                             let menuItem = NSMenuItem(
                                 title: "\(result.title) (\(result.subtitle))",
                                 action: #selector(self.menuItemSelected(_:)),
@@ -115,7 +110,7 @@ struct LocationSearchField: NSViewRepresentable {
     }
 }
 
-class LocationSearchFieldViewModel: ObservableObject {
+@MainActor class LocationSearchFieldViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var searchResults: [MKLocalSearchCompletion] = []
     @Published var selectedResult: TimeZoneItem?
@@ -127,14 +122,11 @@ class LocationSearchFieldViewModel: ObservableObject {
     init() {
         locationSearchService = LocationSearchService()
         locationSearchService.$searchResults
-            .assign(to: \LocationSearchFieldViewModel.searchResults, on: self)
+            .receive(on: RunLoop.main)
+            .sink { [weak self] results in
+                self?.searchResults = results
+            }
             .store(in: &cancellables)
-    }
-
-    deinit {
-        cancellables.forEach { sub in
-            sub.cancel()
-        }
     }
 
     func updateQuery(_ query: String) {
@@ -156,10 +148,12 @@ class LocationSearchFieldViewModel: ObservableObject {
 
             print("Setting selected result: \(String(describing: item))")
             self?.searchQuery = result.title
-            self!.selectedResult = TimeZoneItem(
-                timeZone: timeZone,
-                displayName: result.title
-            )
+            if let self = self {
+                self.selectedResult = TimeZoneItem(
+                    timeZone: timeZone,
+                    displayName: result.title
+                )
+            }
         }
     }
 }
