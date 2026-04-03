@@ -25,6 +25,7 @@ struct TimeBarView: View {
                     date: .constant(date),
                     dimension: 30,
                     timeZone: timeZone,
+                    showDate: getHour(from: date) == 0
                 )
                 .clipShape(
                     getHour(from: date) == 23 ? AnyShape(
@@ -90,7 +91,7 @@ struct TimeBarView: View {
     TimeBarView(timeZone: .constant(TimeZone.current), width: .constant(10))
     TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!), width: .constant(10))
         .colorScheme(.light)
-    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!), width: .constant(10))
+    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/New_York")!), width: .constant(10))
         .colorScheme(.dark)
 }
 

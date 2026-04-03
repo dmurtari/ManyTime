@@ -13,6 +13,7 @@ struct TimeBarTimeView: View {
 
     var dimension: Int
     var timeZone: TimeZone
+    var showDate: Bool
 
     var body: some View {
         Rectangle()
@@ -25,7 +26,7 @@ struct TimeBarTimeView: View {
 
     private var displayContent: some View {
         Group {
-            if hour == 0 {
+            if showDate {
                 VStack(spacing: 0) {
                     Text(monthText)
                         .bold()
@@ -103,25 +104,29 @@ struct TimeBarTimeView: View {
         TimeBarTimeView(
             date: .constant(Date()),
             dimension: 30,
-            timeZone: TimeZone.current
+            timeZone: TimeZone.current,
+            showDate: false
         )
 
         TimeBarTimeView(
             date: .constant(Calendar.current.date(bySettingHour: 6, minute: 0, second: 0, of: Date()) ?? Date()),
             dimension: 30,
-            timeZone: TimeZone.current
+            timeZone: TimeZone.current,
+            showDate: false
         )
 
         TimeBarTimeView(
             date: .constant(Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date()) ?? Date()),
             dimension: 30,
-            timeZone: TimeZone.current
+            timeZone: TimeZone.current,
+            showDate: false
         )
 
         TimeBarTimeView(
             date: .constant(Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: Date()) ?? Date()),
             dimension: 30,
-            timeZone: TimeZone.current
+            timeZone: TimeZone.current,
+            showDate: false
         )
     }
 }
