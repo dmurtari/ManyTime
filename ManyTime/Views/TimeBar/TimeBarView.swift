@@ -48,10 +48,8 @@ struct TimeBarView: View {
                 .zIndex(getHour(from: date) == currentHour ? 1 : 0)
             }
         }
-        .onAppear {
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-                currentTime = Date()
-            }
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            currentTime = Date()
         }
     }
 
@@ -95,3 +93,4 @@ struct TimeBarView: View {
     TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!), width: .constant(10))
         .colorScheme(.dark)
 }
+

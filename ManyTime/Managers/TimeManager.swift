@@ -14,10 +14,12 @@ enum TimeMode {
     case offset(TimeInterval)
 }
 
-class TimeManager: ObservableObject, Observable {
-    @Published var currentDate = Date()
+@MainActor
+final class TimeManager: ObservableObject {
+    @Published private(set) var currentDate = Date()
     @Published var timeMode: TimeMode = .current
-    private var timer: Timer?
+
+    private var timerCancellable: AnyCancellable?
 
     var displayDate: Date {
         switch timeMode {
@@ -31,46 +33,27 @@ class TimeManager: ObservableObject, Observable {
     }
 
     init() {
-        setupTimer()
+        startTimer()
     }
 
-    deinit {
-        timer?.invalidate()
-    }
-
-    private func setupTimer() {
-        timer?.invalidate()
-
-        let now = Date()
-        let timeInterval = ceil(now.timeIntervalSinceReferenceDate) - now.timeIntervalSinceReferenceDate
-
-        timer = Timer.scheduledTimer(
-            withTimeInterval: timeInterval,
-            repeats: false
-        ) { [weak self] _ in
-            self?.currentDate = Date()
-            self?.timer = Timer.scheduledTimer(
-                withTimeInterval: 1.0,
-                repeats: true
-            ) { [weak self] _ in
-                self?.currentDate = Date()
+    private func startTimer() {
+        timerCancellable = Timer.publish(every: 1.0, on: .main, in: .common)
+            .autoconnect()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] date in
+                self?.currentDate = date
             }
-            self?.timer?.tolerance = 0.1
-        }
     }
 
     func setTimeOffset(_ interval: TimeInterval) {
         timeMode = .offset(interval)
-        setupTimer()
     }
 
     func setFixedTime(_ date: Date) {
         timeMode = .fixed(date)
-        setupTimer()
     }
 
     func switchToCurrent() {
         timeMode = .current
-        setupTimer()
     }
 }

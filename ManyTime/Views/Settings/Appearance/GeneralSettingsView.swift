@@ -40,5 +40,5 @@ struct GeneralSettingsView: View {
 
 #Preview {
     GeneralSettingsView()
-        .environment(TimeManager())
+        .environmentObject(TimeManager())
 }
