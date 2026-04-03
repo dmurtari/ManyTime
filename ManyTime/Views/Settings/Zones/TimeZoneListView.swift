@@ -55,5 +55,5 @@ struct TimeZoneListView: View {
 #Preview {
     TimeZoneListView()
         .environmentObject(TimeZoneManager())
-        .environment(TimeManager())
+        .environmentObject(TimeManager())
 }

@@ -23,6 +23,6 @@ struct SettingsView: View {
 
 #Preview {
     SettingsView()
-        .environment(TimeZoneManager())
-        .environment(TimeManager())
+        .environmentObject(TimeZoneManager())
+        .environmentObject(TimeManager())
 }

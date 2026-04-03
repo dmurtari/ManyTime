@@ -39,7 +39,7 @@ struct ZonesSettingsView: View {
 #Preview {
     ZonesSettingsView()
         .environmentObject(TimeZoneManager())
-        .environment(TimeManager())
+        .environmentObject(TimeManager())
 }
 
 

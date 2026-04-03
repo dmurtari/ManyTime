@@ -164,7 +164,7 @@ struct TimeView: View {
         isEditing: .constant(true), timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
         date: Date()
     )
-        .environment(TimeManager())
+        .environmentObject(TimeManager())
         .environmentObject(TimeZoneManager())
 }
 
@@ -176,7 +176,7 @@ struct TimeView: View {
         ),
         date: Date()
     )
-        .environment(TimeManager())
+        .environmentObject(TimeManager())
         .environmentObject(TimeZoneManager())
 
 }
