@@ -46,18 +46,16 @@ struct TimeBarView: View {
                         let thresholdIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
 
                         if dateArray.firstIndex(where: { $0 == date }) == thresholdIndex {
-                            var calendar = Calendar.current
-                            calendar.timeZone = timeZone
-
-                            for i in 1...40 {
-                                if let dateToAdd = calendar.date(byAdding: .hour, value: i, to: date) {
-                                    dateArray.append(dateToAdd)
-                                }
-                            }
-
+                            dateArray = appendDates()
                         }
                     }
-                    
+                    .onAppear() {
+                        let thresholdIndex = dateArray.index(dateArray.startIndex, offsetBy: 5)
+
+                        if dateArray.firstIndex(where: { $0 == date }) == thresholdIndex {
+                            dateArray = prependDates()
+                        }
+                    }
                 }
             }
         }
@@ -76,6 +74,46 @@ struct TimeBarView: View {
         .onAppear() {
             dateArray = generateDateArray(currentTime: currentTime, length: width)
         }
+    }
+
+    private func appendDates() -> [Date] {
+        print("Appending")
+
+        var calendar = Calendar.current
+        calendar.timeZone = timeZone
+
+        let lastDate = dateArray.last
+
+        guard lastDate != nil else {
+            return dateArray
+        }
+
+        for i in 1...40 {
+            if let dateToAdd = calendar.date(byAdding: .hour, value: i, to: lastDate!) {
+                dateArray.append(dateToAdd)
+            }
+        }
+
+        return dateArray
+    }
+
+    private func prependDates() -> [Date] {
+        var calendar = Calendar.current
+        calendar.timeZone = timeZone
+
+        let firstDate = dateArray.first
+
+        guard firstDate != nil else {
+            return dateArray
+        }
+
+        for i in stride(from: 40, to: 0, by: -1) {
+            if let dateToAdd = calendar.date(byAdding: .hour, value: -i, to: firstDate!) {
+                dateArray.append(dateToAdd)
+            }
+        }
+
+        return dateArray
     }
 
     func generateDateArray(currentTime: Date, length: Int) -> [Date] {
