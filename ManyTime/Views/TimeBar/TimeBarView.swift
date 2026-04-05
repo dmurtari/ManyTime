@@ -11,6 +11,7 @@ struct TimeBarView: View {
     @Binding var timeZone: TimeZone
     @Binding var width: Int
     @State private var currentTime = Date()
+    @State private var dateArray: [Date] = []
 
     private var currentHour: Int {
         var calendar = Calendar.current
@@ -19,44 +20,67 @@ struct TimeBarView: View {
     }
 
     var body: some View {
-        HStack(spacing: 0) {
-            ForEach(generateDateArray(currentTime: currentTime, length: width), id: \.timeIntervalSince1970) { date in
-                TimeBarTimeView(
-                    date: .constant(date),
-                    dimension: 30,
-                    timeZone: timeZone,
-                    showDate: getHour(from: date) == 0
-                )
-                .clipShape(
-                    getHour(from: date) == 23 ? AnyShape(
-                        UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 6, topTrailing: 6))) : AnyShape(
-                            Rectangle()
-                        )
-                )
-                .clipShape(
-                    getHour(from: date) == 0 ? AnyShape(
-                        UnevenRoundedRectangle(cornerRadii: .init(topLeading: 6, bottomLeading: 6))) : AnyShape(
-                            Rectangle()
-                        )
-                )
-                .overlay {
-                    let hour = getHour(from: date)
-                    if hour == currentHour {
-                        RoundedRectangle(cornerRadius: 4)
-                            .stroke(Color.black, lineWidth: 2)
+        ScrollView([.horizontal]){
+            LazyHStack(spacing: 0) {
+                ForEach(dateArray, id: \.timeIntervalSince1970) { date in
+                    TimeBarTimeView(
+                        date: .constant(date),
+                        dimension: 30,
+                        timeZone: timeZone,
+                        showDate: getHour(from: date) == 0
+                    )
+                    .clipShape(
+                        getHour(from: date) == 23 ? AnyShape(
+                            UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 6, topTrailing: 6))) : AnyShape(
+                                Rectangle()
+                            )
+                    )
+                    .clipShape(
+                        getHour(from: date) == 0 ? AnyShape(
+                            UnevenRoundedRectangle(cornerRadii: .init(topLeading: 6, bottomLeading: 6))) : AnyShape(
+                                Rectangle()
+                            )
+                    )
+                    .zIndex(getHour(from: date) == currentHour ? 1 : 0)
+                    .onAppear() {
+                        let thresholdIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
+
+                        if dateArray.firstIndex(where: { $0 == date }) == thresholdIndex {
+                            var calendar = Calendar.current
+                            calendar.timeZone = timeZone
+
+                            for i in 1...40 {
+                                if let dateToAdd = calendar.date(byAdding: .hour, value: i, to: date) {
+                                    dateArray.append(dateToAdd)
+                                }
+                            }
+
+                        }
                     }
+                    
                 }
-                .zIndex(getHour(from: date) == currentHour ? 1 : 0)
             }
+        }
+        .defaultScrollAnchor(.bottomLeading)
+        .scrollIndicators(.hidden)
+        .frame(width: 300, height: 30)
+        .overlay {
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(Color.black, lineWidth: 2)
+                .frame(width: 30, height: 30)
+                .offset(x: -15)
         }
         .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
             currentTime = Date()
         }
+        .onAppear() {
+            dateArray = generateDateArray(currentTime: currentTime, length: width)
+        }
     }
 
     func generateDateArray(currentTime: Date, length: Int) -> [Date] {
-        let hoursBeforeCurrent = length / 3
-        let hoursAfterCurrent = length - hoursBeforeCurrent - 1
+        let hoursBeforeCurrent = 4
+        let hoursAfterCurrent = 40
 
         var calendar = Calendar.current
         calendar.timeZone = timeZone
