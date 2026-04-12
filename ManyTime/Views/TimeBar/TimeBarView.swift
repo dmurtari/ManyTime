@@ -12,10 +12,7 @@ struct TimeBarView: View {
     @Binding var width: Int
     @State private var currentTime = Date()
     @State private var dateArray: [Date] = []
-    @State private var position = ScrollPosition(
-        x: Constants.TimeBarConstants.timeViewInitialCount * Constants.TimeBarConstants
-            .timeViewWidth - (Constants.AppViewConstants.timeMenuWidth / 2 - Constants.TimeBarConstants.timeViewWidth)
-    )
+    @State private var position = ScrollPosition(edge: .leading)
     @State private var isLoading = false
     @State private var currentScrollX: CGFloat = 0
 
@@ -26,38 +23,44 @@ struct TimeBarView: View {
     }
 
     var body: some View {
-        ScrollView([.horizontal]){
-            ScrollViewReader { proxy in
+        ScrollViewReader { proxy in
+            ScrollView([.horizontal]) {
                 LazyHStack(spacing: 0) {
                     ForEach(dateArray, id: \.timeIntervalSince1970) { date in
                         TimeBarTimeView(
                             date: .constant(date),
-                            dimension: Int(Constants.TimeBarConstants.timeViewWidth),
+                            dimension: Int(Constants.TimeBarConstants.timeViewSide),
                             timeZone: timeZone,
                             showDate: getHour(from: date) == 0
                         )
                         .id(date)
                         .clipShape(
-                            getHour(from: date) == 23 ? AnyShape(
-                                UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 6, topTrailing: 6))) : AnyShape(
+                            getHour(from: date) == 23
+                                ? AnyShape(
+                                    UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 6, topTrailing: 6))
+                                )
+                                : AnyShape(
                                     Rectangle()
                                 )
                         )
                         .clipShape(
-                            getHour(from: date) == 0 ? AnyShape(
-                                UnevenRoundedRectangle(cornerRadii: .init(topLeading: 6, bottomLeading: 6))) : AnyShape(
+                            getHour(from: date) == 0
+                                ? AnyShape(
+                                    UnevenRoundedRectangle(cornerRadii: .init(topLeading: 6, bottomLeading: 6))
+                                )
+                                : AnyShape(
                                     Rectangle()
                                 )
                         )
                         .zIndex(getHour(from: date) == currentHour ? 1 : 0)
-                        .onAppear() {
+                        .onAppear {
                             let thresholdIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
 
                             if dateArray.firstIndex(of: date) == thresholdIndex {
                                 appendDates()
                             }
                         }
-                        .onAppear() {
+                        .onAppear {
                             let thresholdIndex = dateArray.index(dateArray.startIndex, offsetBy: 5)
 
                             if dateArray.firstIndex(of: date) == thresholdIndex {
@@ -67,30 +70,39 @@ struct TimeBarView: View {
                     }
                 }
             }
-        }
-        .defaultScrollAnchor(.bottomLeading)
-        .scrollPosition($position)
-        .onScrollGeometryChange(for: CGFloat.self) { geo in
-            geo.contentOffset.x
-        } action: { _, newX in
-            currentScrollX = newX
-        }
-        .scrollIndicators(.hidden)
-        .frame(width: Constants.AppViewConstants.timeMenuWidth, height: Constants.TimeBarConstants.timeViewWidth)
-        .overlay {
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(Color.black, lineWidth: 2)
-                .frame(
-                    width: Constants.TimeBarConstants.timeViewWidth,
-                    height: Constants.TimeBarConstants.timeViewWidth
+            .onScrollGeometryChange(for: CGFloat.self) { geo in
+                geo.contentOffset.x
+            } action: { _, newX in
+                currentScrollX = newX
+            }
+            .scrollIndicators(.hidden)
+            .frame(width: Constants.AppViewConstants.timeMenuWidth, height: Constants.TimeBarConstants.timeViewSide)
+            .overlay {
+                Path() { path in
+                    let x = Constants.AppViewConstants.timeMenuWidth / 2
+
+                    path.move(to: CGPoint(x: x, y: -1))
+                    path.addLine(to: CGPoint(x: x, y: Constants.TimeBarConstants.timeViewSide + 1))
+                }
+                .stroke(.black, lineWidth: 2)
+            }
+            .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+                currentTime = Date()
+            }
+            .onAppear {
+                dateArray.append(currentTime)
+                appendDates()
+                prependDates()
+
+                position = ScrollPosition(
+                    x: Constants.TimeBarConstants.timeViewInitialCount
+                        * Constants.TimeBarConstants
+                        .timeViewSide
+                        - (Constants.AppViewConstants.timeMenuWidth / 2 - Constants.TimeBarConstants.timeViewSide)
                 )
-                .offset(x: -15)
-        }
-        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
-            currentTime = Date()
-        }
-        .onAppear() {
-            dateArray = generateDateArray(currentTime: currentTime, length: width)
+            }
+            .defaultScrollAnchor(.bottomLeading)
+            .scrollPosition($position)
         }
     }
 
@@ -99,18 +111,17 @@ struct TimeBarView: View {
             return
         }
 
-        var calendar = Calendar.current
-        calendar.timeZone = timeZone
-
-        let lastDate = dateArray.last
-
-        guard lastDate != nil else {
+        guard let lastDate = dateArray.last else {
             return
         }
 
         isLoading = true
+
+        var calendar = Calendar.current
+        calendar.timeZone = timeZone
+
         for i in 1...Int(Constants.TimeBarConstants.timeViewInitialCount) {
-            if let dateToAdd = calendar.date(byAdding: .hour, value: i, to: lastDate!) {
+            if let dateToAdd = calendar.date(byAdding: .hour, value: i, to: lastDate) {
                 dateArray.append(dateToAdd)
             }
         }
@@ -121,6 +132,7 @@ struct TimeBarView: View {
         guard !isLoading else {
             return
         }
+
         guard let firstDate = dateArray.first else {
             return
         }
@@ -139,35 +151,12 @@ struct TimeBarView: View {
 
         dateArray.insert(contentsOf: newDates.reversed(), at: 0)
 
-        let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewWidth
+        let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewSide
         position = ScrollPosition(x: currentScrollX + addedWidth)
 
         DispatchQueue.main.async {
             self.isLoading = false
         }
-    }
-
-    func generateDateArray(currentTime: Date, length: Int) -> [Date] {
-        var calendar = Calendar.current
-        calendar.timeZone = timeZone
-
-        var result: [Date] = []
-
-        for i in stride(from: Int(Constants.TimeBarConstants.timeViewInitialCount), to: 0, by: -1) {
-            if let date = calendar.date(byAdding: .hour, value: -i, to: currentTime) {
-                result.append(date)
-            }
-        }
-
-        result.append(currentTime)
-
-        for i in 1...Int(Constants.TimeBarConstants.timeViewInitialCount) {
-            if let date = calendar.date(byAdding: .hour, value: i, to: currentTime) {
-                result.append(date)
-            }
-        }
-
-        return result
     }
 
     private func getHour(from date: Date) -> Int {
@@ -184,4 +173,3 @@ struct TimeBarView: View {
     TimeBarView(timeZone: .constant(TimeZone(identifier: "America/New_York")!), width: .constant(10))
         .colorScheme(.dark)
 }
-
