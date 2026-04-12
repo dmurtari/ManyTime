@@ -12,7 +12,10 @@ struct TimeBarView: View {
     @Binding var width: Int
     @State private var currentTime = Date()
     @State private var dateArray: [Date] = []
-    @State private var position = ScrollPosition(x: 40 * 30 - (300 / 2 - 30))
+    @State private var position = ScrollPosition(
+        x: Constants.TimeBarConstants.timeViewInitialCount * Constants.TimeBarConstants
+            .timeViewWidth - (Constants.AppViewConstants.timeMenuWidth / 2 - Constants.TimeBarConstants.timeViewWidth)
+    )
     @State private var isLoading = false
     @State private var currentScrollX: CGFloat = 0
 
@@ -29,7 +32,7 @@ struct TimeBarView: View {
                     ForEach(dateArray, id: \.timeIntervalSince1970) { date in
                         TimeBarTimeView(
                             date: .constant(date),
-                            dimension: 30,
+                            dimension: Int(Constants.TimeBarConstants.timeViewWidth),
                             timeZone: timeZone,
                             showDate: getHour(from: date) == 0
                         )
@@ -73,11 +76,14 @@ struct TimeBarView: View {
             currentScrollX = newX
         }
         .scrollIndicators(.hidden)
-        .frame(width: 300, height: 30)
+        .frame(width: Constants.AppViewConstants.timeMenuWidth, height: Constants.TimeBarConstants.timeViewWidth)
         .overlay {
             RoundedRectangle(cornerRadius: 4)
                 .stroke(Color.black, lineWidth: 2)
-                .frame(width: 30, height: 30)
+                .frame(
+                    width: Constants.TimeBarConstants.timeViewWidth,
+                    height: Constants.TimeBarConstants.timeViewWidth
+                )
                 .offset(x: -15)
         }
         .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
@@ -103,7 +109,7 @@ struct TimeBarView: View {
         }
 
         isLoading = true
-        for i in 1...40 {
+        for i in 1...Int(Constants.TimeBarConstants.timeViewInitialCount) {
             if let dateToAdd = calendar.date(byAdding: .hour, value: i, to: lastDate!) {
                 dateArray.append(dateToAdd)
             }
@@ -125,7 +131,7 @@ struct TimeBarView: View {
         calendar.timeZone = timeZone
 
         var newDates: [Date] = []
-        for i in 1...40 {
+        for i in 1...Int(Constants.TimeBarConstants.timeViewInitialCount) {
             if let date = calendar.date(byAdding: .hour, value: -i, to: firstDate) {
                 newDates.append(date)
             }
@@ -133,7 +139,7 @@ struct TimeBarView: View {
 
         dateArray.insert(contentsOf: newDates.reversed(), at: 0)
 
-        let addedWidth = CGFloat(newDates.count) * 30
+        let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewWidth
         position = ScrollPosition(x: currentScrollX + addedWidth)
 
         DispatchQueue.main.async {
@@ -142,15 +148,12 @@ struct TimeBarView: View {
     }
 
     func generateDateArray(currentTime: Date, length: Int) -> [Date] {
-        let hoursBeforeCurrent = 40
-        let hoursAfterCurrent = 40
-
         var calendar = Calendar.current
         calendar.timeZone = timeZone
 
         var result: [Date] = []
 
-        for i in stride(from: hoursBeforeCurrent, to: 0, by: -1) {
+        for i in stride(from: Int(Constants.TimeBarConstants.timeViewInitialCount), to: 0, by: -1) {
             if let date = calendar.date(byAdding: .hour, value: -i, to: currentTime) {
                 result.append(date)
             }
@@ -158,7 +161,7 @@ struct TimeBarView: View {
 
         result.append(currentTime)
 
-        for i in 1...hoursAfterCurrent {
+        for i in 1...Int(Constants.TimeBarConstants.timeViewInitialCount) {
             if let date = calendar.date(byAdding: .hour, value: i, to: currentTime) {
                 result.append(date)
             }
