@@ -13,7 +13,7 @@ struct Constants {
     }
 
     struct TimeBarConstants {
-        static let timeViewWidth: CGFloat = 30;
+        static let timeViewSide: CGFloat = 30;
         static let timeViewInitialCount: CGFloat = 40;
     }
 }
