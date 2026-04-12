@@ -161,7 +161,7 @@ struct TimeView: View {
 
 #Preview("Local") {
     TimeView(
-        isEditing: .constant(true), timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
+        isEditing: .constant(false), timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
         date: Date()
     )
         .environmentObject(TimeManager())

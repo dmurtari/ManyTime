@@ -12,6 +12,9 @@ struct TimeBarView: View {
     @Binding var width: Int
     @State private var currentTime = Date()
     @State private var dateArray: [Date] = []
+    @State private var position = ScrollPosition(x: 40 * 30 - (300 / 2 - 30))
+    @State private var isLoading = false
+    @State private var currentScrollX: CGFloat = 0
 
     private var currentHour: Int {
         var calendar = Calendar.current
@@ -21,45 +24,54 @@ struct TimeBarView: View {
 
     var body: some View {
         ScrollView([.horizontal]){
-            LazyHStack(spacing: 0) {
-                ForEach(dateArray, id: \.timeIntervalSince1970) { date in
-                    TimeBarTimeView(
-                        date: .constant(date),
-                        dimension: 30,
-                        timeZone: timeZone,
-                        showDate: getHour(from: date) == 0
-                    )
-                    .clipShape(
-                        getHour(from: date) == 23 ? AnyShape(
-                            UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 6, topTrailing: 6))) : AnyShape(
-                                Rectangle()
-                            )
-                    )
-                    .clipShape(
-                        getHour(from: date) == 0 ? AnyShape(
-                            UnevenRoundedRectangle(cornerRadii: .init(topLeading: 6, bottomLeading: 6))) : AnyShape(
-                                Rectangle()
-                            )
-                    )
-                    .zIndex(getHour(from: date) == currentHour ? 1 : 0)
-                    .onAppear() {
-                        let thresholdIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
+            ScrollViewReader { proxy in
+                LazyHStack(spacing: 0) {
+                    ForEach(dateArray, id: \.timeIntervalSince1970) { date in
+                        TimeBarTimeView(
+                            date: .constant(date),
+                            dimension: 30,
+                            timeZone: timeZone,
+                            showDate: getHour(from: date) == 0
+                        )
+                        .id(date)
+                        .clipShape(
+                            getHour(from: date) == 23 ? AnyShape(
+                                UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 6, topTrailing: 6))) : AnyShape(
+                                    Rectangle()
+                                )
+                        )
+                        .clipShape(
+                            getHour(from: date) == 0 ? AnyShape(
+                                UnevenRoundedRectangle(cornerRadii: .init(topLeading: 6, bottomLeading: 6))) : AnyShape(
+                                    Rectangle()
+                                )
+                        )
+                        .zIndex(getHour(from: date) == currentHour ? 1 : 0)
+                        .onAppear() {
+                            let thresholdIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
 
-                        if dateArray.firstIndex(where: { $0 == date }) == thresholdIndex {
-                            dateArray = appendDates()
+                            if dateArray.firstIndex(of: date) == thresholdIndex {
+                                appendDates()
+                            }
                         }
-                    }
-                    .onAppear() {
-                        let thresholdIndex = dateArray.index(dateArray.startIndex, offsetBy: 5)
+                        .onAppear() {
+                            let thresholdIndex = dateArray.index(dateArray.startIndex, offsetBy: 5)
 
-                        if dateArray.firstIndex(where: { $0 == date }) == thresholdIndex {
-                            dateArray = prependDates()
+                            if dateArray.firstIndex(of: date) == thresholdIndex {
+                                prependDates()
+                            }
                         }
                     }
                 }
             }
         }
         .defaultScrollAnchor(.bottomLeading)
+        .scrollPosition($position)
+        .onScrollGeometryChange(for: CGFloat.self) { geo in
+            geo.contentOffset.x
+        } action: { _, newX in
+            currentScrollX = newX
+        }
         .scrollIndicators(.hidden)
         .frame(width: 300, height: 30)
         .overlay {
@@ -76,8 +88,10 @@ struct TimeBarView: View {
         }
     }
 
-    private func appendDates() -> [Date] {
-        print("Appending")
+    private func appendDates() {
+        guard isLoading == false else {
+            return
+        }
 
         var calendar = Calendar.current
         calendar.timeZone = timeZone
@@ -85,39 +99,50 @@ struct TimeBarView: View {
         let lastDate = dateArray.last
 
         guard lastDate != nil else {
-            return dateArray
+            return
         }
 
+        isLoading = true
         for i in 1...40 {
             if let dateToAdd = calendar.date(byAdding: .hour, value: i, to: lastDate!) {
                 dateArray.append(dateToAdd)
             }
         }
-
-        return dateArray
+        isLoading = false
     }
 
-    private func prependDates() -> [Date] {
+    private func prependDates() {
+        guard !isLoading else {
+            return
+        }
+        guard let firstDate = dateArray.first else {
+            return
+        }
+
+        isLoading = true
+
         var calendar = Calendar.current
         calendar.timeZone = timeZone
 
-        let firstDate = dateArray.first
-
-        guard firstDate != nil else {
-            return dateArray
-        }
-
-        for i in stride(from: 40, to: 0, by: -1) {
-            if let dateToAdd = calendar.date(byAdding: .hour, value: -i, to: firstDate!) {
-                dateArray.append(dateToAdd)
+        var newDates: [Date] = []
+        for i in 1...40 {
+            if let date = calendar.date(byAdding: .hour, value: -i, to: firstDate) {
+                newDates.append(date)
             }
         }
 
-        return dateArray
+        dateArray.insert(contentsOf: newDates.reversed(), at: 0)
+
+        let addedWidth = CGFloat(newDates.count) * 30
+        position = ScrollPosition(x: currentScrollX + addedWidth)
+
+        DispatchQueue.main.async {
+            self.isLoading = false
+        }
     }
 
     func generateDateArray(currentTime: Date, length: Int) -> [Date] {
-        let hoursBeforeCurrent = 4
+        let hoursBeforeCurrent = 40
         let hoursAfterCurrent = 40
 
         var calendar = Calendar.current
