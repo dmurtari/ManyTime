@@ -124,7 +124,7 @@ struct TimeView: View {
             }
 
             if preferences.showTimeBar {
-                TimeBarView(timeZone: .constant(timeZone.timeZoneObject), width: .constant(9))
+                TimeBarView(timeZone: .constant(timeZone.timeZoneObject))
             }
         }
         .onChange(of: isEditing) { _, newValue in
