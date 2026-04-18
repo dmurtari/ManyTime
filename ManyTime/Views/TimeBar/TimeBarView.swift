@@ -9,7 +9,8 @@ import SwiftUI
 
 struct TimeBarView: View {
     @Binding var timeZone: TimeZone
-    @State private var currentTime = Date()
+    @Binding var currentTime: Date
+
     @State private var dateArray: [Date] = []
     @State private var position = ScrollPosition(edge: .leading)
     @State private var isLoading = false
@@ -66,6 +67,8 @@ struct TimeBarView: View {
                 geo.contentOffset.x
             } action: { _, newX in
                 currentScrollX = newX
+
+                // Recalculate what the time at the location of the black bar is
             }
             .scrollIndicators(.hidden)
             .frame(width: Constants.AppViewConstants.timeMenuWidth, height: Constants.TimeBarConstants.timeViewSide)
@@ -77,9 +80,6 @@ struct TimeBarView: View {
                     path.addLine(to: CGPoint(x: x, y: Constants.TimeBarConstants.timeViewSide + 1))
                 }
                 .stroke(.black, lineWidth: 2)
-            }
-            .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
-                currentTime = Date()
             }
             .onAppear {
                 dateArray.append(currentTime)
@@ -159,9 +159,9 @@ struct TimeBarView: View {
 }
 
 #Preview {
-    TimeBarView(timeZone: .constant(TimeZone.current))
-    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!))
+    TimeBarView(timeZone: .constant(TimeZone.current), currentTime: .constant(Date()))
+    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!), currentTime: .constant(Date()))
         .colorScheme(.light)
-    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/New_York")!))
+    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/New_York")!), currentTime: .constant(Date()))
         .colorScheme(.dark)
 }

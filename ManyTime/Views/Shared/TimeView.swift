@@ -124,7 +124,13 @@ struct TimeView: View {
             }
 
             if preferences.showTimeBar {
-                TimeBarView(timeZone: .constant(timeZone.timeZoneObject))
+                TimeBarView(
+                    timeZone: .constant(timeZone.timeZoneObject),
+                    currentTime: Binding(
+                        get: { timeManager.displayDate },
+                        set: { timeManager.displayDate = $0 }
+                    )
+                )
             }
         }
         .onChange(of: isEditing) { _, newValue in
