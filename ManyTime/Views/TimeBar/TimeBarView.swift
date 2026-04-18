@@ -9,18 +9,11 @@ import SwiftUI
 
 struct TimeBarView: View {
     @Binding var timeZone: TimeZone
-    @Binding var width: Int
     @State private var currentTime = Date()
     @State private var dateArray: [Date] = []
     @State private var position = ScrollPosition(edge: .leading)
     @State private var isLoading = false
     @State private var currentScrollX: CGFloat = 0
-
-    private var currentHour: Int {
-        var calendar = Calendar.current
-        calendar.timeZone = timeZone
-        return calendar.component(.hour, from: currentTime)
-    }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -52,7 +45,6 @@ struct TimeBarView: View {
                                     Rectangle()
                                 )
                         )
-                        .zIndex(getHour(from: date) == currentHour ? 1 : 0)
                         .onAppear {
                             let thresholdIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
 
@@ -167,9 +159,9 @@ struct TimeBarView: View {
 }
 
 #Preview {
-    TimeBarView(timeZone: .constant(TimeZone.current), width: .constant(10))
-    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!), width: .constant(10))
+    TimeBarView(timeZone: .constant(TimeZone.current))
+    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!))
         .colorScheme(.light)
-    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/New_York")!), width: .constant(10))
+    TimeBarView(timeZone: .constant(TimeZone(identifier: "America/New_York")!))
         .colorScheme(.dark)
 }
