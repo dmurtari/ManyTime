@@ -15,6 +15,7 @@ struct TimeBarView: View {
     @State private var position = ScrollPosition(edge: .leading)
     @State private var isLoading = false
     @State private var currentScrollX: CGFloat = 0
+    @State private var currentTimeScrollX: CGFloat = -120
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -68,13 +69,28 @@ struct TimeBarView: View {
             } action: { _, newX in
                 currentScrollX = newX
 
-                // Recalculate what the time at the location of the black bar is
+                guard let startTime = dateArray.first else {
+                    return
+                }
+
+                let offsetFromStart = currentScrollX - currentTimeScrollX
+                let scrollTime = startTime.addingTimeInterval(
+                    TimeInterval(
+                        (offsetFromStart + Constants.TimeBarConstants.timeViewSide)
+                            / Constants.TimeBarConstants.timeViewSide
+                    ) * 3600
+                )
+
+                currentTime = scrollTime
             }
             .scrollIndicators(.hidden)
-            .frame(width: Constants.AppViewConstants.timeMenuWidth, height: Constants.TimeBarConstants.timeViewSide)
+            .frame(
+                width: Constants.AppViewConstants.timeMenuWidth,
+                height: Constants.TimeBarConstants.timeViewSide
+            )
             .overlay {
-                Path() { path in
-                    let x = Constants.AppViewConstants.timeMenuWidth / 2
+                Path { path in
+                    let x = Constants.AppViewConstants.timeMenuWidth / 2 - Constants.TimeBarConstants.timeViewSide
 
                     path.move(to: CGPoint(x: x, y: -1))
                     path.addLine(to: CGPoint(x: x, y: Constants.TimeBarConstants.timeViewSide + 1))
@@ -145,6 +161,7 @@ struct TimeBarView: View {
 
         let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewSide
         position = ScrollPosition(x: currentScrollX + addedWidth)
+        currentTimeScrollX += addedWidth
 
         DispatchQueue.main.async {
             self.isLoading = false
