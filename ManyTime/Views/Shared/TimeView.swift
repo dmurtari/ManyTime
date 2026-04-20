@@ -32,7 +32,8 @@ struct TimeView: View {
 
     var offset: String {
         let offsetInHours = timeZone.timeZoneObject.secondsFromGMT() / 3600
-        let formattedOffset = offsetInHours > 0
+        let formattedOffset =
+            offsetInHours > 0
             ? "GMT+\(offsetInHours)"
             : "GMT-\(abs(offsetInHours))"
 
@@ -64,7 +65,7 @@ struct TimeView: View {
             HStack {
                 VStack(alignment: .leading) {
 
-                    if (!isEditing) {
+                    if !isEditing {
                         Text("\(timeZone.normalizedDisplayName)")
                             .font(.system(size: 20))
                             .fontWeight(.semibold)
@@ -93,7 +94,7 @@ struct TimeView: View {
                         }
                     }
 
-                    if (timeZone.displayName != nil) {
+                    if timeZone.displayName != nil {
                         Text("\(offset) (\(readableTimeZone))")
                             .font(.system(size: 14))
                             .foregroundStyle(.secondary)
@@ -108,10 +109,12 @@ struct TimeView: View {
 
                 VStack(alignment: .trailing) {
                     HStack {
-                        Text(TimeFormatterService.shared.appTimeFormat(
-                            from: timeManager.displayDate,
-                            timeZone: timeZone.timeZoneObject
-                        ))
+                        Text(
+                            TimeFormatterService.shared.appTimeFormat(
+                                from: timeManager.displayDate,
+                                timeZone: timeZone.timeZoneObject
+                            )
+                        )
                         .font(.system(size: 20))
                         .fontWeight(.semibold)
                         .monospacedDigit()
@@ -128,7 +131,10 @@ struct TimeView: View {
                     timeZone: .constant(timeZone.timeZoneObject),
                     currentTime: Binding(
                         get: { timeManager.displayDate },
-                        set: { timeManager.displayDate = $0 }
+                        set: {
+                            print("Set time to \($0)")
+                            timeManager.displayDate = $0
+                        }
                     )
                 )
             }
@@ -143,12 +149,12 @@ struct TimeView: View {
         }
     }
 
-    func handleDisplayNameEdit() -> Void {
+    func handleDisplayNameEdit() {
         isEditing = true
         editableDisplayName = timeZone.normalizedDisplayName
     }
 
-    func handleDisplayNameSave() -> Void {
+    func handleDisplayNameSave() {
         Task {
             timeZoneManager.updateDisplayName(
                 for: timeZone.id,
@@ -159,7 +165,7 @@ struct TimeView: View {
         }
     }
 
-    func handleDisplayNameBlur() -> Void {
+    func handleDisplayNameBlur() {
         isEditing = false
         isDisplayNameFocused = false
     }
@@ -167,22 +173,24 @@ struct TimeView: View {
 
 #Preview("Local") {
     TimeView(
-        isEditing: .constant(false), timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
+        isEditing: .constant(false),
+        timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
         date: Date()
     )
-        .environmentObject(TimeManager())
-        .environmentObject(TimeZoneManager())
+    .environmentObject(TimeManager())
+    .environmentObject(TimeZoneManager())
 }
 
 #Preview("Los Angeles") {
     TimeView(
-        isEditing: .constant(false), timeZone: TimeZoneItem(
+        isEditing: .constant(false),
+        timeZone: TimeZoneItem(
             timeZone: TimeZone(identifier: "America/Los_Angeles")!,
             displayName: nil
         ),
         date: Date()
     )
-        .environmentObject(TimeManager())
-        .environmentObject(TimeZoneManager())
+    .environmentObject(TimeManager())
+    .environmentObject(TimeZoneManager())
 
 }
