@@ -11,26 +11,23 @@ import Combine
 enum TimeMode {
     case current
     case fixed(Date)
-    case offset(TimeInterval)
 }
 
 @MainActor
 final class TimeManager: ObservableObject {
-    @Published var displayDate = Date()
-//    @Published var timeMode: TimeMode = .current
+    @Published private(set) var currentDate = Date()
+    @Published var timeMode: TimeMode = .current
 
     private var timerCancellable: AnyCancellable?
 
-//    var displayDate: Date {
-//        switch timeMode {
-//        case .current:
-//            return currentDate
-//        case .fixed(let date):
-//            return date
-//        case .offset(let interval):
-//            return currentDate.addingTimeInterval(interval)
-//        }
-//    }
+    var displayDate: Date {
+        switch timeMode {
+        case .current:
+            return currentDate
+        case .fixed(let date):
+            return date
+        }
+    }
 
     init() {
         startTimer()
@@ -41,19 +38,15 @@ final class TimeManager: ObservableObject {
             .autoconnect()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] date in
-                self?.displayDate = date
+                self?.currentDate = date
             }
     }
 
-//    func setTimeOffset(_ interval: TimeInterval) {
-//        timeMode = .offset(interval)
-//    }
-//
-//    func setFixedTime(_ date: Date) {
-//        timeMode = .fixed(date)
-//    }
-//
-//    func switchToCurrent() {
-//        timeMode = .current
-//    }
+    func setFixedTime(_ date: Date) {
+        timeMode = .fixed(date)
+    }
+
+    func switchToCurrent() {
+        timeMode = .current
+    }
 }

@@ -13,9 +13,11 @@ struct TimeBarView: View {
 
     @State private var dateArray: [Date] = []
     @State private var position = ScrollPosition(edge: .leading)
-    @State private var isLoading = false
     @State private var currentScrollX: CGFloat = 0
-    @State private var currentTimeScrollX: CGFloat = -120
+
+    @State private var isLoading = false
+    @State private var isProgrammaticScroll = false
+    @State private var isInternalScroll = false
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -69,19 +71,23 @@ struct TimeBarView: View {
             } action: { _, newX in
                 currentScrollX = newX
 
+                guard !isProgrammaticScroll else {
+                    return
+                }
+
                 guard let startTime = dateArray.first else {
                     return
                 }
 
-                let offsetFromStart = currentScrollX - currentTimeScrollX
-                let scrollTime = startTime.addingTimeInterval(
-                    TimeInterval(
-                        (offsetFromStart + Constants.TimeBarConstants.timeViewSide)
-                            / Constants.TimeBarConstants.timeViewSide
-                    ) * 3600
-                )
+                let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
+                let viewWidth = Constants.AppViewConstants.timeMenuWidth
+                let contentOffsetAtCenter = currentScrollX + viewWidth / 2
+                let secondsFromStart = (contentOffsetAtCenter / pixelsPerHour) * 3600
+                let scrollTime = startTime.addingTimeInterval(TimeInterval(secondsFromStart))
 
+                isInternalScroll = true
                 currentTime = scrollTime
+                isInternalScroll = false
             }
             .scrollIndicators(.hidden)
             .frame(
@@ -90,7 +96,7 @@ struct TimeBarView: View {
             )
             .overlay {
                 Path { path in
-                    let x = Constants.AppViewConstants.timeMenuWidth / 2 - Constants.TimeBarConstants.timeViewSide
+                    let x = Constants.AppViewConstants.timeMenuWidth / 2 + Constants.TimeBarConstants.timeViewSide / 2
 
                     path.move(to: CGPoint(x: x, y: -1))
                     path.addLine(to: CGPoint(x: x, y: Constants.TimeBarConstants.timeViewSide + 1))
@@ -102,15 +108,34 @@ struct TimeBarView: View {
                 appendDates()
                 prependDates()
 
-                position = ScrollPosition(
-                    x: Constants.TimeBarConstants.timeViewInitialCount
-                        * Constants.TimeBarConstants
-                        .timeViewSide
-                        - (Constants.AppViewConstants.timeMenuWidth / 2 - Constants.TimeBarConstants.timeViewSide)
-                )
+                let initialScrollX =
+                    CGFloat(Constants.TimeBarConstants.timeViewInitialCount) * Constants.TimeBarConstants.timeViewSide
+                    - Constants.AppViewConstants.timeMenuWidth / 2
+
+                position = ScrollPosition(x: initialScrollX)
             }
             .defaultScrollAnchor(.bottomLeading)
             .scrollPosition($position)
+            .onChange(of: currentTime) { _, newValue in
+                guard !isInternalScroll else {
+                    return
+                }
+
+                guard let startTime = dateArray.first else {
+                    return
+                }
+
+                let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
+                let viewWidth = Constants.AppViewConstants.timeMenuWidth
+                let secondsFromStart = newValue.timeIntervalSince(startTime)
+                let targetScrollX = CGFloat(secondsFromStart / 3600) * pixelsPerHour - viewWidth / 2
+
+                isProgrammaticScroll = true
+                position = ScrollPosition(x: targetScrollX)
+                DispatchQueue.main.async {
+                    self.isProgrammaticScroll = false
+                }
+            }
         }
     }
 
@@ -137,11 +162,7 @@ struct TimeBarView: View {
     }
 
     private func prependDates() {
-        guard !isLoading else {
-            return
-        }
-
-        guard let firstDate = dateArray.first else {
+        guard !isLoading, let firstDate = dateArray.first else {
             return
         }
 
@@ -159,11 +180,13 @@ struct TimeBarView: View {
 
         dateArray.insert(contentsOf: newDates.reversed(), at: 0)
 
+        // Shift the scroll position to compensate for the inserted content
         let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewSide
+        isProgrammaticScroll = true
         position = ScrollPosition(x: currentScrollX + addedWidth)
-        currentTimeScrollX += addedWidth
 
         DispatchQueue.main.async {
+            self.isProgrammaticScroll = false
             self.isLoading = false
         }
     }
