@@ -11,8 +11,6 @@ struct TimeZoneMenu: View {
     @EnvironmentObject private var timeManager: TimeManager
     @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
-    @State private var date = Date()
-
     var body: some View {
         VStack(spacing: 0) {
             if timeZoneManager.savedTimeZones.isEmpty {
@@ -21,7 +19,7 @@ struct TimeZoneMenu: View {
             } else {
                 VStack(spacing: 16) {
                     ForEach(timeZoneManager.savedTimeZones) { timeZone in
-                        TimeView(timeZone: timeZone, date: date)
+                        TimeView(timeZone: timeZone)
                     }
                 }
                 .padding()

@@ -23,7 +23,6 @@ struct TimeZoneListView: View {
                         }
                     ),
                     timeZone: timeZone,
-                    date: Date()
                 )
                 .contextMenu {
                     Button("Edit Name", systemImage: "pencil") {
