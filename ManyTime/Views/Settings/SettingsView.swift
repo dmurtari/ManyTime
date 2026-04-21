@@ -11,11 +11,11 @@ struct SettingsView: View {
     var body: some View {
         VStack {
             GeneralSettingsView()
-                .frame(width: 275)
+                .frame(width: 300)
             ZonesSettingsView()
-                .frame(width: 275)
+                .frame(width: 300)
         }
-        .frame(width: 300)
+        .frame(width: 320)
         .padding([.vertical], 8)
         .fixedSize(horizontal: true, vertical: true)
     }
