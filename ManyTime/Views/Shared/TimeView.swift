@@ -18,16 +18,13 @@ struct TimeView: View {
     @Binding var isEditing: Bool
 
     var timeZone: TimeZoneItem
-    var date: Date
 
     init(
         isEditing: Binding<Bool> = .constant(false),
-        timeZone: TimeZoneItem,
-        date: Date
+        timeZone: TimeZoneItem
     ) {
         self._isEditing = isEditing
         self.timeZone = timeZone
-        self.date = date
     }
 
     var offset: String {
@@ -174,7 +171,6 @@ struct TimeView: View {
     TimeView(
         isEditing: .constant(false),
         timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
-        date: Date()
     )
     .environmentObject(TimeManager())
     .environmentObject(TimeZoneManager())
@@ -187,7 +183,6 @@ struct TimeView: View {
             timeZone: TimeZone(identifier: "America/Los_Angeles")!,
             displayName: nil
         ),
-        date: Date()
     )
     .environmentObject(TimeManager())
     .environmentObject(TimeZoneManager())
