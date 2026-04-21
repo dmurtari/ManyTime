@@ -9,9 +9,16 @@ import SwiftUI
 
 struct ControlsRowView: View {
     @Environment(\.openWindow) private var openWindow
+    @EnvironmentObject private var timeManager: TimeManager
 
     var body: some View {
         HStack(alignment: .center) {
+            if case .fixed = timeManager.timeMode {
+                Button("Reset to Current", systemImage: "arrow.uturn.backward.circle") {
+                    timeManager.switchToCurrent()
+                }
+            }
+
             Spacer()
 
             Menu {
@@ -40,4 +47,5 @@ struct ControlsRowView: View {
 
 #Preview {
     ControlsRowView()
+        .environmentObject(TimeManager())
 }

@@ -132,8 +132,7 @@ struct TimeView: View {
                     currentTime: Binding(
                         get: { timeManager.displayDate },
                         set: {
-                            print("Set time to \($0)")
-                            timeManager.displayDate = $0
+                            timeManager.setFixedTime($0)
                         }
                     )
                 )
