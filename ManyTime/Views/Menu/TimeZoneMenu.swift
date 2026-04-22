@@ -8,41 +8,40 @@
 import SwiftUI
 
 struct TimeZoneMenu: View {
-    @EnvironmentObject private var timeManager: TimeManager
-    @EnvironmentObject private var timeZoneManager: TimeZoneManager
+  @EnvironmentObject private var timeManager: TimeManager
+  @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
-    var body: some View {
-        VStack(spacing: 0) {
-            if timeZoneManager.savedTimeZones.isEmpty {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Nothing to show yet!")
-                        .font(.callout)
+  var body: some View {
+    VStack(spacing: 0) {
+      if timeZoneManager.savedTimeZones.isEmpty {
+        VStack(alignment: .leading, spacing: 16) {
+          Text("Nothing to show yet!")
+            .font(.callout)
 
-                    
-                    Text("Click Options > Preferences to get started by adding a Time Zone")
-                        .foregroundColor(.secondary)
-                        .font(.callout)
-                }
-                .padding()
-            } else {
-                VStack(spacing: 16) {
-                    ForEach(timeZoneManager.savedTimeZones) { timeZone in
-                        TimeView(timeZone: timeZone)
-                    }
-                }
-                .padding()
-            }
-
-            ControlsRowView()
-                .padding([.bottom], 12)
-                .padding([.horizontal])
+          Text("Click Options > Preferences to get started by adding a Time Zone")
+            .foregroundColor(.secondary)
+            .font(.callout)
         }
+        .padding()
+      } else {
+        VStack(spacing: 16) {
+          ForEach(timeZoneManager.savedTimeZones) { timeZone in
+            TimeView(timeZone: timeZone)
+          }
+        }
+        .padding()
+      }
+
+      ControlsRowView()
+        .padding([.bottom], 12)
+        .padding([.horizontal])
     }
+  }
 }
 
 #Preview {
-    TimeZoneMenu()
-        .frame(width: 300)
-        .environmentObject(TimeManager())
-        .environmentObject(TimeZoneManager())
+  TimeZoneMenu()
+    .frame(width: 300)
+    .environmentObject(TimeManager())
+    .environmentObject(TimeZoneManager())
 }

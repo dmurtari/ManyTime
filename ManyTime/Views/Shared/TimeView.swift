@@ -8,183 +8,183 @@
 import SwiftUI
 
 struct TimeView: View {
-    @EnvironmentObject private var timeManager: TimeManager
-    @EnvironmentObject private var timeZoneManager: TimeZoneManager
+  @EnvironmentObject private var timeManager: TimeManager
+  @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
-    @StateObject private var preferences = AppPreferences.shared
+  @StateObject private var preferences = AppPreferences.shared
 
-    @State private var editableDisplayName: String = ""
-    @FocusState private var isDisplayNameFocused: Bool
-    @Binding var isEditing: Bool
+  @State private var editableDisplayName: String = ""
+  @FocusState private var isDisplayNameFocused: Bool
+  @Binding var isEditing: Bool
 
-    var timeZone: TimeZoneItem
+  var timeZone: TimeZoneItem
 
-    init(
-        isEditing: Binding<Bool> = .constant(false),
-        timeZone: TimeZoneItem
-    ) {
-        self._isEditing = isEditing
-        self.timeZone = timeZone
-    }
+  init(
+    isEditing: Binding<Bool> = .constant(false),
+    timeZone: TimeZoneItem
+  ) {
+    self._isEditing = isEditing
+    self.timeZone = timeZone
+  }
 
-    var offset: String {
-        let offsetInHours = timeZone.timeZoneObject.secondsFromGMT() / 3600
-        let formattedOffset =
-            offsetInHours > 0
-            ? "GMT+\(offsetInHours)"
-            : "GMT-\(abs(offsetInHours))"
+  var offset: String {
+    let offsetInHours = timeZone.timeZoneObject.secondsFromGMT() / 3600
+    let formattedOffset =
+      offsetInHours > 0
+      ? "GMT+\(offsetInHours)"
+      : "GMT-\(abs(offsetInHours))"
 
-        return formattedOffset
-    }
+    return formattedOffset
+  }
 
-    var readableDate: String {
-        var format = Date.FormatStyle()
-            .weekday(.abbreviated)
-            .month()
-            .day()
+  var readableDate: String {
+    var format = Date.FormatStyle()
+      .weekday(.abbreviated)
+      .month()
+      .day()
 
-        format.timeZone = timeZone.timeZoneObject
+    format.timeZone = timeZone.timeZoneObject
 
-        return timeManager.displayDate.formatted(
-            format
-        )
-    }
+    return timeManager.displayDate.formatted(
+      format
+    )
+  }
 
-    var readableTimeZone: String {
-        return timeZone
-            .timeZoneObject
-            .identifier
-            .replacingOccurrences(of: "_", with: " ")
-    }
+  var readableTimeZone: String {
+    return timeZone
+      .timeZoneObject
+      .identifier
+      .replacingOccurrences(of: "_", with: " ")
+  }
 
-    var body: some View {
-        VStack {
+  var body: some View {
+    VStack {
+      HStack {
+        VStack(alignment: .leading) {
+
+          if !isEditing {
+            Text("\(timeZone.normalizedDisplayName)")
+              .font(.system(size: 20))
+              .fontWeight(.semibold)
+          } else {
             HStack {
-                VStack(alignment: .leading) {
-
-                    if !isEditing {
-                        Text("\(timeZone.normalizedDisplayName)")
-                            .font(.system(size: 20))
-                            .fontWeight(.semibold)
-                    } else {
-                        HStack {
-                            TextField("Display Name", text: $editableDisplayName)
-                                .textFieldStyle(.roundedBorder)
-                                .focused($isDisplayNameFocused)
-                                .onExitCommand(perform: handleDisplayNameBlur)
-                                .onSubmit {
-                                    handleDisplayNameSave()
-                                }
-
-                            Button("Cancel", systemImage: "x.circle") {
-                                handleDisplayNameBlur()
-                            }
-                            .buttonStyle(.glass)
-                            .labelStyle(.iconOnly)
-
-                            Button("Save", systemImage: "checkmark") {
-                                handleDisplayNameSave()
-                            }
-                            .buttonStyle(.glassProminent)
-                            .labelStyle(.iconOnly)
-
-                        }
-                    }
-
-                    if timeZone.displayName != nil {
-                        Text("\(offset) (\(readableTimeZone))")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("\(offset)")
-                            .font(.system(size: 14))
-                            .foregroundStyle(.secondary)
-                    }
+              TextField("Display Name", text: $editableDisplayName)
+                .textFieldStyle(.roundedBorder)
+                .focused($isDisplayNameFocused)
+                .onExitCommand(perform: handleDisplayNameBlur)
+                .onSubmit {
+                  handleDisplayNameSave()
                 }
 
-                Spacer()
+              Button("Cancel", systemImage: "x.circle") {
+                handleDisplayNameBlur()
+              }
+              .buttonStyle(.glass)
+              .labelStyle(.iconOnly)
 
-                VStack(alignment: .trailing) {
-                    HStack {
-                        Text(
-                            TimeFormatterService.shared.appTimeFormat(
-                                from: timeManager.displayDate,
-                                timeZone: timeZone.timeZoneObject
-                            )
-                        )
-                        .font(.system(size: 20))
-                        .fontWeight(.semibold)
-                        .monospacedDigit()
-                    }
+              Button("Save", systemImage: "checkmark") {
+                handleDisplayNameSave()
+              }
+              .buttonStyle(.glassProminent)
+              .labelStyle(.iconOnly)
 
-                    Text("\(readableDate)")
-                        .font(.system(size: 14))
-                        .foregroundStyle(.secondary)
-                }
             }
+          }
 
-            if preferences.showTimeBar {
-                TimeBarView(
-                    timeZone: .constant(timeZone.timeZoneObject),
-                    currentTime: Binding(
-                        get: { timeManager.displayDate },
-                        set: {
-                            timeManager.setFixedTime($0)
-                        }
-                    )
-                )
-            }
+          if timeZone.displayName != nil {
+            Text("\(offset) (\(readableTimeZone))")
+              .font(.system(size: 14))
+              .foregroundStyle(.secondary)
+          } else {
+            Text("\(offset)")
+              .font(.system(size: 14))
+              .foregroundStyle(.secondary)
+          }
         }
-        .onChange(of: isEditing) { _, newValue in
-            if newValue {
-                DispatchQueue.main.async { isDisplayNameFocused = true }
-                editableDisplayName = timeZone.normalizedDisplayName
-            } else {
-                isDisplayNameFocused = false
-            }
-        }
-    }
 
-    func handleDisplayNameEdit() {
-        isEditing = true
-        editableDisplayName = timeZone.normalizedDisplayName
-    }
+        Spacer()
 
-    func handleDisplayNameSave() {
-        Task {
-            timeZoneManager.updateDisplayName(
-                for: timeZone.id,
-                newName: editableDisplayName
+        VStack(alignment: .trailing) {
+          HStack {
+            Text(
+              TimeFormatterService.shared.appTimeFormat(
+                from: timeManager.displayDate,
+                timeZone: timeZone.timeZoneObject
+              )
             )
-            isEditing = false
-            editableDisplayName = ""
-        }
-    }
+            .font(.system(size: 20))
+            .fontWeight(.semibold)
+            .monospacedDigit()
+          }
 
-    func handleDisplayNameBlur() {
-        isEditing = false
-        isDisplayNameFocused = false
+          Text("\(readableDate)")
+            .font(.system(size: 14))
+            .foregroundStyle(.secondary)
+        }
+      }
+
+      if preferences.showTimeBar {
+        TimeBarView(
+          timeZone: .constant(timeZone.timeZoneObject),
+          currentTime: Binding(
+            get: { timeManager.displayDate },
+            set: {
+              timeManager.setFixedTime($0)
+            }
+          )
+        )
+      }
     }
+    .onChange(of: isEditing) { _, newValue in
+      if newValue {
+        DispatchQueue.main.async { isDisplayNameFocused = true }
+        editableDisplayName = timeZone.normalizedDisplayName
+      } else {
+        isDisplayNameFocused = false
+      }
+    }
+  }
+
+  func handleDisplayNameEdit() {
+    isEditing = true
+    editableDisplayName = timeZone.normalizedDisplayName
+  }
+
+  func handleDisplayNameSave() {
+    Task {
+      timeZoneManager.updateDisplayName(
+        for: timeZone.id,
+        newName: editableDisplayName
+      )
+      isEditing = false
+      editableDisplayName = ""
+    }
+  }
+
+  func handleDisplayNameBlur() {
+    isEditing = false
+    isDisplayNameFocused = false
+  }
 }
 
 #Preview("Local") {
-    TimeView(
-        isEditing: .constant(false),
-        timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
-    )
-    .environmentObject(TimeManager())
-    .environmentObject(TimeZoneManager())
+  TimeView(
+    isEditing: .constant(false),
+    timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
+  )
+  .environmentObject(TimeManager())
+  .environmentObject(TimeZoneManager())
 }
 
 #Preview("Los Angeles") {
-    TimeView(
-        isEditing: .constant(false),
-        timeZone: TimeZoneItem(
-            timeZone: TimeZone(identifier: "America/Los_Angeles")!,
-            displayName: nil
-        ),
-    )
-    .environmentObject(TimeManager())
-    .environmentObject(TimeZoneManager())
+  TimeView(
+    isEditing: .constant(false),
+    timeZone: TimeZoneItem(
+      timeZone: TimeZone(identifier: "America/Los_Angeles")!,
+      displayName: nil
+    ),
+  )
+  .environmentObject(TimeManager())
+  .environmentObject(TimeZoneManager())
 
 }
