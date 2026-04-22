@@ -8,81 +8,83 @@
 import SwiftUI
 
 @MainActor extension Locale {
-    var is12HourTimeFormat: Bool {
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeStyle = .short
-        dateFormatter.dateStyle = .none
-        dateFormatter.locale = self
-        let dateString = dateFormatter.string(from: Date())
-        return dateString.contains(dateFormatter.amSymbol) || dateString.contains(dateFormatter.pmSymbol)
-    }
+  var is12HourTimeFormat: Bool {
+    let dateFormatter = DateFormatter()
+    dateFormatter.timeStyle = .short
+    dateFormatter.dateStyle = .none
+    dateFormatter.locale = self
+    let dateString = dateFormatter.string(from: Date())
+    return dateString.contains(dateFormatter.amSymbol)
+      || dateString.contains(dateFormatter.pmSymbol)
+  }
 }
 
 @MainActor class TimeFormatterService {
-    private var preferences = AppPreferences.shared
+  private var preferences = AppPreferences.shared
 
-    static let shared = TimeFormatterService()
+  static let shared = TimeFormatterService()
 
-    private var formatters: [String: DateFormatter] = [:]
-    private var currentFormat: Format = .short
+  private var formatters: [String: DateFormatter] = [:]
+  private var currentFormat: Format = .short
 
-    enum Format: String {
-        case short = "hh:mm a"
-        case medium = "hh:mm:ss a"
-        case short24 = "HH:mm"
-        case medium24 = "HH:mm:ss"
+  enum Format: String {
+    case short = "hh:mm a"
+    case medium = "hh:mm:ss a"
+    case short24 = "HH:mm"
+    case medium24 = "HH:mm:ss"
+  }
+
+  private init() {
+    updateTimeFormat()
+  }
+
+  private func formatter(for format: Format, timeZone: TimeZone) -> DateFormatter {
+    let key = "\(format.rawValue)_\(timeZone.identifier)"
+
+    if let existing = formatters[key] {
+      return existing
     }
 
-    private init() {
-        updateTimeFormat()
+    let formatter = DateFormatter()
+    formatter.timeZone = timeZone
+    formatter.locale = Locale(identifier: "en_US_POSIX")
+
+    switch format {
+    case .short, .short24:
+      formatter.timeStyle = .short
+    case .medium, .medium24:
+      formatter.timeStyle = .medium
     }
 
-    private func formatter(for format: Format, timeZone: TimeZone) -> DateFormatter {
-        let key = "\(format.rawValue)_\(timeZone.identifier)"
-
-        if let existing = formatters[key] {
-            return existing
-        }
-
-        let formatter = DateFormatter()
-        formatter.timeZone = timeZone
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-
-        switch format {
-        case .short, .short24:
-            formatter.timeStyle = .short
-        case .medium, .medium24:
-            formatter.timeStyle = .medium
-        }
-
-        if format == .short24 || format == .medium24 {
-            formatter.setLocalizedDateFormatFromTemplate(format == .medium24 ? "HH:mm:ss" : "HH:mm")
-        } else {
-            formatter.setLocalizedDateFormatFromTemplate(format == .medium ? "hh:mm:ss a" : "hh:mm a")
-        }
-
-        formatters[key] = formatter
-
-        return formatter
+    if format == .short24 || format == .medium24 {
+      formatter.setLocalizedDateFormatFromTemplate(format == .medium24 ? "HH:mm:ss" : "HH:mm")
+    } else {
+      formatter.setLocalizedDateFormatFromTemplate(format == .medium ? "hh:mm:ss a" : "hh:mm a")
     }
 
-    func string(from date: Date, format: Format = .short, timeZone: TimeZone) -> String {
-        formatter(for: format, timeZone: timeZone).string(from: date)
-    }
+    formatters[key] = formatter
 
-    func appTimeFormat(from date: Date, timeZone: TimeZone) -> String {
-        formatter(for: currentFormat, timeZone: timeZone).string(from: date)
-    }
+    return formatter
+  }
 
-    func updateTimeFormat() {
-        let showSeconds = preferences.showSeconds
+  func string(from date: Date, format: Format = .short, timeZone: TimeZone) -> String {
+    formatter(for: format, timeZone: timeZone).string(from: date)
+  }
 
-        currentFormat = if Locale.current.is12HourTimeFormat {
-            showSeconds ? .medium : .short
-        } else {
-            showSeconds ? .medium24 : .short24
-        }
+  func appTimeFormat(from date: Date, timeZone: TimeZone) -> String {
+    formatter(for: currentFormat, timeZone: timeZone).string(from: date)
+  }
 
-        formatters.removeAll()
-    }
+  func updateTimeFormat() {
+    let showSeconds = preferences.showSeconds
+
+    currentFormat =
+      if Locale.current.is12HourTimeFormat {
+        showSeconds ? .medium : .short
+      } else {
+        showSeconds ? .medium24 : .short24
+      }
+
+    formatters.removeAll()
+  }
 }

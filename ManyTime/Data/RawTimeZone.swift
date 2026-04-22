@@ -6,10 +6,9 @@
 //
 
 struct RawTimeZone: Decodable, Hashable {
-    let name: String
-    let mainCities: [String]
-    let countryCode: String
-    let rawOffsetInMinutes: Int
-    let rawFormat: String
+  let name: String
+  let mainCities: [String]
+  let countryCode: String
+  let rawOffsetInMinutes: Int
+  let rawFormat: String
 }
-

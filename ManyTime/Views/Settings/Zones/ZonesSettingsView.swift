@@ -8,38 +8,36 @@
 import SwiftUI
 
 struct ZonesSettingsView: View {
-    @EnvironmentObject var timeZoneManager: TimeZoneManager
+  @EnvironmentObject var timeZoneManager: TimeZoneManager
 
-    var body: some View {
-        VStack(spacing: 16) {
-            VStack(alignment: .leading) {
-                Text("Active Time Zones")
-                    .font(.system(size: 14, weight: .bold))
+  var body: some View {
+    VStack(spacing: 16) {
+      VStack(alignment: .leading) {
+        Text("Active Time Zones")
+          .font(.system(size: 14, weight: .bold))
 
-                Divider()
+        Divider()
 
-                Group {
-                    TimeZoneListView()
-                }
-            }
-
-            VStack(alignment: .leading) {
-                Text("Add New")
-                    .font(.system(size: 14, weight: .bold))
-
-                Divider()
-
-                TimeZoneAddView()
-                    .padding([.vertical], 6)
-             }
+        Group {
+          TimeZoneListView()
         }
+      }
+
+      VStack(alignment: .leading) {
+        Text("Add New")
+          .font(.system(size: 14, weight: .bold))
+
+        Divider()
+
+        TimeZoneAddView()
+          .padding([.vertical], 6)
+      }
     }
+  }
 }
 
 #Preview {
-    ZonesSettingsView()
-        .environmentObject(TimeZoneManager())
-        .environmentObject(TimeManager())
+  ZonesSettingsView()
+    .environmentObject(TimeZoneManager())
+    .environmentObject(TimeManager())
 }
-
-

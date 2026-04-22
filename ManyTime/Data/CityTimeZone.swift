@@ -6,10 +6,10 @@
 //
 
 struct CityTimeZone: Decodable, Hashable, Identifiable {
-    let id: String
-    let city: String
-    let countryCode: String
-    let name: String
-    let rawOffsetInMinutes: Int
-    let rawFormat: String
+  let id: String
+  let city: String
+  let countryCode: String
+  let name: String
+  let rawOffsetInMinutes: Int
+  let rawFormat: String
 }
