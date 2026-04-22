@@ -24,5 +24,5 @@ struct SettingsView: View {
 #Preview {
   SettingsView()
     .environmentObject(TimeZoneManager())
-    .environmentObject(TimeManager())
+    .environment(TimeManager())
 }

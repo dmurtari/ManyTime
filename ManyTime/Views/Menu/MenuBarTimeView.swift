@@ -8,14 +8,14 @@
 import SwiftUI
 
 struct MenuBarTimeView: View {
-  @EnvironmentObject private var timeManager: TimeManager
+  @Environment(TimeManager.self) private var timeManager
 
   var timeZoneItem: TimeZoneItem
 
   var body: some View {
     Text(
       TimeFormatterService.shared.appTimeFormat(
-        from: timeManager.displayDate,
+        from: timeManager.committedDisplayDate,
         timeZone: timeZoneItem.timeZoneObject
       )
     )
@@ -29,5 +29,5 @@ struct MenuBarTimeView: View {
       displayName: "Current"
     )
   )
-  .environmentObject(TimeManager())
+  .environment(TimeManager())
 }

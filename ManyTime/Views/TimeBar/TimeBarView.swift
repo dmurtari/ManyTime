@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct TimeBarView: View {
+  @Environment(TimeManager.self) private var timeManager
+
   @Binding var timeZone: TimeZone
   @Binding var currentTime: Date
 
@@ -17,36 +19,31 @@ struct TimeBarView: View {
 
   @State private var isLoading = false
   @State private var isProgrammaticScroll = false
-  @State private var isInternalScroll = false
+  @State private var isUserScrolling = false
+  @State private var scrollSyncTask: Task<Void, any Error>?
 
   var body: some View {
     ScrollView([.horizontal]) {
       LazyHStack(spacing: 0) {
         ForEach(dateArray, id: \.timeIntervalSince1970) { date in
+          let hourValue = getHour(from: date)
           TimeBarTimeView(
             date: .constant(date),
             dimension: Int(Constants.TimeBarConstants.timeViewSide),
             timeZone: timeZone,
-            showDate: getHour(from: date) == 0
+            hour: hourValue,
+            showDate: hourValue == 0
           )
           .id(date)
           .clipShape(
-            getHour(from: date) == 23
-              ? AnyShape(
-                UnevenRoundedRectangle(cornerRadii: .init(bottomTrailing: 6, topTrailing: 6))
+            UnevenRoundedRectangle(
+              cornerRadii: .init(
+                topLeading: hourValue == 0 ? 6 : 0,
+                bottomLeading: hourValue == 0 ? 6 : 0,
+                bottomTrailing: hourValue == 23 ? 6 : 0,
+                topTrailing: hourValue == 23 ? 6 : 0
               )
-              : AnyShape(
-                Rectangle()
-              )
-          )
-          .clipShape(
-            getHour(from: date) == 0
-              ? AnyShape(
-                UnevenRoundedRectangle(cornerRadii: .init(topLeading: 6, bottomLeading: 6))
-              )
-              : AnyShape(
-                Rectangle()
-              )
+            )
           )
           .onAppear {
             let thresholdIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
@@ -80,13 +77,25 @@ struct TimeBarView: View {
 
       let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
       let viewWidth = Constants.AppViewConstants.timeMenuWidth
-      let contentOffsetAtCenter = currentScrollX + viewWidth / 2
+      let contentOffsetAtCenter = newX + viewWidth / 2
       let secondsFromStart = (contentOffsetAtCenter / pixelsPerHour) * 3600
       let scrollTime = startTime.addingTimeInterval(TimeInterval(secondsFromStart))
 
-      isInternalScroll = true
-      currentTime = scrollTime
-      isInternalScroll = false
+      timeManager.liveScrollTime = scrollTime
+
+      if !timeManager.isScrolling {
+        timeManager.isScrolling = true
+      }
+
+      isUserScrolling = true
+      scrollSyncTask?.cancel()
+      scrollSyncTask = Task { @MainActor in
+        try await Task.sleep(nanoseconds: 10_000_000)
+        
+        isUserScrolling = false
+        timeManager.isScrolling = false
+        timeManager.setFixedTime(scrollTime)
+      }
     }
     .scrollIndicators(.hidden)
     .frame(
@@ -104,6 +113,11 @@ struct TimeBarView: View {
       .stroke(.black, lineWidth: 2)
     }
     .onAppear {
+      guard dateArray.isEmpty else {
+        scrollToTime(currentTime)
+        return
+      }
+
       dateArray.append(currentTime)
       appendDates()
       prependDates()
@@ -117,25 +131,32 @@ struct TimeBarView: View {
     }
     .defaultScrollAnchor(.bottomLeading)
     .scrollPosition($position)
+    .onDisappear {
+      scrollSyncTask?.cancel()
+    }
     .onChange(of: currentTime) { _, newValue in
-      guard !isInternalScroll else {
+      guard !isUserScrolling else {
         return
       }
 
-      guard let startTime = dateArray.first else {
-        return
-      }
+      scrollToTime(newValue)
+    }
+  }
 
-      let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
-      let viewWidth = Constants.AppViewConstants.timeMenuWidth
-      let secondsFromStart = newValue.timeIntervalSince(startTime)
-      let targetScrollX = CGFloat(secondsFromStart / 3600) * pixelsPerHour - viewWidth / 2
+  private func scrollToTime(_ time: Date) {
+    guard let startTime = dateArray.first else {
+      return
+    }
 
-      isProgrammaticScroll = true
-      position = ScrollPosition(x: targetScrollX)
-      DispatchQueue.main.async {
-        self.isProgrammaticScroll = false
-      }
+    let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
+    let viewWidth = Constants.AppViewConstants.timeMenuWidth
+    let secondsFromStart = time.timeIntervalSince(startTime)
+    let targetScrollX = CGFloat(secondsFromStart / 3600) * pixelsPerHour - viewWidth / 2
+
+    isProgrammaticScroll = true
+    position = ScrollPosition(x: targetScrollX)
+    DispatchQueue.main.async {
+      self.isProgrammaticScroll = false
     }
   }
 
@@ -199,14 +220,22 @@ struct TimeBarView: View {
 }
 
 #Preview {
+  let timeManager = TimeManager()
+
   TimeBarView(timeZone: .constant(TimeZone.current), currentTime: .constant(Date()))
+    .environment(timeManager)
+
   TimeBarView(
     timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!),
     currentTime: .constant(Date())
   )
   .colorScheme(.light)
+  .environment(timeManager)
+
   TimeBarView(
-    timeZone: .constant(TimeZone(identifier: "America/New_York")!), currentTime: .constant(Date())
+    timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!),
+    currentTime: .constant(Date())
   )
   .colorScheme(.dark)
+  .environment(timeManager)
 }

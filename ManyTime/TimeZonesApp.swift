@@ -3,24 +3,24 @@ import SwiftUI
 
 @main
 struct TimeZonesApp: App {
-  @StateObject private var timeManager = TimeManager()
+  @State private var timeManager = TimeManager()
   @StateObject private var timeZoneManager = TimeZoneManager()
 
   var body: some Scene {
     MenuBarExtra {
       TimeZoneMenu()
-        .environmentObject(timeManager)
+        .environment(timeManager)
         .environmentObject(timeZoneManager)
     } label: {
       MenuBarView()
-        .environmentObject(timeManager)
+        .environment(timeManager)
         .environmentObject(timeZoneManager)
     }
     .menuBarExtraStyle(.window)
 
     Window("", id: "settings") {
       SettingsView()
-        .environmentObject(timeManager)
+        .environment(timeManager)
         .environmentObject(timeZoneManager)
     }
     .windowResizability(.contentSize)

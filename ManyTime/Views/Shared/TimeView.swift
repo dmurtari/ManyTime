@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TimeView: View {
-  @EnvironmentObject private var timeManager: TimeManager
+  @Environment(TimeManager.self) private var timeManager
   @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
   @StateObject private var preferences = AppPreferences.shared
@@ -26,6 +26,8 @@ struct TimeView: View {
     self._isEditing = isEditing
     self.timeZone = timeZone
   }
+
+  var displayDate: Date { timeManager.displayDate }
 
   var offset: String {
     let offsetInHours = timeZone.timeZoneObject.secondsFromGMT() / 3600
@@ -45,7 +47,7 @@ struct TimeView: View {
 
     format.timeZone = timeZone.timeZoneObject
 
-    return timeManager.displayDate.formatted(
+    return displayDate.formatted(
       format
     )
   }
@@ -108,7 +110,7 @@ struct TimeView: View {
           HStack {
             Text(
               TimeFormatterService.shared.appTimeFormat(
-                from: timeManager.displayDate,
+                from: displayDate,
                 timeZone: timeZone.timeZoneObject
               )
             )
@@ -127,7 +129,7 @@ struct TimeView: View {
         TimeBarView(
           timeZone: .constant(timeZone.timeZoneObject),
           currentTime: Binding(
-            get: { timeManager.displayDate },
+            get: { displayDate },
             set: {
               timeManager.setFixedTime($0)
             }
@@ -172,7 +174,7 @@ struct TimeView: View {
     isEditing: .constant(false),
     timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
   )
-  .environmentObject(TimeManager())
+  .environment(TimeManager())
   .environmentObject(TimeZoneManager())
 }
 
@@ -184,7 +186,6 @@ struct TimeView: View {
       displayName: nil
     ),
   )
-  .environmentObject(TimeManager())
+  .environment(TimeManager())
   .environmentObject(TimeZoneManager())
-
 }
