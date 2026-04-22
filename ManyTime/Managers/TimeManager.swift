@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import Observation
 
 enum TimeMode {
   case current
@@ -14,19 +15,24 @@ enum TimeMode {
 }
 
 @MainActor
-final class TimeManager: ObservableObject {
-  @Published private(set) var currentDate = Date()
-  @Published var timeMode: TimeMode = .current
+@Observable
+final class TimeManager {
+  private(set) var currentDate = Date()
+  var timeMode: TimeMode = .current
+  var liveScrollTime: Date = Date()
+  var isScrolling: Bool = false
 
-  private var timerCancellable: AnyCancellable?
+  @ObservationIgnored private var timerCancellable: AnyCancellable?
+
+  var committedDisplayDate: Date {
+    switch timeMode {
+    case .current: return currentDate
+    case .fixed(let date): return date
+    }
+  }
 
   var displayDate: Date {
-    switch timeMode {
-    case .current:
-      return currentDate
-    case .fixed(let date):
-      return date
-    }
+    isScrolling ? liveScrollTime : committedDisplayDate
   }
 
   init() {

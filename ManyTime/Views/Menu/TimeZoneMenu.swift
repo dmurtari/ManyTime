@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TimeZoneMenu: View {
-  @EnvironmentObject private var timeManager: TimeManager
+  @Environment(TimeManager.self) private var timeManager
   @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
   var body: some View {
@@ -42,6 +42,6 @@ struct TimeZoneMenu: View {
 #Preview {
   TimeZoneMenu()
     .frame(width: 300)
-    .environmentObject(TimeManager())
+    .environment(TimeManager())
     .environmentObject(TimeZoneManager())
 }

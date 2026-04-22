@@ -13,7 +13,20 @@ struct TimeBarTimeView: View {
 
   var dimension: Int
   var timeZone: TimeZone
+  var hour: Int
   var showDate: Bool
+
+  private static var formatterCache: [String: DateFormatter] = [:]
+
+  private static func cachedFormatter(format: String, timeZone: TimeZone) -> DateFormatter {
+    let key = "\(format)_\(timeZone.identifier)"
+    if let existing = formatterCache[key] { return existing }
+    let f = DateFormatter()
+    f.dateFormat = format
+    f.timeZone = timeZone
+    formatterCache[key] = f
+    return f
+  }
 
   var body: some View {
     Rectangle()
@@ -47,23 +60,11 @@ struct TimeBarTimeView: View {
   }
 
   private var monthText: String {
-    let formatter = DateFormatter()
-    formatter.timeZone = timeZone
-    formatter.dateFormat = "MMM"
-    return formatter.string(from: date)
+    TimeBarTimeView.cachedFormatter(format: "MMM", timeZone: timeZone).string(from: date)
   }
 
   private var dateText: String {
-    let formatter = DateFormatter()
-    formatter.timeZone = timeZone
-    formatter.dateFormat = "d"
-    return formatter.string(from: date)
-  }
-
-  private var hour: Int {
-    var calendar = Calendar.current
-    calendar.timeZone = timeZone
-    return calendar.component(.hour, from: date)
+    TimeBarTimeView.cachedFormatter(format: "d", timeZone: timeZone).string(from: date)
   }
 
   var backgroundColor: Color {
@@ -109,6 +110,7 @@ struct TimeBarTimeView: View {
       date: .constant(Date()),
       dimension: 30,
       timeZone: TimeZone.current,
+      hour: Calendar.current.component(.hour, from: Date()),
       showDate: false
     )
 
@@ -117,6 +119,7 @@ struct TimeBarTimeView: View {
         Calendar.current.date(bySettingHour: 6, minute: 0, second: 0, of: Date()) ?? Date()),
       dimension: 30,
       timeZone: TimeZone.current,
+      hour: 6,
       showDate: false
     )
 
@@ -125,6 +128,7 @@ struct TimeBarTimeView: View {
         Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date()) ?? Date()),
       dimension: 30,
       timeZone: TimeZone.current,
+      hour: 12,
       showDate: false
     )
 
@@ -133,7 +137,8 @@ struct TimeBarTimeView: View {
         Calendar.current.date(bySettingHour: 0, minute: 0, second: 0, of: Date()) ?? Date()),
       dimension: 30,
       timeZone: TimeZone.current,
-      showDate: false
+      hour: 0,
+      showDate: true
     )
   }
 }

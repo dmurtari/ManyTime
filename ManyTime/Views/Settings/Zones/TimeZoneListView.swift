@@ -93,5 +93,5 @@ struct TimeZoneListView: View {
 #Preview {
   TimeZoneListView()
     .environmentObject(TimeZoneManager())
-    .environmentObject(TimeManager())
+    .environment(TimeManager())
 }

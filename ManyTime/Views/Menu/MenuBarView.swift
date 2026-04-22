@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MenuBarView: View {
   @EnvironmentObject private var timeZoneManager: TimeZoneManager
-  @EnvironmentObject private var timeManager: TimeManager
+  @Environment(TimeManager.self) private var timeManager
 
   var body: some View {
     if let primaryZone = timeZoneManager.savedTimeZones.first {
@@ -23,7 +23,7 @@ struct MenuBarView: View {
 
 #Preview {
   MenuBarView()
-    .environmentObject(TimeManager())
+    .environment(TimeManager())
     .environmentObject(TimeZoneManager())
     .frame(width: 250, height: 50)
 }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ControlsRowView: View {
   @Environment(\.openWindow) private var openWindow
-  @EnvironmentObject private var timeManager: TimeManager
+  @Environment(TimeManager.self) private var timeManager
 
   var body: some View {
     HStack(alignment: .center) {
@@ -50,5 +50,5 @@ struct ControlsRowView: View {
 
 #Preview {
   ControlsRowView()
-    .environmentObject(TimeManager())
+    .environment(TimeManager())
 }
