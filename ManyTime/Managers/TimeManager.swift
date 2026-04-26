@@ -17,7 +17,7 @@ enum TimeMode {
 @MainActor
 @Observable
 final class TimeManager {
-  private(set) var currentDate = Date()
+  var currentDate = Date()
   var timeMode: TimeMode = .current
   var liveScrollTime: Date = Date()
   var isScrolling: Bool = false
