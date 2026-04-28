@@ -15,7 +15,7 @@ struct ControlsRowView: View {
     HStack(alignment: .center) {
       if case .fixed = timeManager.timeMode {
         Button(
-          "Back to Now",
+          "Back to Present",
           systemImage: "arrow.uturn.backward.circle"
         ) {
           timeManager.switchToCurrent()
