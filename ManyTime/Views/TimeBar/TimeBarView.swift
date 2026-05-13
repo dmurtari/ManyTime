@@ -155,8 +155,9 @@ struct TimeBarView: View {
 
     isProgrammaticScroll = true
     position = ScrollPosition(x: targetScrollX)
-    DispatchQueue.main.async {
-      self.isProgrammaticScroll = false
+    Task { @MainActor in
+      try? await Task.sleep(nanoseconds: 100_000_000)
+      isProgrammaticScroll = false
     }
   }
 
