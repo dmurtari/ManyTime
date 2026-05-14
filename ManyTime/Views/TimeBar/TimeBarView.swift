@@ -104,8 +104,7 @@ struct TimeBarView: View {
     )
     .overlay {
       Path { path in
-        let x =
-          Constants.AppViewConstants.timeMenuWidth / 2 + Constants.TimeBarConstants.timeViewSide / 2
+        let x = Constants.AppViewConstants.timeMenuWidth / 2
 
         path.move(to: CGPoint(x: x, y: -1))
         path.addLine(to: CGPoint(x: x, y: Constants.TimeBarConstants.timeViewSide + 1))
@@ -118,13 +117,17 @@ struct TimeBarView: View {
         return
       }
 
-      dateArray.append(currentTime)
+      var calendar = Calendar.current
+      calendar.timeZone = timeZone
+      let seedDate = calendar.dateInterval(of: .hour, for: currentTime)?.start ?? currentTime
+      dateArray.append(seedDate)
       appendDates()
       prependDates()
 
+      guard let startTime = dateArray.first else { return }
+      let secondsFromStart = currentTime.timeIntervalSince(startTime)
       let initialScrollX =
-        CGFloat(Constants.TimeBarConstants.timeViewInitialCount)
-        * Constants.TimeBarConstants.timeViewSide
+        CGFloat(secondsFromStart / 3600) * Constants.TimeBarConstants.timeViewSide
         - Constants.AppViewConstants.timeMenuWidth / 2
 
       position = ScrollPosition(x: initialScrollX)
