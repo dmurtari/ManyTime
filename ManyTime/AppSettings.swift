@@ -9,17 +9,20 @@ import ServiceManagement
 import SwiftUI
 
 @MainActor class AppPreferences: ObservableObject {
-  @AppStorage("showSeconds") var showSeconds = false {
+  @AppStorage("menuBarTimeFormat") var menuBarTimeFormat: String = "HH:mm" {
     didSet {
       notifyTimeFormatChanged()
     }
   }
-  @AppStorage("use24Hour") var use24Hour = false {
+
+  @AppStorage("dropdownTimeFormat") var dropdownTimeFormat: String = "HH:mm" {
     didSet {
       notifyTimeFormatChanged()
     }
   }
+
   @AppStorage("showTimeBar") var showTimeBar = true
+
   @AppStorage("launchOnLogin") var launchOnLogin = false {
     didSet {
       if launchOnLogin == true {
@@ -36,3 +39,4 @@ import SwiftUI
 
   static let shared = AppPreferences()
 }
+

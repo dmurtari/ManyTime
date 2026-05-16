@@ -1,13 +1,13 @@
 //
-//  GeneralSettingsView.swift
+//  MenuBarSettingsView.swift
 //  ManyTime
 //
-//  Created by Domenic Murtari on 2/23/25.
+//  Created by Domenic Murtari on 2026/05/16.
 //
 
 import SwiftUI
 
-struct GeneralSettingsView: View {
+struct MenuBarSettingsView: View {
   @StateObject private var preferences = AppPreferences.shared
 
   @State private var selectedPresetFormat: String = ""
@@ -17,45 +17,30 @@ struct GeneralSettingsView: View {
   var body: some View {
     VStack(spacing: 16) {
       VStack(alignment: .leading) {
-        Text("General")
+        Text("Menu Bar")
           .font(.system(size: 14, weight: .bold))
         Divider()
-
-        VStack(alignment: .leading, spacing: 8) {
-          Toggle("Show Time Bar", isOn: $preferences.showTimeBar)
-          Text("Help compare times across timezones with a visual bar")
-            .font(.callout)
-            .foregroundStyle(.secondary)
-        }
-        .padding([.top], 6)
 
         VStack(alignment: .leading, spacing: 8) {
           HStack {
             Picker("Format", selection: $selectedPresetFormat) {
               Text("1:23 PM").tag(presetFormats[0])
               Text("13:23").tag(presetFormats[1])
+              Text("12/31 1:23 PM").tag(presetFormats[2])
+              Text("12/31 13:23").tag(presetFormats[3])
               Text("Custom").tag("")
             }
             .onChange(of: selectedPresetFormat) { _, newValue in
               if (!selectedPresetFormat.isEmpty) {
-                preferences.dropdownTimeFormat = newValue
+                preferences.menuBarTimeFormat = newValue
               }
             }
 
             if (selectedPresetFormat.isEmpty) {
-              TextField("Format", text: $preferences.dropdownTimeFormat)
+              TextField("Format", text: $preferences.menuBarTimeFormat)
             }
           }
-
-          Text("The time format to use in the Main Window")
-            .font(.callout)
-            .foregroundStyle(.secondary)
-        }
-        .padding([.top], 6)
-
-        VStack(alignment: .leading, spacing: 8) {
-          Toggle("Launch at login", isOn: $preferences.launchOnLogin)
-          Text("Automatically start when you login to your Mac")
+          Text("The time format to use in the Menu Bar")
             .font(.callout)
             .foregroundStyle(.secondary)
         }
@@ -72,6 +57,6 @@ struct GeneralSettingsView: View {
 }
 
 #Preview {
-  GeneralSettingsView()
+  MenuBarSettingsView()
     .environment(TimeManager())
 }

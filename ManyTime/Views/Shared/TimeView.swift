@@ -109,7 +109,7 @@ struct TimeView: View {
         VStack(alignment: .trailing) {
           HStack {
             Text(
-              TimeFormatterService.shared.appTimeFormat(
+              TimeFormatterService.shared.dropdownTimeFormat(
                 from: displayDate,
                 timeZone: timeZone.timeZoneObject
               )
