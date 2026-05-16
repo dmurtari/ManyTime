@@ -10,6 +10,8 @@ import SwiftUI
 struct SettingsView: View {
   var body: some View {
     VStack {
+      MenuBarSettingsView()
+        .frame(width: 300)
       GeneralSettingsView()
         .frame(width: 300)
       ZonesSettingsView()
