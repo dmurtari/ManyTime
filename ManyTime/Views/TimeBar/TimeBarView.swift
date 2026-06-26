@@ -9,20 +9,22 @@ import SwiftUI
 
 struct TimeBarView: View {
   @Environment(TimeManager.self) private var timeManager
+  @Environment(TimeViewPosition.self) private var timeViewPosition: TimeViewPosition
 
   @Binding var timeZone: TimeZone
   @Binding var currentTime: Date
+  var positionInList: Int
 
   @State private var dateArray: [Date] = []
-  @State private var position = ScrollPosition(edge: .leading)
   @State private var currentScrollX: CGFloat = 0
 
   @State private var isLoading = false
-  @State private var isProgrammaticScroll = false
   @State private var isUserScrolling = false
   @State private var scrollSyncTask: Task<Void, any Error>?
 
   var body: some View {
+    @Bindable var timeViewPosition = timeViewPosition
+
     ScrollView([.horizontal]) {
       LazyHStack(spacing: 0) {
         ForEach(dateArray, id: \.timeIntervalSince1970) { date in
@@ -62,17 +64,22 @@ struct TimeBarView: View {
         }
       }
     }
+    .scrollPosition($timeViewPosition.scrollPositions[positionInList])
     .onScrollGeometryChange(for: CGFloat.self) { geo in
       geo.contentOffset.x
-    } action: { _, newX in
-      currentScrollX = newX
-
-      guard !isProgrammaticScroll else {
+    } action: { oldX, newX in
+      guard oldX != newX else {
         return
       }
 
+      currentScrollX = newX
+
       guard let startTime = dateArray.first else {
         return
+      }
+
+      for i in $timeViewPosition.scrollPositions.indices where i != timeViewPosition.indexScrolledByUser {
+        timeViewPosition.scrollPositions[i].scrollTo(x: newX)
       }
 
       let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
@@ -83,19 +90,7 @@ struct TimeBarView: View {
 
       timeManager.liveScrollTime = scrollTime
 
-      if !timeManager.isScrolling {
-        timeManager.isScrolling = true
-      }
-
-      isUserScrolling = true
-      scrollSyncTask?.cancel()
-      scrollSyncTask = Task { @MainActor in
-        try await Task.sleep(nanoseconds: 10_000_000)
-        
-        isUserScrolling = false
-        timeManager.isScrolling = false
-        timeManager.setFixedTime(scrollTime)
-      }
+      timeManager.setFixedTime(scrollTime)
     }
     .scrollIndicators(.hidden)
     .frame(
@@ -130,18 +125,18 @@ struct TimeBarView: View {
         CGFloat(secondsFromStart / 3600) * Constants.TimeBarConstants.timeViewSide
         - Constants.AppViewConstants.timeMenuWidth / 2
 
-      position = ScrollPosition(x: initialScrollX)
+      timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: initialScrollX)
     }
     .defaultScrollAnchor(.bottomLeading)
-    .scrollPosition($position)
     .onDisappear {
       scrollSyncTask?.cancel()
     }
-    .onChange(of: currentTime) { _, newValue in
-      guard !isUserScrolling else {
-        return
+    .onScrollPhaseChange { _, newPhase in
+      if newPhase.isScrolling {
+        timeViewPosition.indexScrolledByUser = positionInList
       }
-
+    }
+    .onChange(of: currentTime) { _, newValue in
       scrollToTime(newValue)
     }
   }
@@ -156,12 +151,7 @@ struct TimeBarView: View {
     let secondsFromStart = time.timeIntervalSince(startTime)
     let targetScrollX = CGFloat(secondsFromStart / 3600) * pixelsPerHour - viewWidth / 2
 
-    isProgrammaticScroll = true
-    position = ScrollPosition(x: targetScrollX)
-    Task { @MainActor in
-      try? await Task.sleep(nanoseconds: 100_000_000)
-      isProgrammaticScroll = false
-    }
+    timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: targetScrollX)
   }
 
   private func appendDates() {
@@ -207,13 +197,9 @@ struct TimeBarView: View {
 
     // Shift the scroll position to compensate for the inserted content
     let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewSide
-    isProgrammaticScroll = true
-    position = ScrollPosition(x: currentScrollX + addedWidth)
+    timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: currentScrollX + addedWidth)
 
-    DispatchQueue.main.async {
-      self.isProgrammaticScroll = false
-      self.isLoading = false
-    }
+    self.isLoading = false
   }
 
   private func getHour(from date: Date) -> Int {
@@ -221,25 +207,4 @@ struct TimeBarView: View {
     calendar.timeZone = timeZone
     return calendar.component(.hour, from: date)
   }
-}
-
-#Preview {
-  let timeManager = TimeManager()
-
-  TimeBarView(timeZone: .constant(TimeZone.current), currentTime: .constant(Date()))
-    .environment(timeManager)
-
-  TimeBarView(
-    timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!),
-    currentTime: .constant(Date())
-  )
-  .colorScheme(.light)
-  .environment(timeManager)
-
-  TimeBarView(
-    timeZone: .constant(TimeZone(identifier: "America/Los_Angeles")!),
-    currentTime: .constant(Date())
-  )
-  .colorScheme(.dark)
-  .environment(timeManager)
 }

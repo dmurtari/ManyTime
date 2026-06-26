@@ -34,7 +34,7 @@ struct TimeZoneListView: View {
         .foregroundStyle(.secondary)
 
         List {
-          ForEach(timeZoneManager.savedTimeZones) { timeZone in
+          ForEach(timeZoneManager.savedTimeZones.enumerated(), id: \.offset) { index, timeZone in
             TimeView(
               isEditing: Binding(
                 get: { editingTimeZoneId == timeZone.id },
@@ -44,6 +44,7 @@ struct TimeZoneListView: View {
                 }
               ),
               timeZone: timeZone,
+              index: index
             )
             .contextMenu {
               Button("Edit Name", systemImage: "pencil") {

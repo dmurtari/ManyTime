@@ -24,12 +24,8 @@ struct TimeZoneMenu: View {
         }
         .padding()
       } else {
-        VStack(spacing: 16) {
-          ForEach(timeZoneManager.savedTimeZones) { timeZone in
-            TimeView(timeZone: timeZone)
-          }
-        }
-        .padding()
+        TimeZoneListView()
+          .padding()
       }
 
       ControlsRowView()

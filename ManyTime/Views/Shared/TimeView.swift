@@ -18,13 +18,16 @@ struct TimeView: View {
   @Binding var isEditing: Bool
 
   var timeZone: TimeZoneItem
+  var index: Int
 
   init(
     isEditing: Binding<Bool> = .constant(false),
-    timeZone: TimeZoneItem
+    timeZone: TimeZoneItem,
+    index: Int = 0
   ) {
     self._isEditing = isEditing
     self.timeZone = timeZone
+    self.index = index
   }
 
   var displayDate: Date { timeManager.displayDate }
@@ -133,7 +136,8 @@ struct TimeView: View {
             set: {
               timeManager.setFixedTime($0)
             }
-          )
+          ),
+          positionInList: index
         )
       }
     }
