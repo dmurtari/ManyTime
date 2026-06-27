@@ -24,7 +24,7 @@ struct TimeZoneMenu: View {
         }
         .padding()
       } else {
-        TimeZoneListView()
+        TimeListView()
           .padding()
       }
 

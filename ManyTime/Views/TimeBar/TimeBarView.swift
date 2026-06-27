@@ -143,10 +143,6 @@ struct TimeBarView: View {
       timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: initialScrollX)
     }
     .onChange(of: currentTime) { _, newValue in
-      guard timeViewPosition.indexScrolledByUser != positionInList else {
-        return
-      }
-
       logger.log("Current time changed to \(newValue), scrolling to time")
       scrollToTime(newValue)
     }

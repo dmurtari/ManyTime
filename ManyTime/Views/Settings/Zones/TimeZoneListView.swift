@@ -10,7 +10,16 @@ import SwiftUI
 struct TimeZoneListView: View {
   @EnvironmentObject var timeZoneManager: TimeZoneManager
   @StateObject private var preferences = AppPreferences.shared
+
   @State private var editingTimeZoneId: UUID?
+  @State private var timeViewPosition: TimeViewPosition = .init()
+
+  init() {
+    timeViewPosition.scrollPositions = Array(
+      repeating: ScrollPosition(edge: .leading),
+      count: 100
+    ) // some big count, just to initialize the array
+  }
 
   var body: some View {
     if timeZoneManager.savedTimeZones.isEmpty {
@@ -62,6 +71,7 @@ struct TimeZoneListView: View {
           }
           .onMove(perform: onMove)
           .listRowSeparator(.hidden)
+          .environment(timeViewPosition)
         }
         .padding(
           EdgeInsets(
