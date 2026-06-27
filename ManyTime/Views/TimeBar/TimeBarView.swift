@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import OSLog
+
+let logger = Logger(subsystem: "com.dmurtari.ManyTime", category: "TimeBarView")
 
 struct TimeBarView: View {
   @Environment(TimeManager.self) private var timeManager
@@ -19,8 +22,6 @@ struct TimeBarView: View {
   @State private var currentScrollX: CGFloat = 0
 
   @State private var isLoading = false
-  @State private var isUserScrolling = false
-  @State private var scrollSyncTask: Task<Void, any Error>?
 
   var body: some View {
     @Bindable var timeViewPosition = timeViewPosition
@@ -78,8 +79,8 @@ struct TimeBarView: View {
         return
       }
 
-      for i in $timeViewPosition.scrollPositions.indices where i != timeViewPosition.indexScrolledByUser {
-        timeViewPosition.scrollPositions[i].scrollTo(x: newX)
+      guard timeViewPosition.indexScrolledByUser == positionInList else {
+        return
       }
 
       let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
@@ -88,9 +89,13 @@ struct TimeBarView: View {
       let secondsFromStart = (contentOffsetAtCenter / pixelsPerHour) * 3600
       let scrollTime = startTime.addingTimeInterval(TimeInterval(secondsFromStart))
 
-      timeManager.liveScrollTime = scrollTime
-
       timeManager.setFixedTime(scrollTime)
+    }
+    .defaultScrollAnchor(.bottomLeading)
+    .onScrollPhaseChange { _, newPhase in
+      if newPhase.isScrolling {
+        timeViewPosition.indexScrolledByUser = positionInList
+      }
     }
     .scrollIndicators(.hidden)
     .frame(
@@ -107,8 +112,11 @@ struct TimeBarView: View {
       .stroke(.black, lineWidth: 2)
     }
     .onAppear {
+      logger.log("Starting onAppear Hook")
+
       guard dateArray.isEmpty else {
         scrollToTime(currentTime)
+        logger.log("Date array not empty, scrolled to time")
         return
       }
 
@@ -119,29 +127,33 @@ struct TimeBarView: View {
       appendDates()
       prependDates()
 
-      guard let startTime = dateArray.first else { return }
+      guard let startTime = dateArray.first else {
+        logger.log("Start time is nil, returning")
+        return
+      }
+
+      logger.log("dateArray.first: \(startTime)")
+
       let secondsFromStart = currentTime.timeIntervalSince(startTime)
       let initialScrollX =
         CGFloat(secondsFromStart / 3600) * Constants.TimeBarConstants.timeViewSide
         - Constants.AppViewConstants.timeMenuWidth / 2
 
+      logger.log("Initial scroll X: \(initialScrollX)")
       timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: initialScrollX)
     }
-    .defaultScrollAnchor(.bottomLeading)
-    .onDisappear {
-      scrollSyncTask?.cancel()
-    }
-    .onScrollPhaseChange { _, newPhase in
-      if newPhase.isScrolling {
-        timeViewPosition.indexScrolledByUser = positionInList
-      }
-    }
     .onChange(of: currentTime) { _, newValue in
+      guard timeViewPosition.indexScrolledByUser != positionInList else {
+        return
+      }
+
+      logger.log("Current time changed to \(newValue), scrolling to time")
       scrollToTime(newValue)
     }
   }
 
   private func scrollToTime(_ time: Date) {
+    logger.log("Scrolling to time: \(time)")
     guard let startTime = dateArray.first else {
       return
     }

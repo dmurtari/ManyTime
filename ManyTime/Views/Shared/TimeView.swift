@@ -191,5 +191,6 @@ struct TimeView: View {
     ),
   )
   .environment(TimeManager())
+  .environment(TimeViewPosition())
   .environmentObject(TimeZoneManager())
 }
