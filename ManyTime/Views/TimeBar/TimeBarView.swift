@@ -5,8 +5,8 @@
 //  Created by Domenic Murtari on 2025/11/01.
 //
 
-import SwiftUI
 import OSLog
+import SwiftUI
 
 let logger = Logger(subsystem: "com.dmurtari.ManyTime", category: "TimeBarView")
 
@@ -20,7 +20,6 @@ struct TimeBarView: View {
 
   @State private var dateArray: [Date] = []
   @State private var currentScrollX: CGFloat = 0
-
   @State private var isLoading = false
 
   var body: some View {
@@ -142,8 +141,20 @@ struct TimeBarView: View {
       logger.log("Initial scroll X: \(initialScrollX)")
       timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: initialScrollX)
     }
-    .onChange(of: currentTime) { _, newValue in
+    .onChange(of: currentTime) { oldValue, newValue in
+      let wasCurrent = if case .current = timeManager.timeMode { true } else { false }
+
+      logger.log("Current time changed from \(oldValue) to \(newValue)")
       scrollToTime(newValue)
+
+      if wasCurrent {
+        // Let scroll updates finish, then switch back to currentTime
+        Task { @MainActor in
+          await Task.yield()
+          logger.log("Time mode is current, switching to current time")
+          timeManager.switchToCurrent()
+        }
+      }
     }
   }
 
