@@ -13,7 +13,7 @@ struct ControlsRowView: View {
 
   var body: some View {
     HStack(alignment: .center) {
-      if case .fixed = timeManager.timeMode {
+      if !timeManager.isShowingCurrentTime {
         Button(
           "Back to Present",
           systemImage: "arrow.uturn.backward.circle"
