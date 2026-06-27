@@ -8,6 +8,7 @@
 import Combine
 import Foundation
 import Observation
+import OSLog
 
 enum TimeMode {
   case current
@@ -24,9 +25,19 @@ final class TimeManager {
 
   var displayDate: Date {
     switch timeMode {
-    case .current: return currentDate
+    case .current:
+      return Calendar.current.date(
+        from: Calendar.current.dateComponents(
+          [.year, .month, .day, .hour, .minute],
+          from: currentDate
+        )
+      ) ?? currentDate
     case .fixed(let date): return date
     }
+  }
+
+  var isShowingCurrentTime: Bool {
+    return Calendar.current.isDate(currentDate, equalTo: displayDate, toGranularity: .minute)
   }
 
   init() {
@@ -43,12 +54,12 @@ final class TimeManager {
   }
 
   func setFixedTime(_ date: Date) {
-    print("Setting fixed time to: \(date)")
+    logger.log("Setting fixed time to: \(date)")
     timeMode = .fixed(date)
   }
 
   func switchToCurrent() {
-    print("Switching to current time")
+    logger.log("Switching to current time")
     timeMode = .current
   }
 }

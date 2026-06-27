@@ -143,13 +143,11 @@ struct TimeBarView: View {
       timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: initialScrollX)
     }
     .onChange(of: currentTime) { _, newValue in
-      logger.log("Current time changed to \(newValue), scrolling to time")
       scrollToTime(newValue)
     }
   }
 
   private func scrollToTime(_ time: Date) {
-    logger.log("Scrolling to time: \(time)")
     guard let startTime = dateArray.first else {
       return
     }
