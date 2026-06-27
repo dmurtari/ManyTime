@@ -19,20 +19,14 @@ enum TimeMode {
 final class TimeManager {
   var currentDate = Date()
   var timeMode: TimeMode = .current
-  var liveScrollTime: Date = Date()
-  var isScrolling: Bool = false
 
   @ObservationIgnored private var timerCancellable: AnyCancellable?
 
-  var committedDisplayDate: Date {
+  var displayDate: Date {
     switch timeMode {
     case .current: return currentDate
     case .fixed(let date): return date
     }
-  }
-
-  var displayDate: Date {
-    isScrolling ? liveScrollTime : committedDisplayDate
   }
 
   init() {
@@ -49,10 +43,12 @@ final class TimeManager {
   }
 
   func setFixedTime(_ date: Date) {
+    print("Setting fixed time to: \(date)")
     timeMode = .fixed(date)
   }
 
   func switchToCurrent() {
+    print("Switching to current time")
     timeMode = .current
   }
 }
