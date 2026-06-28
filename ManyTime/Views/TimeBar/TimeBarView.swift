@@ -8,8 +8,6 @@
 import OSLog
 import SwiftUI
 
-let logger = Logger(subsystem: "com.dmurtari.ManyTime", category: "TimeBarView")
-
 struct TimeBarView: View {
   @Environment(TimeManager.self) private var timeManager
   @Environment(TimeViewPosition.self) private var timeViewPosition: TimeViewPosition
@@ -21,6 +19,14 @@ struct TimeBarView: View {
   @State private var dateArray: [Date] = []
   @State private var currentScrollX: CGFloat = 0
   @State private var isLoading = false
+
+  private let logger = Logger(subsystem: "com.dmurtari.ManyTime", category: "TimeBarView")
+
+  private var calendar: Calendar {
+    var calendar = Calendar.current
+    calendar.timeZone = timeZone
+    return calendar
+  }
 
   var body: some View {
     @Bindable var timeViewPosition = timeViewPosition
@@ -48,16 +54,12 @@ struct TimeBarView: View {
             )
           )
           .onAppear {
-            let thresholdIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
+            let upperIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
+            let lowerIndex = dateArray.index(dateArray.startIndex, offsetBy: 5)
 
-            if dateArray.firstIndex(of: date) == thresholdIndex {
+            if dateArray.firstIndex(of: date) == upperIndex {
               appendDates()
-            }
-          }
-          .onAppear {
-            let thresholdIndex = dateArray.index(dateArray.startIndex, offsetBy: 5)
-
-            if dateArray.firstIndex(of: date) == thresholdIndex {
+            } else if dateArray.firstIndex(of: date) == lowerIndex {
               prependDates()
             }
           }
@@ -119,8 +121,6 @@ struct TimeBarView: View {
         return
       }
 
-      var calendar = Calendar.current
-      calendar.timeZone = timeZone
       let seedDate = calendar.dateInterval(of: .hour, for: currentTime)?.start ?? currentTime
       dateArray.append(seedDate)
       appendDates()
@@ -162,18 +162,11 @@ struct TimeBarView: View {
   }
 
   private func appendDates() {
-    guard isLoading == false else {
-      return
-    }
-
-    guard let lastDate = dateArray.last else {
+    guard !isLoading, let lastDate = dateArray.last else {
       return
     }
 
     isLoading = true
-
-    var calendar = Calendar.current
-    calendar.timeZone = timeZone
 
     for i in 1...Int(Constants.TimeBarConstants.timeViewInitialCount) {
       if let dateToAdd = calendar.date(byAdding: .hour, value: i, to: lastDate) {
@@ -190,9 +183,6 @@ struct TimeBarView: View {
 
     isLoading = true
 
-    var calendar = Calendar.current
-    calendar.timeZone = timeZone
-
     var newDates: [Date] = []
     for i in 1...Int(Constants.TimeBarConstants.timeViewInitialCount) {
       if let date = calendar.date(byAdding: .hour, value: -i, to: firstDate) {
@@ -203,17 +193,15 @@ struct TimeBarView: View {
     dateArray.insert(contentsOf: newDates.reversed(), at: 0)
 
     // Shift the scroll position to compensate for the inserted content
-    if (adjustScroll) {
+    if adjustScroll {
       let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewSide
       timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: currentScrollX + addedWidth)
     }
 
-    self.isLoading = false
+    isLoading = false
   }
 
   private func getHour(from date: Date) -> Int {
-    var calendar = Calendar.current
-    calendar.timeZone = timeZone
     return calendar.component(.hour, from: date)
   }
 }

@@ -14,6 +14,6 @@ struct Constants {
 
   struct TimeBarConstants {
     static let timeViewSide: CGFloat = 30
-    static let timeViewInitialCount: CGFloat = 40
+    static let timeViewInitialCount: CGFloat = 400
   }
 }
