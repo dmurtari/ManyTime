@@ -23,6 +23,8 @@ final class TimeManager {
 
   @ObservationIgnored private var timerCancellable: AnyCancellable?
 
+  private let logger = Logger(subsystem: "com.dmurtari.ManyTime", category: "TimeManager")
+
   var displayDate: Date {
     switch timeMode {
     case .current:
