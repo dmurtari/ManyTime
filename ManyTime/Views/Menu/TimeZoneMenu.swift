@@ -11,6 +11,8 @@ struct TimeZoneMenu: View {
   @Environment(TimeManager.self) private var timeManager
   @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
+  @State private var timeViewPosition: TimeViewPosition = .init()
+
   var body: some View {
     VStack(spacing: 0) {
       if timeZoneManager.savedTimeZones.isEmpty {
@@ -24,8 +26,13 @@ struct TimeZoneMenu: View {
         }
         .padding()
       } else {
-        TimeListView()
-          .padding()
+        VStack(spacing: 16) {
+          ForEach(timeZoneManager.savedTimeZones.enumerated(), id: \.offset) { index, timeZone in
+            TimeView(timeZone: timeZone, index: index)
+          }
+        }
+        .environment(timeViewPosition)
+        .padding()
       }
 
       ControlsRowView()
