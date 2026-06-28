@@ -144,14 +144,14 @@ struct TimeBarView: View {
     .onChange(of: currentTime) { oldValue, newValue in
       let wasCurrent = if case .current = timeManager.timeMode { true } else { false }
 
-      logger.log("Current time changed from \(oldValue) to \(newValue)")
+      logger.log("currentTime changed from \(oldValue) to \(newValue)")
       scrollToTime(newValue)
 
       if wasCurrent {
         // Let scroll updates finish, then switch back to currentTime
         Task { @MainActor in
           await Task.yield()
-          logger.log("Time mode is current, switching to current time")
+          logger.log("Time mode is current, re-switching to current time")
           timeManager.switchToCurrent()
         }
       }
