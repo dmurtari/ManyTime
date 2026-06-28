@@ -33,8 +33,9 @@ struct TimeBarView: View {
 
     ScrollView([.horizontal]) {
       LazyHStack(spacing: 0) {
-        ForEach(dateArray, id: \.timeIntervalSince1970) { date in
+        ForEach(dateArray.enumerated(), id: \.offset) { index, date in
           let hourValue = getHour(from: date)
+
           TimeBarTimeView(
             date: .constant(date),
             dimension: Int(Constants.TimeBarConstants.timeViewSide),
@@ -54,12 +55,12 @@ struct TimeBarView: View {
             )
           )
           .onAppear {
-            let upperIndex = dateArray.index(dateArray.endIndex, offsetBy: -5)
-            let lowerIndex = dateArray.index(dateArray.startIndex, offsetBy: 5)
+            let upperIndex = dateArray.count - 5
+            let lowerIndex = 5
 
-            if dateArray.firstIndex(of: date) == upperIndex {
+            if index == upperIndex {
               appendDates()
-            } else if dateArray.firstIndex(of: date) == lowerIndex {
+            } else if index == lowerIndex {
               prependDates()
             }
           }
