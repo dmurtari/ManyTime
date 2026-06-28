@@ -22,14 +22,6 @@ struct GeneralSettingsView: View {
         Divider()
 
         VStack(alignment: .leading, spacing: 8) {
-          Toggle("Show Time Bar", isOn: $preferences.showTimeBar)
-          Text("Help compare times across timezones with a visual bar")
-            .font(.callout)
-            .foregroundStyle(.secondary)
-        }
-        .padding([.top], 6)
-
-        VStack(alignment: .leading, spacing: 8) {
           HStack {
             Picker("Format", selection: $selectedPresetFormat) {
               Text("1:23 PM").tag(presetFormats[0])
@@ -47,7 +39,15 @@ struct GeneralSettingsView: View {
             }
           }
 
-          Text("The time format to use in the Main Window")
+          Text("The time format to use in the Popup Window")
+            .font(.callout)
+            .foregroundStyle(.secondary)
+        }
+        .padding([.top], 6)
+
+        VStack(alignment: .leading, spacing: 8) {
+          Toggle("Show Time Bar", isOn: $preferences.showTimeBar)
+          Text("Help compare times across timezones with a visual bar")
             .font(.callout)
             .foregroundStyle(.secondary)
         }
