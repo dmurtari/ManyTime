@@ -14,13 +14,6 @@ struct TimeZoneListView: View {
   @State private var editingTimeZoneId: UUID?
   @State private var timeViewPosition: TimeViewPosition = .init()
 
-  init() {
-    timeViewPosition.scrollPositions = Array(
-      repeating: ScrollPosition(edge: .leading),
-      count: 100
-    ) // some big count, just to initialize the array
-  }
-
   var body: some View {
     if timeZoneManager.savedTimeZones.isEmpty {
       VStack(alignment: .leading, spacing: 16) {

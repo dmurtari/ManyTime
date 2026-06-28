@@ -124,22 +124,12 @@ struct TimeBarView: View {
       let seedDate = calendar.dateInterval(of: .hour, for: currentTime)?.start ?? currentTime
       dateArray.append(seedDate)
       appendDates()
-      prependDates()
+      prependDates(adjustScroll: false)
 
-      guard let startTime = dateArray.first else {
-        logger.log("Start time is nil, returning")
-        return
+      Task { @MainActor in
+        await Task.yield()
+        scrollToTime(currentTime)
       }
-
-      logger.log("dateArray.first: \(startTime)")
-
-      let secondsFromStart = currentTime.timeIntervalSince(startTime)
-      let initialScrollX =
-        CGFloat(secondsFromStart / 3600) * Constants.TimeBarConstants.timeViewSide
-        - Constants.AppViewConstants.timeMenuWidth / 2
-
-      logger.log("Initial scroll X: \(initialScrollX)")
-      timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: initialScrollX)
     }
     .onChange(of: currentTime) { oldValue, newValue in
       let wasCurrent = if case .current = timeManager.timeMode { true } else { false }
@@ -193,7 +183,7 @@ struct TimeBarView: View {
     isLoading = false
   }
 
-  private func prependDates() {
+  private func prependDates(adjustScroll: Bool = true) {
     guard !isLoading, let firstDate = dateArray.first else {
       return
     }
@@ -213,8 +203,10 @@ struct TimeBarView: View {
     dateArray.insert(contentsOf: newDates.reversed(), at: 0)
 
     // Shift the scroll position to compensate for the inserted content
-    let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewSide
-    timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: currentScrollX + addedWidth)
+    if (adjustScroll) {
+      let addedWidth = CGFloat(newDates.count) * Constants.TimeBarConstants.timeViewSide
+      timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: currentScrollX + addedWidth)
+    }
 
     self.isLoading = false
   }
