@@ -39,7 +39,7 @@ struct GeneralSettingsView: View {
             }
           }
 
-          Text("The time format to use in the Popup Window")
+          Text("The time format to use in the Popup Window (use `{name}` to include the timezone name)")
             .font(.callout)
             .foregroundStyle(.secondary)
         }
@@ -72,8 +72,8 @@ struct GeneralSettingsView: View {
       }
     }
     .onAppear {
-      if presetFormats.contains(preferences.menuBarTimeFormat) {
-        selectedPresetFormat = preferences.menuBarTimeFormat
+      if presetFormats.contains(preferences.dropdownTimeFormat) {
+        selectedPresetFormat = preferences.dropdownTimeFormat
       }
     }
   }
