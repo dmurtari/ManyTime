@@ -9,19 +9,29 @@ import SwiftUI
 
 struct SettingsView: View {
   var body: some View {
-    VStack {
-      MenuBarSettingsView()
-        .frame(width: 300)
-      GeneralSettingsView()
-        .frame(width: 300)
+    TabView {
+      ScrollView {
+        VStack(spacing: 16) {
+          GeneralSettingsView()
+          MenuBarSettingsView()
+        }
+      }
+      .frame(width: 400)
+      .padding([.all], 18)
+      .tabItem {
+        Label("General", systemImage: "gearshape")
+      }
+
       ZonesSettingsView()
-        .frame(width: 300)
+        .padding([.all], 18)
+        .tabItem {
+          Label("Time Zones", systemImage: "globe")
+        }
     }
-    .frame(width: 320)
-    .padding([.vertical], 8)
     .fixedSize(horizontal: true, vertical: true)
   }
 }
+
 
 #Preview {
   SettingsView()

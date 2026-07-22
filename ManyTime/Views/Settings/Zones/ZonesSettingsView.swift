@@ -33,6 +33,7 @@ struct ZonesSettingsView: View {
           .padding([.vertical], 6)
       }
     }
+    .frame(width: 300)
   }
 }
 
