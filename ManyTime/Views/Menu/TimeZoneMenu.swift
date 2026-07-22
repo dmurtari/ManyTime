@@ -15,7 +15,7 @@ struct TimeZoneMenu: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      if timeZoneManager.savedTimeZones.isEmpty {
+      if timeZoneManager.displayedTimeZones.isEmpty {
         VStack(alignment: .leading, spacing: 16) {
           Text("Nothing to show yet!")
             .font(.callout)
@@ -27,7 +27,7 @@ struct TimeZoneMenu: View {
         .padding()
       } else {
         VStack(spacing: 16) {
-          ForEach(timeZoneManager.savedTimeZones.enumerated(), id: \.offset) { index, timeZone in
+          ForEach(timeZoneManager.displayedTimeZones.enumerated(), id: \.offset) { index, timeZone in
             TimeView(timeZone: timeZone, index: index)
           }
         }

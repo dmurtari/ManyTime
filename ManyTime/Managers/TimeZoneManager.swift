@@ -5,6 +5,7 @@
 //  Created by Domenic Murtari on 2/16/25.
 //
 
+import Combine
 import SwiftUI
 
 struct TimeZoneItem: Identifiable, Codable, Equatable {
@@ -64,11 +65,13 @@ class SystemTimeZoneProvider: TimeZoneProviding {
   }
 }
 
+@MainActor
 class TimeZoneManager: ObservableObject, Observable {
   @Published var savedTimeZones: [TimeZoneItem] = []
   private let saveKey: String
   private let userDefaults: UserDefaultsProtocol
   private let timeZoneProvider: TimeZoneProviding
+  private var cancellables = Set<AnyCancellable>()
 
   init(
     userDefaults: UserDefaultsProtocol = UserDefaults.standard,
@@ -79,6 +82,7 @@ class TimeZoneManager: ObservableObject, Observable {
     self.timeZoneProvider = timeZoneProvider
     self.saveKey = saveKey
     loadTimeZones()
+    addListeners()
   }
 
   var availableTimeZoneIdentifiers: [String] {
@@ -162,5 +166,44 @@ class TimeZoneManager: ObservableObject, Observable {
       print("Failed to load time zones: \(error)")
       savedTimeZones = []
     }
+  }
+
+  private func addListeners() {
+    AppPreferences.shared.objectWillChange
+      .sink { [weak self] _ in
+        self?.objectWillChange.send()
+      }
+      .store(in: &cancellables)
+
+    NotificationCenter.default.publisher(for: .NSSystemTimeZoneDidChange)
+      .sink { [weak self] _ in
+        if let self {
+          self.objectWillChange.send()
+        }
+      }
+      .store(in: &cancellables)
+  }
+}
+
+extension TimeZoneManager {
+  /// The timezones in display order, adjusted so the device's own timezone doesn't appear first in the list
+  var displayedTimeZones: [TimeZoneItem] {
+    guard AppPreferences.shared.demoteCurrentTimezoneInList else {
+      return savedTimeZones
+    }
+
+    let deviceIdentifier = timeZoneProvider.current.identifier
+
+    guard let first = savedTimeZones.first,
+      first.timeZone == deviceIdentifier,
+      let nextIndex = savedTimeZones.firstIndex(where: { $0.timeZone != deviceIdentifier })
+    else {
+      return savedTimeZones
+    }
+
+    var reordered = savedTimeZones
+    let promoted = reordered.remove(at: nextIndex)
+    reordered.insert(promoted, at: 0)
+    return reordered
   }
 }
