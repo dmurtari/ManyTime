@@ -114,7 +114,7 @@ struct TimeView: View {
             Text(
               TimeFormatterService.shared.dropdownTimeFormat(
                 from: displayDate,
-                timeZone: timeZone.timeZoneObject
+                timeZone: timeZone
               )
             )
             .font(.system(size: 20))

@@ -20,10 +20,11 @@ import SwiftUI
 }
 
 @MainActor class TimeFormatterService {
-  private var preferences = AppPreferences.shared
-
   static let shared = TimeFormatterService()
 
+  private static let namePlaceholder = "{name}"
+
+  private var preferences = AppPreferences.shared
   private var formatters: [String: DateFormatter] = [:]
 
   private init() {
@@ -47,12 +48,28 @@ import SwiftUI
     return formatter
   }
 
-  func menuBarTimeFormat(from date: Date, timeZone: TimeZone) -> String {
-    formatter(for: preferences.menuBarTimeFormat, timeZone: timeZone).string(from: date)
+  /// Replaces {name} with the given display name
+  private func resolvedFormat(_ format: String, displayName: String) -> String {
+    guard format.contains(Self.namePlaceholder) else {
+      return format
+    }
+
+    let escaped = displayName.replacingOccurrences(of: "'", with: "''")
+
+    return format.replacingOccurrences(
+      of: Self.namePlaceholder,
+      with: "'\(escaped)'"
+    )
   }
 
-  func dropdownTimeFormat(from date: Date, timeZone: TimeZone) -> String {
-    formatter(for: preferences.dropdownTimeFormat, timeZone: timeZone).string(from: date)
+  func menuBarTimeFormat(from date: Date, timeZone: TimeZoneItem) -> String {
+    let format = resolvedFormat(preferences.menuBarTimeFormat, displayName: timeZone.normalizedDisplayName)
+    return formatter(for: format, timeZone: timeZone.timeZoneObject).string(from: date)
+  }
+
+  func dropdownTimeFormat(from date: Date, timeZone: TimeZoneItem) -> String {
+    let format = resolvedFormat(preferences.dropdownTimeFormat, displayName: timeZone.normalizedDisplayName)
+    return formatter(for: format, timeZone: timeZone.timeZoneObject).string(from: date)
   }
 
   func updateTimeFormat() {

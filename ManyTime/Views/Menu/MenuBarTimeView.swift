@@ -16,7 +16,7 @@ struct MenuBarTimeView: View {
     Text(
       TimeFormatterService.shared.menuBarTimeFormat(
         from: timeManager.currentDate,
-        timeZone: timeZoneItem.timeZoneObject
+        timeZone: timeZoneItem
       )
     )
   }

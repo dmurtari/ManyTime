@@ -12,7 +12,16 @@ struct MenuBarSettingsView: View {
 
   @State private var selectedPresetFormat: String = ""
 
-  private let presetFormats: [String] = ["hh:mm a", "HH:mm", "MM/dd hh:mm a", "MM/dd HH:mm"]
+  private let presetFormats: [String] = [
+    "hh:mm a",
+    "HH:mm",
+    "MM/dd hh:mm a",
+    "MM/dd HH:mm",
+    "{name}: hh:mm a",
+    "{name}: HH:mm",
+    "{name}: MM/dd hh:mm a",
+    "{name}: MM/dd HH:mm"
+  ]
 
   var body: some View {
     VStack(spacing: 16) {
@@ -28,6 +37,10 @@ struct MenuBarSettingsView: View {
               Text("13:23").tag(presetFormats[1])
               Text("12/31 1:23 PM").tag(presetFormats[2])
               Text("12/31 13:23").tag(presetFormats[3])
+              Text("New York: 1:23 PM").tag(presetFormats[4])
+              Text("New York: 13:23").tag(presetFormats[5])
+              Text("New York: 12/31 1:23 PM").tag(presetFormats[6])
+              Text("New York: 12/31 13:23").tag(presetFormats[7])
               Text("Custom").tag("")
             }
             .onChange(of: selectedPresetFormat) { _, newValue in
@@ -40,7 +53,7 @@ struct MenuBarSettingsView: View {
               TextField("Format", text: $preferences.menuBarTimeFormat)
             }
           }
-          Text("The time format to use in the Menu Bar")
+          Text("The time format to use in the Popup Window (use `{name}` to include the timezone name)")
             .font(.callout)
             .foregroundStyle(.secondary)
         }
