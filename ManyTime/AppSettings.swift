@@ -23,7 +23,9 @@ import SwiftUI
 
   @AppStorage("showTimeBar") var showTimeBar = true
 
-  @AppStorage("demoteCurrentTimezoneInList") var demoteCurrentTimezoneInList = true
+  @AppStorage("demoteCurrentTimezoneInList") var demoteCurrentTimezoneInList = false
+
+  @AppStorage("showNonDeviceTimezoneInMenuBar") var showNonDeviceTimezoneInMenuBar = true
 
   @AppStorage("launchOnLogin") var launchOnLogin = false {
     didSet {

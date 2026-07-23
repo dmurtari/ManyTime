@@ -12,8 +12,8 @@ struct SettingsView: View {
     TabView {
       ScrollView {
         VStack(spacing: 16) {
-          GeneralSettingsView()
           MenuBarSettingsView()
+          GeneralSettingsView()
         }
       }
       .frame(width: 400)

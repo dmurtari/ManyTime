@@ -13,7 +13,8 @@ struct MenuBarView: View {
   @Environment(TimeManager.self) private var timeManager
 
   var body: some View {
-    if let primaryZone = timeZoneManager.displayedTimeZones.first {
+
+    if let primaryZone = timeZoneManager.menuBarTimezoneItem {
       MenuBarTimeView(timeZoneItem: primaryZone)
     } else {
       Image(systemName: "clock")
