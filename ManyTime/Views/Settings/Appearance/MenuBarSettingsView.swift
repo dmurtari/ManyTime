@@ -56,6 +56,15 @@ struct MenuBarSettingsView: View {
           Text("The time format to use in the Popup Window (use `{name}` to include the timezone name)")
             .font(.callout)
             .foregroundStyle(.secondary)
+
+          VStack(alignment: .leading, spacing: 8) {
+            Toggle("Always show a non-device timezone in the Menu Bar", isOn: $preferences.showNonDeviceTimezoneInMenuBar)
+            Text("Show the first, non-device timezone in the Menu Bar, if the device timezone is first in the list")
+              .font(.callout)
+              .foregroundStyle(.secondary)
+          }
+          .padding([.top], 6)
+
         }
         .padding([.top], 6)
         .padding([.bottom], 12)

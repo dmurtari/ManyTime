@@ -195,8 +195,8 @@ extension TimeZoneManager {
     let deviceIdentifier = timeZoneProvider.current.identifier
 
     guard let first = savedTimeZones.first,
-      first.timeZone == deviceIdentifier,
-      let nextIndex = savedTimeZones.firstIndex(where: { $0.timeZone != deviceIdentifier })
+          first.timeZone == deviceIdentifier,
+          let nextIndex = savedTimeZones.firstIndex(where: { $0.timeZone != deviceIdentifier })
     else {
       return savedTimeZones
     }
@@ -205,5 +205,19 @@ extension TimeZoneManager {
     let promoted = reordered.remove(at: nextIndex)
     reordered.insert(promoted, at: 0)
     return reordered
+  }
+
+  var menuBarTimezoneItem: TimeZoneItem? {
+    guard AppPreferences.shared.showNonDeviceTimezoneInMenuBar else {
+      return savedTimeZones.first
+    }
+
+    let deviceIdentifier = timeZoneProvider.current.identifier
+
+    if let firstNonDevice = savedTimeZones.first(where: { $0.timeZone != deviceIdentifier }) {
+      return firstNonDevice
+    } else {
+      return savedTimeZones.first
+    }
   }
 }

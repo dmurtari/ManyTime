@@ -17,7 +17,7 @@ struct GeneralSettingsView: View {
   var body: some View {
     VStack(spacing: 16) {
       VStack(alignment: .leading) {
-        Text("General")
+        Text("Timezone Menu")
           .font(.system(size: 14, weight: .bold))
         Divider()
 
@@ -60,6 +60,12 @@ struct GeneralSettingsView: View {
             .foregroundStyle(.secondary)
         }
         .padding([.top], 6)
+      }
+
+      VStack(alignment: .leading) {
+        Text("General")
+          .font(.system(size: 14, weight: .bold))
+        Divider()
 
         VStack(alignment: .leading, spacing: 8) {
           Toggle("Launch at login", isOn: $preferences.launchOnLogin)
