@@ -11,6 +11,7 @@ struct TimeZoneMenu: View {
   @Environment(TimeManager.self) private var timeManager
   @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
+  @StateObject private var preferences = AppPreferences.shared
   @State private var timeViewPosition: TimeViewPosition = .init()
 
   var body: some View {
@@ -29,6 +30,11 @@ struct TimeZoneMenu: View {
         VStack(spacing: 16) {
           ForEach(timeZoneManager.displayedTimeZones.enumerated(), id: \.offset) { index, timeZone in
             TimeView(timeZone: timeZone, index: index)
+          }
+
+          if (preferences.showTimeBar && preferences.showRockerControls) {
+            TimeRockerControl()
+              .padding(.top, 8)
           }
         }
         .environment(timeViewPosition)

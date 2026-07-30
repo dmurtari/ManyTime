@@ -46,6 +46,14 @@ struct GeneralSettingsView: View {
         .padding([.top], 6)
 
         VStack(alignment: .leading, spacing: 8) {
+          Toggle("Always list a non-device timezone first", isOn: $preferences.demoteCurrentTimezoneInList)
+          Text("When the device timezone is first in the list, move it down so the next timezone is first")
+            .font(.callout)
+            .foregroundStyle(.secondary)
+        }
+        .padding([.top], 6)
+
+        VStack(alignment: .leading, spacing: 8) {
           Toggle("Show Time Bar", isOn: $preferences.showTimeBar)
           Text("Help compare times across timezones with a visual bar")
             .font(.callout)
@@ -53,13 +61,15 @@ struct GeneralSettingsView: View {
         }
         .padding([.top], 6)
 
-        VStack(alignment: .leading, spacing: 8) {
-          Toggle("Always list a non-device timezone first", isOn: $preferences.demoteCurrentTimezoneInList)
-          Text("When the device timezone is first in the list, move it down so the next timezone is first")
-            .font(.callout)
-            .foregroundStyle(.secondary)
+        if (preferences.showTimeBar) {
+          VStack(alignment: .leading, spacing: 8) {
+            Toggle("Scroll with Rocker Control", isOn: $preferences.showRockerControls)
+            Text("Show a rocker control to scroll the time bar")
+              .font(.callout)
+              .foregroundStyle(.secondary)
+          }
+          .padding([.top], 6)
         }
-        .padding([.top], 6)
       }
 
       VStack(alignment: .leading) {

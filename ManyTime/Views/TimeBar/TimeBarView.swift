@@ -99,7 +99,7 @@ struct TimeBarView: View {
         timeViewPosition.indexScrolledByUser = positionInList
       }
     }
-    .scrollIndicators(.hidden)
+    .scrollIndicators(.never)
     .frame(
       width: Constants.AppViewConstants.timeMenuWidth,
       height: Constants.TimeBarConstants.timeViewSide

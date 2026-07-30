@@ -23,6 +23,8 @@ import SwiftUI
 
   @AppStorage("showTimeBar") var showTimeBar = true
 
+  @AppStorage("showRockerControls") var showRockerControls = true
+
   @AppStorage("demoteCurrentTimezoneInList") var demoteCurrentTimezoneInList = false
 
   @AppStorage("showNonDeviceTimezoneInMenuBar") var showNonDeviceTimezoneInMenuBar = true
