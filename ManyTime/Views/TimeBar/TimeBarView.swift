@@ -20,6 +20,8 @@ struct TimeBarView: View {
   @State private var currentScrollX: CGFloat = 0
   @State private var isLoading = false
 
+  @StateObject private var preferences = AppPreferences.shared
+
   private let logger = Logger(subsystem: "com.dmurtari.ManyTime", category: "TimeBarView")
 
   private var calendar: Calendar {
@@ -99,7 +101,7 @@ struct TimeBarView: View {
         timeViewPosition.indexScrolledByUser = positionInList
       }
     }
-    .scrollIndicators(.never)
+    .scrollIndicators(preferences.showRockerControls ? .never : .hidden)
     .frame(
       width: Constants.AppViewConstants.timeMenuWidth,
       height: Constants.TimeBarConstants.timeViewSide
