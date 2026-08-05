@@ -25,6 +25,11 @@ struct ControlsRowView: View {
       Spacer()
 
       Menu {
+        Button("About") {
+          NSApp.activate(ignoringOtherApps: true)
+          openWindow(id: "about")
+        }
+
         Button("Preferences", systemImage: "gear.circle.fill") {
           NSApp.activate(ignoringOtherApps: true)
           openWindow(id: "settings")

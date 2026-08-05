@@ -26,5 +26,12 @@ struct TimeZonesApp: App {
     .windowResizability(.contentSize)
     .windowIdealSize(.fitToContent)
     .defaultPosition(.center)
+
+    Window("", id: "about") {
+      AboutView()
+    }
+    .windowResizability(.contentSize)
+    .windowIdealSize(.fitToContent)
+    .defaultPosition(.center)
   }
 }
