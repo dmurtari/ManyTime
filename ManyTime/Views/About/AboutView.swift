@@ -29,6 +29,7 @@ struct AboutView: View {
 
       Link("https://codeberg.org/dmurtari/ManyTime", destination: repositoryURL!)
         .font(.caption)
+        .focusable(false)
     }
     .padding()
     .frame(minWidth: 280)
