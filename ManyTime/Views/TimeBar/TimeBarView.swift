@@ -149,6 +149,17 @@ struct TimeBarView: View {
         }
       }
     }
+    .onChange(of: timeManager.timeMode) { oldMode, newMode in
+      guard case .current = newMode else { return }
+
+      logger.log("Switched to current time, resetting date array")
+      resetDateArray()
+
+      Task { @MainActor in
+        await Task.yield()
+        scrollToTime(timeManager.displayDate)
+      }
+    }
   }
 
   private func scrollToTime(_ time: Date) {
@@ -162,6 +173,15 @@ struct TimeBarView: View {
     let targetScrollX = CGFloat(secondsFromStart / 3600) * pixelsPerHour - viewWidth / 2
 
     timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: targetScrollX)
+  }
+
+  private func resetDateArray() {
+    dateArray.removeAll()
+    
+    let seedDate = calendar.dateInterval(of: .hour, for: currentTime)?.start ?? currentTime
+    dateArray.append(seedDate)
+    appendDates()
+    prependDates(adjustScroll: false)
   }
 
   private func appendDates() {

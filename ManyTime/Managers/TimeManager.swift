@@ -10,7 +10,7 @@ import Foundation
 import Observation
 import OSLog
 
-enum TimeMode {
+enum TimeMode: Equatable {
   case current
   case fixed(Date)
 }
