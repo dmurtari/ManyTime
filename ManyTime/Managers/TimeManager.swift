@@ -40,7 +40,12 @@ final class TimeManager {
 
   // Are the currentDate and displayDate similar enough to be considered the same?
   var isShowingCurrentTime: Bool {
-    return Calendar.current.isDate(currentDate, equalTo: displayDate, toGranularity: .minute)
+    switch timeMode {
+    case .current:
+      return true
+    case .fixed(let date):
+      return Calendar.current.isDate(currentDate, equalTo: date, toGranularity: .minute)
+    }
   }
 
   init() {

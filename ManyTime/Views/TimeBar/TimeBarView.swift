@@ -19,16 +19,11 @@ struct TimeBarView: View {
   @State private var dateArray: [Date] = []
   @State private var currentScrollX: CGFloat = 0
   @State private var isLoading = false
+  @State private var calendar: Calendar = .current
 
   @StateObject private var preferences = AppPreferences.shared
 
   private let logger = Logger(subsystem: "com.dmurtari.ManyTime", category: "TimeBarView")
-
-  private var calendar: Calendar {
-    var calendar = Calendar.current
-    calendar.timeZone = timeZone
-    return calendar
-  }
 
   var body: some View {
     @Bindable var timeViewPosition = timeViewPosition
@@ -124,6 +119,8 @@ struct TimeBarView: View {
         return
       }
 
+      calendar.timeZone = timeZone
+
       let seedDate = calendar.dateInterval(of: .hour, for: currentTime)?.start ?? currentTime
       dateArray.append(seedDate)
       appendDates()
@@ -155,6 +152,15 @@ struct TimeBarView: View {
       logger.log("Switched to current time, resetting date array")
       resetDateArray()
 
+      Task { @MainActor in
+        await Task.yield()
+        scrollToTime(timeManager.displayDate)
+      }
+    }
+    .onChange(of: timeZone) { _, newZone in
+      calendar.timeZone = newZone
+      resetDateArray()
+      
       Task { @MainActor in
         await Task.yield()
         scrollToTime(timeManager.displayDate)
