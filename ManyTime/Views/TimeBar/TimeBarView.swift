@@ -30,7 +30,7 @@ struct TimeBarView: View {
 
     ScrollView([.horizontal]) {
       LazyHStack(spacing: 0) {
-        ForEach(dateArray.enumerated(), id: \.offset) { index, date in
+        ForEach(dateArray.enumerated(), id: \.element) { index, date in
           let hourValue = getHour(from: date)
 
           TimeBarTimeView(
@@ -40,7 +40,6 @@ struct TimeBarView: View {
             hour: hourValue,
             showDate: hourValue == 0
           )
-          .id(date)
           .clipShape(
             UnevenRoundedRectangle(
               cornerRadii: .init(
