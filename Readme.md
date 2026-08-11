@@ -22,7 +22,7 @@ There's no notarized version (yet?) since I haven't committed to paying for an A
 Either downloed the latest Release from [Releases](https://codeberg.org/dmurtari/ManyTime/releases), or via Homebrew:
 
 ```sh
-brew tap dmurtari/tap https://codeberg.org/dmurtari/homebrew-tap
+brew tap dmurtari/tap
 brew install --cask dmurtari/tap/manytime
 ```
 
