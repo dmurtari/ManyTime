@@ -30,7 +30,7 @@ struct TimeBarView: View {
 
     ScrollView([.horizontal]) {
       LazyHStack(spacing: 0) {
-        ForEach(dateArray.enumerated(), id: \.element) { index, date in
+        ForEach(dateArray, id: \.self) { date in
           let hourValue = getHour(from: date)
 
           TimeBarTimeView(
@@ -50,16 +50,6 @@ struct TimeBarView: View {
               )
             )
           )
-          .onAppear {
-            let upperIndex = dateArray.count - 5
-            let lowerIndex = 5
-
-            if index == upperIndex {
-              appendDates()
-            } else if index == lowerIndex {
-              prependDates()
-            }
-          }
         }
       }
     }
@@ -77,12 +67,21 @@ struct TimeBarView: View {
         return
       }
 
+      let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
+      let viewWidth = Constants.AppViewConstants.timeMenuWidth
+      let nearEdgeThreshold = pixelsPerHour * 5
+      let totalContentWidth = CGFloat(dateArray.count) * pixelsPerHour
+
+      if newX < nearEdgeThreshold {
+        prependDates()
+      } else if newX > totalContentWidth - viewWidth - nearEdgeThreshold {
+        appendDates()
+      }
+
       guard timeViewPosition.indexScrolledByUser == positionInList else {
         return
       }
 
-      let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
-      let viewWidth = Constants.AppViewConstants.timeMenuWidth
       let contentOffsetAtCenter = newX + viewWidth / 2
       let secondsFromStart = (contentOffsetAtCenter / pixelsPerHour) * 3600
       let scrollTime = startTime.addingTimeInterval(TimeInterval(secondsFromStart))
@@ -159,7 +158,7 @@ struct TimeBarView: View {
     .onChange(of: timeZone) { _, newZone in
       calendar.timeZone = newZone
       resetDateArray()
-      
+
       Task { @MainActor in
         await Task.yield()
         scrollToTime(timeManager.displayDate)
@@ -182,7 +181,7 @@ struct TimeBarView: View {
 
   private func resetDateArray() {
     dateArray.removeAll()
-    
+
     let seedDate = calendar.dateInterval(of: .hour, for: currentTime)?.start ?? currentTime
     dateArray.append(seedDate)
     appendDates()
@@ -193,6 +192,8 @@ struct TimeBarView: View {
     guard !isLoading, let lastDate = dateArray.last else {
       return
     }
+
+    logger.log("appendDates count \(dateArray.count)")
 
     isLoading = true
 
@@ -208,6 +209,7 @@ struct TimeBarView: View {
     guard !isLoading, let firstDate = dateArray.first else {
       return
     }
+
 
     isLoading = true
 
