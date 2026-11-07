@@ -26,22 +26,28 @@ struct ControlsRowView: View {
 
       Menu {
         Button("About") {
+#if os(macOS)
           NSApp.activate(ignoringOtherApps: true)
           openWindow(id: "about")
+#endif
         }
 
         Button("Preferences", systemImage: "gear.circle.fill") {
+#if os(macOS)
           NSApp.activate(ignoringOtherApps: true)
           openWindow(id: "settings")
+#endif
         }
         .keyboardShortcut(",", modifiers: .command)
 
+#if os(macOS)
         Divider()
 
         Button("Quit", systemImage: "power") {
           NSApp.terminate(nil)
         }
         .keyboardShortcut("Q", modifiers: .command)
+#endif
       } label: {
         Label("Options", systemImage: "ellipsis.circle")
           .labelStyle(.titleOnly)

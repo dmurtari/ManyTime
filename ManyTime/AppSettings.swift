@@ -5,8 +5,10 @@
 //  Created by Domenic Murtari on 2/16/25.
 //
 
-import ServiceManagement
 import SwiftUI
+#if os(macOS)
+import ServiceManagement
+#endif
 
 @MainActor class AppPreferences: ObservableObject {
   @AppStorage("menuBarTimeFormat") var menuBarTimeFormat: String = "HH:mm" {
@@ -31,11 +33,13 @@ import SwiftUI
 
   @AppStorage("launchOnLogin") var launchOnLogin = false {
     didSet {
+#if os(macOS)
       if launchOnLogin == true {
         try? SMAppService.mainApp.register()
       } else {
         try? SMAppService.mainApp.unregister()
       }
+#endif
     }
   }
 

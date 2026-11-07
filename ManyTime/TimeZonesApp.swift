@@ -7,6 +7,7 @@ struct TimeZonesApp: App {
   @StateObject private var timeZoneManager = TimeZoneManager()
 
   var body: some Scene {
+#if os(macOS)
     MenuBarExtra {
       TimeZoneMenu()
         .environment(timeManager)
@@ -33,5 +34,13 @@ struct TimeZonesApp: App {
     .windowResizability(.contentSize)
     .windowIdealSize(.fitToContent)
     .defaultPosition(.center)
+
+#else
+    WindowGroup {
+      MainIOSView()
+        .environment(timeManager)
+        .environmentObject(timeZoneManager)
+    }
+#endif
   }
 }

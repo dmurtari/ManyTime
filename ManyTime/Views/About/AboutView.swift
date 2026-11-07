@@ -5,16 +5,27 @@
 //  Created by Domenic Murtari on 2026/08/05.
 //
 
-import AppKit
 import SwiftUI
+#if os(macOS)
+import AppKit
+#else
+import UIKit
+#endif
 
 struct AboutView: View {
   var body: some View {
     VStack(spacing: 16) {
+#if os(macOS)
       Image(nsImage: appIcon)
         .resizable()
         .aspectRatio(contentMode: .fit)
         .frame(width: 180, height: 180)
+#else
+      Image(uiImage: UIImage(named: "AppIcon") ?? UIImage())
+        .resizable()
+        .aspectRatio(contentMode: .fit)
+        .frame(width: 180, height: 180)
+#endif
 
       Text("ManyTime")
         .font(.headline)
@@ -35,9 +46,11 @@ struct AboutView: View {
     .frame(minWidth: 280)
   }
 
+#if os(macOS)
   private var appIcon: NSImage {
     NSApplication.shared.applicationIconImage
   }
+#endif
 
   private var version: String {
     Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
