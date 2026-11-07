@@ -70,7 +70,7 @@ import SwiftUI
         .sheet(isPresented: $showingAdd) {
           NavigationStack {
             TimeZoneAddView()
-              .navigationTitle("Add Time Zone")
+              .navigationTitle("Add a Time Zone")
               .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                   Button("Done") { showingAdd = false }
@@ -78,20 +78,20 @@ import SwiftUI
               }
           }
         }
-      }
-      .safeAreaInset(edge: .bottom) {
-        if preferences.showTimeBar && preferences.showRockerControls && !timeZoneManager.displayedTimeZones.isEmpty {
-          HStack {
-            Button("", systemImage: "arrow.uturn.backward.circle") {
-              timeManager.switchToCurrent()
-            }
-            .disabled(timeManager.isShowingCurrentTime)
+        .safeAreaInset(edge: .bottom) {
+          if preferences.showTimeBar && preferences.showRockerControls && !timeZoneManager.displayedTimeZones.isEmpty {
+            HStack {
+              Button("", systemImage: "arrow.uturn.backward.circle") {
+                timeManager.switchToCurrent()
+              }
+              .disabled(timeManager.isShowingCurrentTime)
 
-            TimeRockerControl()
+              TimeRockerControl()
+            }
+            .padding()
+            .glassEffect(.regular, in: .rect(cornerRadius: 24))
+            .padding(.horizontal)
           }
-          .padding()
-          .glassEffect(.regular, in: .rect(cornerRadius: 24))
-          .padding(.horizontal)
         }
       }
       .environment(\.editMode, $editMode)
