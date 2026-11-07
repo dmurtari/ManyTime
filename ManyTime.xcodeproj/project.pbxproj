@@ -51,9 +51,6 @@
 		};
 		B09D36C62D545402004AD597 /* ManyTime */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			explicitFolders = (
-				iOS,
-			);
 			path = ManyTime;
 			sourceTree = "<group>";
 		};

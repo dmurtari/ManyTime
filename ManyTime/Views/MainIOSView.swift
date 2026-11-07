@@ -51,26 +51,12 @@ import SwiftUI
                 _ = timeZoneManager.removeTimeZoneAt(at: offsets)
               }
             }
-            if preferences.showTimeBar && preferences.showRockerControls {
-              Section {
-                TimeRockerControl()
-              }
-            }
           }
         }
         .listStyle(.plain)
-        .environment(\.editMode, $editMode)
-        .environment(timeViewPosition)
-        .navigationTitle("ManyTime")
+        .frame(maxHeight: .infinity)
+        .navigationTitle("Time Zones")
         .toolbar {
-          ToolbarItem(placement: .topBarLeading) {
-            if !timeManager.isShowingCurrentTime {
-              Button("Now", systemImage: "arrow.uturn.backward.circle") {
-                timeManager.switchToCurrent()
-              }
-            }
-          }
-
           ToolbarItem(placement: .topBarTrailing) {
             Button("Add", systemImage: "plus") {
               showingAdd = true
@@ -79,22 +65,6 @@ import SwiftUI
 
           ToolbarItem(placement: .topBarTrailing) {
             EditButton()
-          }
-
-          ToolbarItem(placement: .topBarTrailing) {
-            Menu {
-              Button("About") {
-                showingAbout = true
-              }
-
-              Button("Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                  UIApplication.shared.open(url)
-                }
-              }
-            } label: {
-              Image(systemName: "ellipsis.circle")
-            }
           }
         }
         .sheet(isPresented: $showingAdd) {
@@ -108,10 +78,24 @@ import SwiftUI
               }
           }
         }
-        .sheet(isPresented: $showingAbout) {
-          AboutView()
+      }
+      .safeAreaInset(edge: .bottom) {
+        if preferences.showTimeBar && preferences.showRockerControls && !timeZoneManager.displayedTimeZones.isEmpty {
+          HStack {
+            Button("", systemImage: "arrow.uturn.backward.circle") {
+              timeManager.switchToCurrent()
+            }
+            .disabled(timeManager.isShowingCurrentTime)
+
+            TimeRockerControl()
+          }
+          .padding()
+          .glassEffect(.regular, in: .rect(cornerRadius: 24))
+          .padding(.horizontal)
         }
       }
+      .environment(\.editMode, $editMode)
+      .environment(timeViewPosition)
     }
 
     @ViewBuilder

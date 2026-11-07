@@ -20,6 +20,7 @@ struct TimeBarView: View {
   @State private var currentScrollX: CGFloat = 0
   @State private var isLoading = false
   @State private var calendar: Calendar = .current
+  @State private var viewWidth: CGFloat = Constants.AppViewConstants.timeMenuWidth
 
   @StateObject private var preferences = AppPreferences.shared
 
@@ -68,7 +69,6 @@ struct TimeBarView: View {
       }
 
       let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
-      let viewWidth = Constants.AppViewConstants.timeMenuWidth
       let nearEdgeThreshold = pixelsPerHour * 5
       let totalContentWidth = CGFloat(dateArray.count) * pixelsPerHour
 
@@ -95,18 +95,24 @@ struct TimeBarView: View {
       }
     }
     .scrollIndicators(preferences.showRockerControls ? .never : .hidden)
-    .frame(
-      width: Constants.AppViewConstants.timeMenuWidth,
-      height: Constants.TimeBarConstants.timeViewSide
-    )
+    .frame(height: Constants.TimeBarConstants.timeViewSide)
+    #if os(macOS)
+      .frame(width: Constants.AppViewConstants.timeMenuWidth)
+    #else
+      .frame(maxWidth: .infinity)
+    #endif
+    .onGeometryChange(for: CGFloat.self) { proxy in
+      proxy.size.width
+    } action: { newWidth in
+      guard newWidth != viewWidth else { return }
+      viewWidth = newWidth
+      scrollToTime(timeManager.displayDate)
+    }
     .overlay {
-      Path { path in
-        let x = Constants.AppViewConstants.timeMenuWidth / 2
-
-        path.move(to: CGPoint(x: x, y: -1))
-        path.addLine(to: CGPoint(x: x, y: Constants.TimeBarConstants.timeViewSide + 1))
-      }
-      .stroke(.black, lineWidth: 2)
+      Rectangle()
+        .fill(.black)
+        .frame(width: 2)
+        .padding(.vertical, -1)
     }
     .onAppear {
       logger.log("Starting onAppear Hook")
@@ -172,7 +178,6 @@ struct TimeBarView: View {
     }
 
     let pixelsPerHour = Constants.TimeBarConstants.timeViewSide
-    let viewWidth = Constants.AppViewConstants.timeMenuWidth
     let secondsFromStart = time.timeIntervalSince(startTime)
     let targetScrollX = CGFloat(secondsFromStart / 3600) * pixelsPerHour - viewWidth / 2
 
@@ -209,7 +214,6 @@ struct TimeBarView: View {
     guard !isLoading, let firstDate = dateArray.first else {
       return
     }
-
 
     isLoading = true
 
