@@ -61,7 +61,7 @@ struct GeneralSettingsView: View {
         }
         .padding([.top], 6)
 
-        if (preferences.showTimeBar) {
+        if preferences.showTimeBar {
           VStack(alignment: .leading, spacing: 8) {
             Toggle("Scroll with Rocker Control", isOn: $preferences.showRockerControls)
             Text("Show a rocker control to scroll the time bar")
@@ -72,20 +72,23 @@ struct GeneralSettingsView: View {
         }
       }
 
-      VStack(alignment: .leading) {
-        Text("General")
-          .font(.system(size: 14, weight: .bold))
-        Divider()
+      #if os(macOS)
+        VStack(alignment: .leading) {
+          Text("General")
+            .font(.system(size: 14, weight: .bold))
+          Divider()
 
-        VStack(alignment: .leading, spacing: 8) {
-          Toggle("Launch at login", isOn: $preferences.launchOnLogin)
-          Text("Automatically start when you login to your Mac")
-            .font(.callout)
-            .foregroundStyle(.secondary)
+          VStack(alignment: .leading, spacing: 8) {
+            Toggle("Launch at login", isOn: $preferences.launchOnLogin)
+            Text("Automatically start when you login to your Mac")
+              .font(.callout)
+              .foregroundStyle(.secondary)
+          }
+          .padding([.top], 6)
+          .padding([.bottom], 12)
         }
-        .padding([.top], 6)
-        .padding([.bottom], 12)
-      }
+      #endif
+
     }
     .onAppear {
       if presetFormats.contains(preferences.dropdownTimeFormat) {

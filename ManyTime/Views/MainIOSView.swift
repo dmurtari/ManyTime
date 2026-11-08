@@ -16,6 +16,7 @@ import SwiftUI
     @State private var timeViewPosition = TimeViewPosition()
     @State private var showingAdd = false
     @State private var showingAbout = false
+    @State private var showingSettings = false
     @State private var editMode: EditMode = .inactive
 
     var body: some View {
@@ -57,6 +58,12 @@ import SwiftUI
         .frame(maxHeight: .infinity)
         .navigationTitle("Time Zones")
         .toolbar {
+          ToolbarItem(placement: .topBarLeading) {
+            Button("Settings", systemImage: "gearshape") {
+              showingSettings = true
+            }
+          }
+
           ToolbarItem(placement: .topBarTrailing) {
             Button("Add", systemImage: "plus") {
               showingAdd = true
@@ -74,6 +81,18 @@ import SwiftUI
               .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                   Button("Done") { showingAdd = false }
+                }
+              }
+          }
+        }
+        .sheet(isPresented: $showingSettings) {
+          NavigationStack {
+            IOSSettingsView()
+              .navigationTitle("Settings")
+              .navigationBarTitleDisplayMode(.inline)
+              .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                  Button("Done") { showingSettings = false }
                 }
               }
           }
