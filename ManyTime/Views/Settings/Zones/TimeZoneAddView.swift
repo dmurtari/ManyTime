@@ -125,6 +125,7 @@ struct TimeZoneAddView: View {
 
   private func saveIOS() {
     let timeZone: TimeZone?
+    
     switch mode {
     case .city:
       timeZone = selectedCity.flatMap { TimeZone(identifier: $0.name) }

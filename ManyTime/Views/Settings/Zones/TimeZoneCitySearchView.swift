@@ -40,13 +40,20 @@ struct TimeZoneCitySearchView: View {
       .foregroundStyle(.primary)
     }
     .listStyle(.plain)
-    .navigationTitle("Time Zone")
-    .navigationBarTitleDisplayMode(.inline)
-    .searchable(
-      text: $query,
-      placement: .navigationBarDrawer(displayMode: .always),
-      prompt: "Search for a city"
-    )
+    #if os(iOS)
+      .navigationTitle("Time Zone")
+      .navigationBarTitleDisplayMode(.inline)
+      .searchable(
+        text: $query,
+        placement: .navigationBarDrawer(displayMode: .always),
+        prompt: "Search for a city"
+      )
+    #else
+      .searchable(
+        text: $query,
+        prompt: "Search for a city"
+      )
+    #endif
     .task {
       cities = TimeZoneListService.shared.getCityTimeZones()
         .sorted { $0.city.localizedCaseInsensitiveCompare($1.city) == .orderedAscending }
@@ -58,9 +65,9 @@ struct TimeZoneCitySearchView: View {
     guard !q.isEmpty else { return cities }
     return cities.filter {
       $0.city.localizedStandardContains(q)
-      || countryName($0.countryCode).localizedStandardContains(q)
-      || $0.countryCode.localizedCaseInsensitiveContains(q)
-      || $0.name.localizedStandardContains(q) 
+        || countryName($0.countryCode).localizedStandardContains(q)
+        || $0.countryCode.localizedCaseInsensitiveContains(q)
+        || $0.name.localizedStandardContains(q)
     }
   }
 
@@ -72,4 +79,3 @@ struct TimeZoneCitySearchView: View {
     TimeZone(identifier: identifier)?.gmtLabel ?? ""
   }
 }
-
