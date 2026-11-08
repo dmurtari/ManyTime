@@ -29,7 +29,6 @@ import Foundation
           countryCode: tz.countryCode,
           name: tz.name,
           rawOffsetInMinutes: tz.rawOffsetInMinutes,
-          rawFormat: tz.rawFormat
         )
       }
     }

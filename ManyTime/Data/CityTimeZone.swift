@@ -11,5 +11,4 @@ struct CityTimeZone: Decodable, Hashable, Identifiable {
   let countryCode: String
   let name: String
   let rawOffsetInMinutes: Int
-  let rawFormat: String
 }
