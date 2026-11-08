@@ -12,6 +12,7 @@ struct TimeZoneAddView: View {
   @State private var mode: SelectionMode = .city
   @State private var selectedCity: CityTimeZone?
   @State private var offsetMinutes: Int = 0
+  @State private var showingCitySearch = false
 
   private enum SelectionMode: String, CaseIterable, Identifiable {
     case city = "City"
@@ -22,34 +23,59 @@ struct TimeZoneAddView: View {
   var body: some View {
     #if os(macOS)
       Form {
-        HStack {
-          TimeZonePicker(selectedTimeZone: $timeZoneIdentifier)
+        LabeledContent {
+          switch mode {
+          case .city:
+            Button {
+              showingCitySearch = true
+            } label: {
+              HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(selectedCity.map { "\($0.city), \($0.countryCode)" } ?? "Select…")
+                  .foregroundStyle(selectedCity == nil ? .secondary : .primary)
+                  .padding(.trailing, 14)
+                  .overlay(alignment: .trailing) {
+                    Image(systemName: "chevron.up.chevron.down")
+                      .font(.system(size: 10, weight: .semibold))
+                      .foregroundStyle(.secondary)
+                  }
+              }
+            }
+            .popover(isPresented: $showingCitySearch) {
+              TimeZoneCitySearchView(selection: $selectedCity)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.regular)
+            .accessibilityLabel("City")
+            .accessibilityValue(selectedCity?.city ?? "None selected")
+
+          case .offset:
+            Picker("Offset", selection: $offsetMinutes) {
+              ForEach(availableOffsets, id: \.self) {
+                Text(TimeZone.gmtLabel(minutes: $0)).tag($0)
+              }
+            }
+            .pickerStyle(.menu)
             .labelsHidden()
-            .disabled(disableFields)
-          TextField("Display Name", text: $displayName)
-            .textFieldStyle(.roundedBorder)
-            .labelsHidden()
-            .disabled(disableFields)
+          }
+        } label: {
+          Picker("Mode", selection: $mode) {
+            ForEach(SelectionMode.allCases) { Text($0.rawValue).tag($0) }
+          }
+          .pickerStyle(.menu)
+          .labelsHidden()
+          .fixedSize()
         }
+
+        TextField("Display Name", text: $displayName, prompt: Text(defaultDisplayName))
 
         HStack {
           Spacer()
-
-          Button("Add") {
-            save()
-          }
-          .disabled(disableFields)
+          Button("Add") { save() }
+            .keyboardShortcut(.defaultAction)
+            .disabled(mode == .city && selectedCity == nil)
         }
       }
-      .onChange(of: timeZoneIdentifier) { _, newId in
-        let timeZone = TimeZone(identifier: timeZoneIdentifier)
-
-        guard let timeZone else {
-          return
-        }
-
-        self.displayName = !self.displayName.isEmpty ? self.displayName : timeZone.description
-      }
+      .formStyle(.columns)
     #else
       Form {
         Section {
@@ -57,59 +83,52 @@ struct TimeZoneAddView: View {
             ForEach(SelectionMode.allCases) { Text($0.rawValue).tag($0) }
           }
           .pickerStyle(.segmented)
+          .labelsHidden()
         }
 
         Section {
           switch mode {
           case .city:
-            NavigationLink {
-              TimeZoneCitySearchView(selection: $selectedCity)
+            Button {
+              showingCitySearch = true
             } label: {
-              LabeledContent(
-                "City",
-                value: selectedCity.map { "\($0.city), \($0.countryCode)" } ?? "Select…"
-              )
+              LabeledContent("City") {
+                HStack(spacing: 4) {
+                  Text(selectedCity.map { "\($0.city), \($0.countryCode)" } ?? "Select…")
+                    .foregroundStyle(.secondary)
+                  Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                }
+              }
+              .contentShape(Rectangle())
             }
+            .buttonStyle(.plain)
+            .popover(isPresented: $showingCitySearch) {
+              TimeZoneCitySearchView(selection: $selectedCity)
+            }
+
           case .offset:
             Picker("Offset", selection: $offsetMinutes) {
               ForEach(availableOffsets, id: \.self) {
                 Text(TimeZone.gmtLabel(minutes: $0)).tag($0)
               }
             }
+            .pickerStyle(.menu)
           }
 
           TextField("Display Name", text: $displayName, prompt: Text(defaultDisplayName))
         }
 
         Section {
-          Button("Add") { saveIOS() }
+          Button("Add") { save() }
+            .keyboardShortcut(.defaultAction)
             .disabled(mode == .city && selectedCity == nil)
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
       }
+      .formStyle(.grouped)
     #endif
-  }
-
-  private func save() {
-    if timeZoneIdentifier == "" {
-      return
-    }
-
-    let timeZone = TimeZone(identifier: timeZoneIdentifier)
-
-    guard let timeZone else {
-      print("Failed to create TimeZone from identifier: \(timeZoneIdentifier)")
-      return
-    }
-
-    let targetDisplayName = displayName.isEmpty ? timeZone.description : displayName
-
-    timeZoneManager.addTimeZone(
-      timeZone,
-      displayName: targetDisplayName
-    )
-
-    self.displayName = ""
-    self.timeZoneIdentifier = ""
   }
 
   private var defaultDisplayName: String {
@@ -123,9 +142,9 @@ struct TimeZoneAddView: View {
     Set(TimeZoneListService.shared.getTimeZones().map(\.rawOffsetInMinutes)).sorted()
   }
 
-  private func saveIOS() {
+  private func save() {
     let timeZone: TimeZone?
-    
+
     switch mode {
     case .city:
       timeZone = selectedCity.flatMap { TimeZone(identifier: $0.name) }

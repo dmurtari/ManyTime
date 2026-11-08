@@ -14,49 +14,50 @@ struct TimeZoneCitySearchView: View {
   @State private var query = ""
   @State private var cities: [CityTimeZone] = []
 
+  @FocusState private var searchFocused: Bool
+
   var body: some View {
-    List(results, id: \.id) { city in
-      Button {
-        selection = city
-        dismiss()
-      } label: {
-        HStack {
-          VStack(alignment: .leading) {
-            Text(city.city)
-            Text(countryName(city.countryCode))
-              .font(.caption)
+    VStack(spacing: 0) {
+      TextField("Search for a city", text: $query)
+        .textFieldStyle(.roundedBorder)
+        .autocorrectionDisabled()
+        .focused($searchFocused)
+        .padding()
+
+      List(results, id: \.id) { city in
+        Button {
+          selection = city
+          dismiss()
+        } label: {
+          HStack {
+            VStack(alignment: .leading) {
+              Text(city.city)
+              Text(countryName(city.countryCode))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            Text(gmtLabel(for: city.name))
               .foregroundStyle(.secondary)
+
+            if selection?.id == city.id {
+              Image(systemName: "checkmark")
+                .foregroundStyle(.tint)
+            }
           }
-          Spacer()
-          Text(gmtLabel(for: city.name))
-            .foregroundStyle(.secondary)
-          if selection?.id == city.id {
-            Image(systemName: "checkmark")
-              .foregroundStyle(.tint)
-          }
+          .contentShape(Rectangle())
         }
-        .contentShape(Rectangle())
+        .buttonStyle(.plain)
       }
-      .foregroundStyle(.primary)
+      .listStyle(.plain)
     }
-    .listStyle(.plain)
-    #if os(iOS)
-      .navigationTitle("Time Zone")
-      .navigationBarTitleDisplayMode(.inline)
-      .searchable(
-        text: $query,
-        placement: .navigationBarDrawer(displayMode: .always),
-        prompt: "Search for a city"
-      )
-    #else
-      .searchable(
-        text: $query,
-        prompt: "Search for a city"
-      )
-    #endif
+    .frame(minWidth: 320, minHeight: 380)
     .task {
       cities = TimeZoneListService.shared.getCityTimeZones()
         .sorted { $0.city.localizedCaseInsensitiveCompare($1.city) == .orderedAscending }
+      searchFocused = true
     }
   }
 

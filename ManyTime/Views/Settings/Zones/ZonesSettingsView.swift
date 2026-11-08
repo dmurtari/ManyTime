@@ -33,7 +33,7 @@ struct ZonesSettingsView: View {
           .padding([.vertical], 6)
       }
     }
-    .frame(width: 300)
+    .frame(width: Constants.AppViewConstants.timeMenuWidth)
   }
 }
 
