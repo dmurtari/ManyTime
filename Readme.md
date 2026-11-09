@@ -41,3 +41,7 @@ You can choose to set the format for the time shown in the Menu Bar, and the tim
 There are a few presets you can choose from, but you may find the Custom option most useful. The time formats are SwiftUI's standard [Unicode format](https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Format_Patterns), with the additional ability to use `{name}` as a placeholder for the name of the timezone.
 
 For example, to show `Denver: Fri 22:00`, I use the string `{name}: E HH:mm`
+
+## Attributions
+
+Time zone and city data: [GeoNames](https://www.geonames.org), Creative Commons Attribution 4.0 License

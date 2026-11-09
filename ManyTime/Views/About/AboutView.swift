@@ -6,26 +6,27 @@
 //
 
 import SwiftUI
+
 #if os(macOS)
-import AppKit
+  import AppKit
 #else
-import UIKit
+  import UIKit
 #endif
 
 struct AboutView: View {
   var body: some View {
     VStack(spacing: 16) {
-#if os(macOS)
-      Image(nsImage: appIcon)
-        .resizable()
-        .aspectRatio(contentMode: .fit)
-        .frame(width: 180, height: 180)
-#else
-      Image(uiImage: UIImage(named: "AppIcon") ?? UIImage())
-        .resizable()
-        .aspectRatio(contentMode: .fit)
-        .frame(width: 180, height: 180)
-#endif
+      #if os(macOS)
+        Image(nsImage: appIcon)
+          .resizable()
+          .aspectRatio(contentMode: .fit)
+          .frame(width: 180, height: 180)
+      #else
+        Image(uiImage: UIImage(named: "AppIcon") ?? UIImage())
+          .resizable()
+          .aspectRatio(contentMode: .fit)
+          .frame(width: 180, height: 180)
+      #endif
 
       Text("ManyTime")
         .font(.headline)
@@ -41,16 +42,28 @@ struct AboutView: View {
       Link("https://codeberg.org/dmurtari/ManyTime", destination: repositoryURL!)
         .font(.caption)
         .focusable(false)
+
+      Text(
+        """
+        Time zone and city data from [GeoNames](https://www.geonames.org), \
+        used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). \
+        Filtered and reformatted for ManyTime.
+        """
+      )
+      .font(.caption2)
+      .foregroundStyle(.secondary)
+      .multilineTextAlignment(.center)
+      .fixedSize(horizontal: false, vertical: true)
     }
     .padding()
     .frame(minWidth: 280)
   }
 
-#if os(macOS)
-  private var appIcon: NSImage {
-    NSApplication.shared.applicationIconImage
-  }
-#endif
+  #if os(macOS)
+    private var appIcon: NSImage {
+      NSApplication.shared.applicationIconImage
+    }
+  #endif
 
   private var version: String {
     Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A"
