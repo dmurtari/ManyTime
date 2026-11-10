@@ -22,10 +22,11 @@ struct AboutView: View {
           .aspectRatio(contentMode: .fit)
           .frame(width: 180, height: 180)
       #else
-        Image(uiImage: UIImage(named: "AppIcon") ?? UIImage())
+        Image("AboutIcon")
           .resizable()
           .aspectRatio(contentMode: .fit)
           .frame(width: 180, height: 180)
+          .clipShape(RoundedRectangle(cornerRadius: 180 * 0.2237, style: .continuous))
       #endif
 
       Text("ManyTime")
@@ -46,13 +47,14 @@ struct AboutView: View {
       Text(
         """
         Time zone and city data from [GeoNames](https://www.geonames.org), \
-        used under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). \
-        Filtered and reformatted for ManyTime.
+        used under [CC 4.0](https://creativecommons.org/licenses/by/4.0/). \
+        \nFiltered and reformatted for ManyTime.
         """
       )
       .font(.caption2)
       .foregroundStyle(.secondary)
       .multilineTextAlignment(.center)
+      .frame(width: 400)
       .fixedSize(horizontal: false, vertical: true)
     }
     .padding()
