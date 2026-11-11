@@ -80,3 +80,7 @@ struct TimeZoneCitySearchView: View {
     TimeZone(identifier: identifier)?.gmtLabel ?? ""
   }
 }
+
+#Preview {
+  TimeZoneCitySearchView(selection: .constant(nil))
+}
