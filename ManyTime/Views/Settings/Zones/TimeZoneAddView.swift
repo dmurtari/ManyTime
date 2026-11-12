@@ -164,7 +164,10 @@ struct TimeZoneAddView: View {
 
     displayName = ""
     selectedCity = nil
+
+#if os(iOS)
     dismiss()
+#endif
   }
 }
 

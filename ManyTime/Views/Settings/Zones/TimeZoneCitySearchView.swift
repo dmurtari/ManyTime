@@ -7,12 +7,22 @@
 
 import SwiftUI
 
+struct CityRow: Identifiable, Hashable {
+  var id: String { city.id }
+
+  let city: CityTimeZone
+  let countryDisplayName: String
+  let gmtDisplay: String
+  let searchString: String
+}
+
 struct TimeZoneCitySearchView: View {
   @Binding var selection: CityTimeZone?
 
   @Environment(\.dismiss) private var dismiss
   @State private var query = ""
-  @State private var cities: [CityTimeZone] = []
+  @State private var allCities: [CityRow] = []
+  @State private var filtered: [CityRow] = []
 
   @FocusState private var searchFocused: Bool
 
@@ -24,25 +34,25 @@ struct TimeZoneCitySearchView: View {
         .focused($searchFocused)
         .padding()
 
-      List(results, id: \.id) { city in
+      List(filtered.prefix(8), id: \.id) { row in
         Button {
-          selection = city
+          selection = row.city
           dismiss()
         } label: {
           HStack {
             VStack(alignment: .leading) {
-              Text(city.city)
-              Text(countryName(city.countryCode))
+              Text(row.city.city)
+              Text(row.countryDisplayName)
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            Text(gmtLabel(for: city.name))
+            Text(row.gmtDisplay)
               .foregroundStyle(.secondary)
 
-            if selection?.id == city.id {
+            if selection?.id == row.city.id {
               Image(systemName: "checkmark")
                 .foregroundStyle(.tint)
             }
@@ -55,28 +65,61 @@ struct TimeZoneCitySearchView: View {
     }
     .frame(minWidth: 320, minHeight: 380)
     .task {
-      cities = TimeZoneListService.shared.getCityTimeZones()
-        .sorted { $0.city.localizedCaseInsensitiveCompare($1.city) == .orderedAscending }
       searchFocused = true
+      let rows = await Task.detached(priority: .userInitiated) {
+        await Self.getSearchableCities()
+      }.value
+      allCities = rows
+      filtered = []
+    }
+    .task(id: query) {
+      let trimmed = query.trimmingCharacters(in: .whitespaces)
+      if trimmed.count < 3 {
+        filtered = []
+        return
+      }
+
+      do {
+        try await Task.sleep(for: .milliseconds(150))
+      } catch {
+        return
+      }
+
+      let q = trimmed.folding(
+        options: [.caseInsensitive, .diacriticInsensitive],
+        locale: .current
+      )
+
+      filtered = allCities.filter { $0.searchString.contains(q) }
     }
   }
 
-  private var results: [CityTimeZone] {
-    let q = query.trimmingCharacters(in: .whitespaces)
-    guard !q.isEmpty else { return cities }
-    return cities.filter {
-      $0.city.localizedStandardContains(q)
-        || countryName($0.countryCode).localizedStandardContains(q)
-        || $0.countryCode.localizedCaseInsensitiveContains(q)
-        || $0.name.localizedStandardContains(q)
-    }
+  private static func getSearchableCities() -> [CityRow] {
+    return
+      TimeZoneListService.shared.getCityTimeZones()
+      .sorted {
+        $0.city.localizedCaseInsensitiveCompare($1.city) == .orderedAscending
+      }.map { city in
+        let countryDisplayName = countryName(city.countryCode)
+        let gmtDisplay = gmtLabel(for: city.name)
+        let searchString = [city.city, countryDisplayName, city.countryCode]
+          .joined(separator: " ")
+          .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+
+        return CityRow(
+          city: city,
+          countryDisplayName: countryDisplayName,
+          gmtDisplay: gmtDisplay,
+          searchString: searchString
+        )
+      }
   }
 
-  private func countryName(_ code: String) -> String {
+  private static func countryName(_ code: String) -> String {
     Locale.current.localizedString(forRegionCode: code) ?? code
   }
 
-  private func gmtLabel(for identifier: String) -> String {
+  private static func gmtLabel(for identifier: String) -> String {
     TimeZone(identifier: identifier)?.gmtLabel ?? ""
   }
 }
