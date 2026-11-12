@@ -27,41 +27,51 @@ struct TimeZoneCitySearchView: View {
   @FocusState private var searchFocused: Bool
 
   var body: some View {
-    VStack(spacing: 0) {
+    VStack(alignment: .leading, spacing: 0) {
       TextField("Search for a city", text: $query)
         .textFieldStyle(.roundedBorder)
         .autocorrectionDisabled()
         .focused($searchFocused)
         .padding()
 
-      List(filtered.prefix(8), id: \.id) { row in
-        Button {
-          selection = row.city
-          dismiss()
-        } label: {
-          HStack {
-            VStack(alignment: .leading) {
-              Text(row.city.city)
-              Text(row.countryDisplayName)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            Text(row.gmtDisplay)
-              .foregroundStyle(.secondary)
-
-            if selection?.id == row.city.id {
-              Image(systemName: "checkmark")
-                .foregroundStyle(.tint)
-            }
-          }
-          .contentShape(Rectangle())
+      if (filtered.isEmpty) {
+        Spacer()
+        VStack(spacing: 8) {
+          Text("Start typing to search")
+            .multilineTextAlignment(.center)
         }
-        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity)
+        Spacer()
+      } else {
+        List(filtered.prefix(8), id: \.id) { row in
+          Button {
+            selection = row.city
+            dismiss()
+          } label: {
+            HStack {
+              VStack(alignment: .leading) {
+                Text(row.city.city)
+                Text(row.countryDisplayName)
+                  .font(.caption)
+                  .foregroundStyle(.secondary)
+              }
+
+              Spacer()
+
+              Text(row.gmtDisplay)
+                .foregroundStyle(.secondary)
+
+              if selection?.id == row.city.id {
+                Image(systemName: "checkmark")
+                  .foregroundStyle(.tint)
+              }
+            }
+            .contentShape(Rectangle())
+          }
+          .buttonStyle(.plain)
+        }
+        .listStyle(.plain)
       }
-      .listStyle(.plain)
     }
     .frame(minWidth: 320, minHeight: 380)
     .task {
