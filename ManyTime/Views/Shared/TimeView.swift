@@ -35,9 +35,9 @@ struct TimeView: View {
   var offset: String {
     let offsetInHours = timeZone.timeZoneObject.secondsFromGMT() / 3600
     let formattedOffset =
-    offsetInHours > 0
-    ? "GMT+\(offsetInHours)"
-    : "GMT-\(abs(offsetInHours))"
+      offsetInHours > 0
+      ? "GMT+\(offsetInHours)"
+      : "GMT-\(abs(offsetInHours))"
 
     return formattedOffset
   }
@@ -73,22 +73,22 @@ struct TimeView: View {
               .fontWeight(.semibold)
           } else {
             HStack {
-#if os(macOS)
-              TextField("Display Name", text: $editableDisplayName)
-                .textFieldStyle(.roundedBorder)
-                .focused($isDisplayNameFocused)
-                .onExitCommand(perform: handleDisplayNameBlur)
-                .onSubmit {
-                  handleDisplayNameSave()
-                }
-#else
-              TextField("Display Name", text: $editableDisplayName)
-                .textFieldStyle(.roundedBorder)
-                .focused($isDisplayNameFocused)
-                .onSubmit {
-                  handleDisplayNameSave()
-                }
-#endif
+              #if os(macOS)
+                TextField("Display Name", text: $editableDisplayName)
+                  .textFieldStyle(.roundedBorder)
+                  .focused($isDisplayNameFocused)
+                  .onExitCommand(perform: handleDisplayNameBlur)
+                  .onSubmit {
+                    handleDisplayNameSave()
+                  }
+              #else
+                TextField("Display Name", text: $editableDisplayName)
+                  .textFieldStyle(.roundedBorder)
+                  .focused($isDisplayNameFocused)
+                  .onSubmit {
+                    handleDisplayNameSave()
+                  }
+              #endif
 
               Button("Cancel", systemImage: "x.circle") {
                 handleDisplayNameBlur()

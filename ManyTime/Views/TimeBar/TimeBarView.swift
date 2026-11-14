@@ -239,3 +239,13 @@ struct TimeBarView: View {
     return calendar.component(.hour, from: date)
   }
 }
+
+#Preview {
+  TimeBarView(
+    timeZone: .constant(TimeZone.current),
+    currentTime: .constant(Date.now),
+    positionInList: 0
+  )
+    .environment(TimeManager())
+    .environment(TimeViewPosition())
+}

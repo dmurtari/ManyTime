@@ -21,7 +21,11 @@ struct TimeRockerControl: View {
   @State private var cumulativePixels: CGFloat = 0
   @State private var travelLimit: CGFloat = (Constants.AppViewConstants.timeMenuWidth / 2) - Self.rockerRadius - 2
 
-  private static let controlHeight: CGFloat = 20
+  #if os(macOS)
+    private static let controlHeight: CGFloat = 20
+  #else
+    private static let controlHeight: CGFloat = 30
+  #endif
   private static let rockerRadius: CGFloat = (Self.controlHeight / 2) - 2
   private static let scrollTickInterval: Double = 1 / 60
 
@@ -37,7 +41,11 @@ struct TimeRockerControl: View {
           .foregroundStyle(Color.primary.opacity(0.1))
 
         Circle()
-          .fill(isDragging ? Color.accentColor : Color.secondary)
+          #if os(macOS)
+            .fill(isDragging ? Color.accentColor : Color.secondary)
+          #else
+            .fill(Color.accentColor)
+          #endif
           .frame(width: Self.rockerRadius * 2, height: Self.rockerRadius * 2)
           .offset(x: rockerOffsetClamped)
           .shadow(radius: isDragging ? 4 : 2)
