@@ -63,99 +63,138 @@ struct TimeView: View {
   }
 
   var body: some View {
-    VStack {
-      HStack {
-        VStack(alignment: .leading) {
+    #if os(macOS)
+      VStack {
+        headerView
 
-          if !isEditing {
-            Text("\(timeZone.normalizedDisplayName)")
-              .font(.system(size: 20))
-              .fontWeight(.semibold)
-          } else {
-            HStack {
-              #if os(macOS)
-                TextField("Display Name", text: $editableDisplayName)
-                  .textFieldStyle(.roundedBorder)
-                  .focused($isDisplayNameFocused)
-                  .onExitCommand(perform: handleDisplayNameBlur)
-                  .onSubmit {
-                    handleDisplayNameSave()
-                  }
-              #else
-                TextField("Display Name", text: $editableDisplayName)
-                  .textFieldStyle(.roundedBorder)
-                  .focused($isDisplayNameFocused)
-                  .onSubmit {
-                    handleDisplayNameSave()
-                  }
-              #endif
-
-              Button("Cancel", systemImage: "x.circle") {
-                handleDisplayNameBlur()
+        if preferences.showTimeBar {
+          TimeBarView(
+            timeZone: .constant(timeZone.timeZoneObject),
+            currentTime: Binding(
+              get: { displayDate },
+              set: {
+                timeManager.setFixedTime($0)
               }
-              .buttonStyle(.glass)
-              .labelStyle(.iconOnly)
-
-              Button("Save", systemImage: "checkmark") {
-                handleDisplayNameSave()
+            ),
+            positionInList: index
+          )
+        }
+      }
+      .onChange(of: isEditing) { _, newValue in
+        if newValue {
+          DispatchQueue.main.async { isDisplayNameFocused = true }
+          editableDisplayName = timeZone.normalizedDisplayName
+        } else {
+          isDisplayNameFocused = false
+        }
+      }
+    #else
+      ZStack(alignment: .bottom) {
+        if preferences.showTimeBar {
+          TimeBarView(
+            timeZone: .constant(timeZone.timeZoneObject),
+            currentTime: Binding(
+              get: { displayDate },
+              set: {
+                timeManager.setFixedTime($0)
               }
-              .buttonStyle(.glassProminent)
-              .labelStyle(.iconOnly)
+            ),
+            positionInList: index
+          )
+          .allowsHitTesting(!isEditing)
+        }
 
-            }
+        VStack(spacing: 8) {
+          headerView
+
+          if preferences.showTimeBar {
+            Color.clear
+              .frame(height: Constants.TimeBarConstants.timeViewSide)
           }
+        }
+        .allowsHitTesting(!preferences.showTimeBar || isEditing)
+      }
+      .onChange(of: isEditing) { _, newValue in
+        if newValue {
+          DispatchQueue.main.async { isDisplayNameFocused = true }
+          editableDisplayName = timeZone.normalizedDisplayName
+        } else {
+          isDisplayNameFocused = false
+        }
+      }
+    #endif
+  }
 
-          if timeZone.displayName != nil {
-            Text("\(offset) (\(readableTimeZone))")
-              .font(.system(size: 14))
-              .foregroundStyle(.secondary)
-          } else {
-            Text("\(offset)")
-              .font(.system(size: 14))
-              .foregroundStyle(.secondary)
+  @ViewBuilder
+  private var headerView: some View {
+    HStack {
+      VStack(alignment: .leading) {
+        if !isEditing {
+          Text("\(timeZone.normalizedDisplayName)")
+            .font(.system(size: 20))
+            .fontWeight(.semibold)
+        } else {
+          HStack {
+            #if os(macOS)
+              TextField("Display Name", text: $editableDisplayName)
+                .textFieldStyle(.roundedBorder)
+                .focused($isDisplayNameFocused)
+                .onExitCommand(perform: handleDisplayNameBlur)
+                .onSubmit {
+                  handleDisplayNameSave()
+                }
+            #else
+              TextField("Display Name", text: $editableDisplayName)
+                .textFieldStyle(.roundedBorder)
+                .focused($isDisplayNameFocused)
+                .onSubmit {
+                  handleDisplayNameSave()
+                }
+            #endif
+
+            Button("Cancel", systemImage: "x.circle") {
+              handleDisplayNameBlur()
+            }
+            .buttonStyle(.glass)
+            .labelStyle(.iconOnly)
+
+            Button("Save", systemImage: "checkmark") {
+              handleDisplayNameSave()
+            }
+            .buttonStyle(.glassProminent)
+            .labelStyle(.iconOnly)
           }
         }
 
-        Spacer()
-
-        VStack(alignment: .trailing) {
-          HStack {
-            Text(
-              TimeFormatterService.shared.dropdownTimeFormat(
-                from: displayDate,
-                timeZone: timeZone
-              )
-            )
-            .font(.system(size: 20))
-            .fontWeight(.semibold)
-            .monospacedDigit()
-          }
-
-          Text("\(readableDate)")
+        if timeZone.displayName != nil {
+          Text("\(offset) (\(readableTimeZone))")
+            .font(.system(size: 14))
+            .foregroundStyle(.secondary)
+        } else {
+          Text("\(offset)")
             .font(.system(size: 14))
             .foregroundStyle(.secondary)
         }
       }
 
-      if preferences.showTimeBar {
-        TimeBarView(
-          timeZone: .constant(timeZone.timeZoneObject),
-          currentTime: Binding(
-            get: { displayDate },
-            set: {
-              timeManager.setFixedTime($0)
-            }
-          ),
-          positionInList: index
-        )
-      }
-    }
-    .onChange(of: isEditing) { _, newValue in
-      if newValue {
-        DispatchQueue.main.async { isDisplayNameFocused = true }
-        editableDisplayName = timeZone.normalizedDisplayName
-      } else {
-        isDisplayNameFocused = false
+      Spacer()
+
+      VStack(alignment: .trailing) {
+        HStack {
+          Text(
+            TimeFormatterService.shared.dropdownTimeFormat(
+              from: displayDate,
+              timeZone: timeZone
+            )
+          )
+          .font(.system(size: 20))
+          .fontWeight(.semibold)
+          .monospacedDigit()
+        }
+
+        Text("\(readableDate)")
+          .font(.system(size: 14))
+          .foregroundStyle(.secondary)
       }
     }
   }
@@ -188,6 +227,7 @@ struct TimeView: View {
     timeZone: TimeZoneItem(timeZone: TimeZone.current, displayName: "Current"),
   )
   .environment(TimeManager())
+  .environment(TimeViewPosition())
   .environmentObject(TimeZoneManager())
 }
 

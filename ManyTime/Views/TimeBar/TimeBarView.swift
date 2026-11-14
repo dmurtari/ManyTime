@@ -30,29 +30,59 @@ struct TimeBarView: View {
     @Bindable var timeViewPosition = timeViewPosition
 
     ScrollView([.horizontal]) {
-      LazyHStack(spacing: 0) {
-        ForEach(dateArray, id: \.self) { date in
-          let hourValue = getHour(from: date)
+      #if os(iOS)
+        VStack(spacing: 0) {
+          Spacer(minLength: 0)
+          LazyHStack(spacing: 0) {
+            ForEach(dateArray, id: \.self) { date in
+              let hourValue = getHour(from: date)
 
-          TimeBarTimeView(
-            date: .constant(date),
-            dimension: Int(Constants.TimeBarConstants.timeViewSide),
-            timeZone: timeZone,
-            hour: hourValue,
-            showDate: hourValue == 0
-          )
-          .clipShape(
-            UnevenRoundedRectangle(
-              cornerRadii: .init(
-                topLeading: hourValue == 0 ? 6 : 0,
-                bottomLeading: hourValue == 0 ? 6 : 0,
-                bottomTrailing: hourValue == 23 ? 6 : 0,
-                topTrailing: hourValue == 23 ? 6 : 0
+              TimeBarTimeView(
+                date: .constant(date),
+                dimension: Int(Constants.TimeBarConstants.timeViewSide),
+                timeZone: timeZone,
+                hour: hourValue,
+                showDate: hourValue == 0
+              )
+              .clipShape(
+                UnevenRoundedRectangle(
+                  cornerRadii: .init(
+                    topLeading: hourValue == 0 ? 6 : 0,
+                    bottomLeading: hourValue == 0 ? 6 : 0,
+                    bottomTrailing: hourValue == 23 ? 6 : 0,
+                    topTrailing: hourValue == 23 ? 6 : 0
+                  )
+                )
+              )
+            }
+          }
+          .frame(height: Constants.TimeBarConstants.timeViewSide)
+        }
+      #else
+        LazyHStack(spacing: 0) {
+          ForEach(dateArray, id: \.self) { date in
+            let hourValue = getHour(from: date)
+
+            TimeBarTimeView(
+              date: .constant(date),
+              dimension: Int(Constants.TimeBarConstants.timeViewSide),
+              timeZone: timeZone,
+              hour: hourValue,
+              showDate: hourValue == 0
+            )
+            .clipShape(
+              UnevenRoundedRectangle(
+                cornerRadii: .init(
+                  topLeading: hourValue == 0 ? 6 : 0,
+                  bottomLeading: hourValue == 0 ? 6 : 0,
+                  bottomTrailing: hourValue == 23 ? 6 : 0,
+                  topTrailing: hourValue == 23 ? 6 : 0
+                )
               )
             )
-          )
+          }
         }
-      }
+      #endif
     }
     .scrollPosition($timeViewPosition.scrollPositions[positionInList])
     .onScrollGeometryChange(for: CGFloat.self) { geo in
@@ -103,11 +133,12 @@ struct TimeBarView: View {
       }
     }
     .scrollIndicators(preferences.showRockerControls ? .never : .hidden)
-    .frame(height: Constants.TimeBarConstants.timeViewSide)
     #if os(macOS)
+      .frame(height: Constants.TimeBarConstants.timeViewSide)
       .frame(width: Constants.AppViewConstants.timeMenuWidth)
     #else
-      .frame(maxWidth: .infinity)
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .contentShape(Rectangle())
     #endif
     .onGeometryChange(for: CGFloat.self) { proxy in
       proxy.size.width
@@ -116,12 +147,20 @@ struct TimeBarView: View {
       viewWidth = newWidth
       scrollToTime(timeManager.displayDate)
     }
-    .overlay {
-      Rectangle()
+    #if os(macOS)
+      .overlay {
+        Rectangle()
         .fill(.black)
         .frame(width: 2)
         .padding(.vertical, -1)
-    }
+      }
+    #else
+      .overlay(alignment: .bottom) {
+        Rectangle()
+        .fill(.black)
+        .frame(width: 2, height: Constants.TimeBarConstants.timeViewSide)
+      }
+    #endif
     .onAppear {
       logger.log("Starting onAppear Hook")
 
@@ -261,6 +300,6 @@ struct TimeBarView: View {
     currentTime: .constant(Date.now),
     positionInList: 0
   )
-    .environment(TimeManager())
-    .environment(TimeViewPosition())
+  .environment(TimeManager())
+  .environment(TimeViewPosition())
 }
