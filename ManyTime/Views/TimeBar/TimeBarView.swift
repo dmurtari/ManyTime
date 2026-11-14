@@ -90,8 +90,16 @@ struct TimeBarView: View {
     }
     .defaultScrollAnchor(.bottomLeading)
     .onScrollPhaseChange { _, newPhase in
-      if newPhase.isScrolling {
+      if newPhase == .interacting {
         timeViewPosition.indexScrolledByUser = positionInList
+      } else if newPhase == .decelerating {
+        if case .current = timeManager.timeMode {
+          timeViewPosition.indexScrolledByUser = nil
+        }
+      } else {
+        if timeViewPosition.indexScrolledByUser == positionInList {
+          timeViewPosition.indexScrolledByUser = nil
+        }
       }
     }
     .scrollIndicators(preferences.showRockerControls ? .never : .hidden)
@@ -136,6 +144,10 @@ struct TimeBarView: View {
       }
     }
     .onChange(of: currentTime) { oldValue, newValue in
+      guard timeViewPosition.indexScrolledByUser != positionInList else {
+        return
+      }
+
       let wasCurrent = if case .current = timeManager.timeMode { true } else { false }
 
       logger.log("currentTime changed from \(oldValue) to \(newValue)")
@@ -153,8 +165,10 @@ struct TimeBarView: View {
     .onChange(of: timeManager.timeMode) { oldMode, newMode in
       guard case .current = newMode else { return }
 
+      timeViewPosition.indexScrolledByUser = nil
+
       logger.log("Switched to current time, resetting date array")
-      resetDateArray()
+      resetDateArray(around: timeManager.displayDate)
 
       Task { @MainActor in
         await Task.yield()
@@ -163,7 +177,7 @@ struct TimeBarView: View {
     }
     .onChange(of: timeZone) { _, newZone in
       calendar.timeZone = newZone
-      resetDateArray()
+      resetDateArray(around: timeManager.displayDate)
 
       Task { @MainActor in
         await Task.yield()
@@ -184,10 +198,11 @@ struct TimeBarView: View {
     timeViewPosition.scrollPositions[positionInList] = ScrollPosition(x: targetScrollX)
   }
 
-  private func resetDateArray() {
+  private func resetDateArray(around date: Date? = nil) {
     dateArray.removeAll()
 
-    let seedDate = calendar.dateInterval(of: .hour, for: currentTime)?.start ?? currentTime
+    let baseDate = date ?? timeManager.displayDate
+    let seedDate = calendar.dateInterval(of: .hour, for: baseDate)?.start ?? baseDate
     dateArray.append(seedDate)
     appendDates()
     prependDates(adjustScroll: false)

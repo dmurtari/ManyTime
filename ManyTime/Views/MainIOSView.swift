@@ -101,6 +101,7 @@ import SwiftUI
           if preferences.showTimeBar && preferences.showRockerControls && !timeZoneManager.displayedTimeZones.isEmpty {
             HStack {
               Button("", systemImage: "arrow.uturn.backward.circle") {
+                timeViewPosition.indexScrolledByUser = nil
                 timeManager.switchToCurrent()
               }
               .disabled(timeManager.isShowingCurrentTime)
