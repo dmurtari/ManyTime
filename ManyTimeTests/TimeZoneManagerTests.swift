@@ -37,6 +37,7 @@ class MockTimeZoneProvider: TimeZoneProviding {
   }
 }
 
+@MainActor
 @Suite("TimeZoneManager Tests")
 struct TimeZoneManagerTests {
 
@@ -327,6 +328,13 @@ struct TimeZoneManagerTests {
     let item = TimeZoneItem(timeZone: TimeZone(identifier: "America/New_York")!, displayName: nil)
 
     #expect(item.normalizedDisplayName == "America/New York")
+  }
+
+  @Test("TimeZoneItem normalizedDisplayName preserves UTC identifier when display name is nil")
+  func testTimeZoneItemNormalizedDisplayNameUTC() {
+    let item = TimeZoneItem(timeZoneIdentifier: "UTC", displayName: nil)
+
+    #expect(item.normalizedDisplayName == "UTC")
   }
 
   @Test("TimeZoneItem normalizedDisplayName should use custom display name when available")

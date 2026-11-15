@@ -26,16 +26,19 @@ final class TimeManager {
   private let logger = Logger(subsystem: "com.dmurtari.ManyTime", category: "TimeManager")
 
   var displayDate: Date {
+    let date: Date
     switch timeMode {
     case .current:
-      return Calendar.current.date(
-        from: Calendar.current.dateComponents(
-          [.year, .month, .day, .hour, .minute],
-          from: currentDate
-        )
-      ) ?? currentDate
-    case .fixed(let date): return date
+      date = currentDate
+    case .fixed(let fixedDate):
+      date = fixedDate
     }
+    return Calendar.current.date(
+      from: Calendar.current.dateComponents(
+        [.year, .month, .day, .hour, .minute],
+        from: date
+      )
+    ) ?? date
   }
 
   // Are the currentDate and displayDate similar enough to be considered the same?

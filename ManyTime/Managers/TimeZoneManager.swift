@@ -19,8 +19,7 @@ struct TimeZoneItem: Identifiable, Codable, Equatable {
     self.displayName = displayName
   }
 
-  // Added for testing purposes
-  init(id: UUID = UUID(), timeZoneIdentifier: String, displayName: String) {
+  init(id: UUID = UUID(), timeZoneIdentifier: String, displayName: String? = nil) {
     self.id = id
     self.timeZone = timeZoneIdentifier
     self.displayName = displayName
@@ -31,9 +30,10 @@ struct TimeZoneItem: Identifiable, Codable, Equatable {
   }
 
   var normalizedDisplayName: String {
-    displayName
-      ?? timeZoneObject
-      .identifier
+    if let displayName, !displayName.isEmpty {
+      return displayName
+    }
+    return (timeZone.isEmpty ? timeZoneObject.identifier : timeZone)
       .replacingOccurrences(of: "_", with: " ")
   }
 }
