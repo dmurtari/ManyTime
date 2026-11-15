@@ -1,14 +1,10 @@
-import Combine
-import MapKit
 import SwiftUI
 
 struct TimeZoneAddView: View {
   @EnvironmentObject private var timeZoneManager: TimeZoneManager
   @Environment(\.dismiss) private var dismiss
 
-  @State private var timeZoneIdentifier: String = ""
   @State private var displayName: String = ""
-  @State private var disableFields: Bool = false
   @State private var mode: SelectionMode = .city
   @State private var selectedCity: CityTimeZone?
   @State private var offsetMinutes: Int = 0
