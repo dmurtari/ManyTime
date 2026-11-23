@@ -369,6 +369,32 @@ struct TimeZoneManagerTests {
     #expect(secondManager.savedTimeZones[0].displayName == "London")
   }
 
+  @Test("Edits and ordering survive a new manager instance")
+  func testSavedListWorkflow() throws {
+    let defaults = MockUserDefaults()
+    let provider = MockTimeZoneProvider()
+    let manager = TimeZoneManager(userDefaults: defaults, timeZoneProvider: provider)
+    let london = try #require(TimeZone(identifier: "Europe/London"))
+    let tokyo = try #require(TimeZone(identifier: "Asia/Tokyo"))
+    let denver = try #require(TimeZone(identifier: "America/Denver"))
+
+    manager.addTimeZone(london, displayName: "London")
+    manager.addTimeZone(tokyo, displayName: nil)
+    manager.addTimeZone(denver, displayName: "Denver")
+    let londonID = try #require(manager.savedTimeZones.first?.id)
+    let tokyoID = try #require(manager.savedTimeZones.dropFirst().first?.id)
+    let denverID = try #require(manager.savedTimeZones.last?.id)
+
+    manager.updateDisplayName(for: tokyoID, newName: "Tokyo office")
+    manager.moveTimeZone(from: IndexSet(integer: 1), to: 0)
+    manager.removeTimeZone(id: denverID)
+
+    let restored = TimeZoneManager(userDefaults: defaults, timeZoneProvider: provider)
+    #expect(restored.savedTimeZones.map(\.id) == [tokyoID, londonID])
+    #expect(restored.savedTimeZones.map(\.timeZone) == ["Asia/Tokyo", "Europe/London"])
+    #expect(restored.savedTimeZones.map(\.displayName) == ["Tokyo office", "London"])
+  }
+
   @Test("Manager should handle corrupted save data gracefully")
   func testCorruptedSaveData() {
     let mockUserDefaults = MockUserDefaults()

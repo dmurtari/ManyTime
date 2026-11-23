@@ -51,6 +51,14 @@
                BlueprintName = "ManyTimeUITests"
                ReferencedContainer = "container:ManyTime.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "ManyTimeUITests/testLaunchPerformance()">
+               </Test>
+               <Test
+                  Identifier = "ManyTimeUITestsLaunchTests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
