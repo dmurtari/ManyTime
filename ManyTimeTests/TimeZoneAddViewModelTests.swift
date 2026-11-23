@@ -12,7 +12,10 @@ struct TimeZoneAddViewModelTests {
   @Test func citySelectionAndNames() {
     let manager = TimeZoneManager(userDefaults: MockUserDefaults())
     var viewModel = TimeZoneAddViewModel()
+    #expect(viewModel.selection == nil)
     viewModel.selectedCity = tokyo
+    #expect(viewModel.selection?.timeZone.identifier == "Asia/Tokyo")
+    #expect(viewModel.selection?.displayName == "Tokyo")
     let saved = viewModel.save(using: manager)
     #expect(saved)
     #expect(manager.savedTimeZones.first?.timeZone == "Asia/Tokyo")
@@ -35,6 +38,7 @@ struct TimeZoneAddViewModelTests {
       name: "Invalid/Zone", rawOffsetInMinutes: 0
     )
     viewModel.displayName = "Office"
+    #expect(viewModel.selection == nil)
     let saved = viewModel.save(using: manager)
     #expect(!saved)
     #expect(manager.savedTimeZones.isEmpty)

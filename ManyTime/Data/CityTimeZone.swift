@@ -5,7 +5,7 @@
 //  Created by Domenic Murtari on 2025/11/01.
 //
 
-struct CityTimeZone: Decodable, Hashable, Identifiable {
+struct CityTimeZone: Decodable, Hashable, Identifiable, Sendable {
   let id: String
   let city: String
   let countryCode: String

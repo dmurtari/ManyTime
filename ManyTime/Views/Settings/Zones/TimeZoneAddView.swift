@@ -59,7 +59,7 @@ struct TimeZoneAddView: View {
           Spacer()
           Button("Add") { save() }
             .keyboardShortcut(.defaultAction)
-            .disabled(viewModel.mode == .city && viewModel.selectedCity == nil)
+            .disabled(viewModel.selection == nil)
         }
       }
       .formStyle(.columns)
@@ -110,7 +110,7 @@ struct TimeZoneAddView: View {
         Section {
           Button("Add") { save() }
             .keyboardShortcut(.defaultAction)
-            .disabled(viewModel.mode == .city && viewModel.selectedCity == nil)
+            .disabled(viewModel.selection == nil)
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
       }

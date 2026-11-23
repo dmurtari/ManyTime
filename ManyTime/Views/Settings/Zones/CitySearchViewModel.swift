@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-struct CityRow: Identifiable, Hashable {
+struct CityRow: Identifiable, Hashable, Sendable {
   var id: String { city.id }
 
   let city: CityTimeZone
@@ -16,62 +16,81 @@ final class CitySearchViewModel {
   var query = ""
   private(set) var allCities: [CityRow] = []
   private(set) var filtered: [CityRow] = []
+  private var debouncedQuery = ""
+  private let locale: Locale
+
+  init(locale: Locale = .current) {
+    self.locale = locale
+  }
 
   func load(cities: [CityTimeZone]) async {
-    let rows = await Task.detached(priority: .userInitiated) {
-      await Self.getSearchableCities(cities)
-    }.value
+    let locale = locale
+    let task = Task.detached(priority: .userInitiated) {
+      Self.prepareCities(cities, locale: locale)
+    }
+    let rows = await withTaskCancellationHandler {
+      await task.value
+    } onCancel: {
+      task.cancel()
+    }
+    guard !Task.isCancelled else { return }
     allCities = rows
-    filtered = []
+
+    let currentQuery = query.trimmingCharacters(in: .whitespaces)
+    if currentQuery == debouncedQuery {
+      apply(debouncedQuery)
+    } else {
+      filtered = []
+    }
+  }
+
+  nonisolated private static func prepareCities(
+    _ cities: [CityTimeZone], locale: Locale
+  ) -> [CityRow] {
+    cities.sorted {
+      $0.city.localizedCaseInsensitiveCompare($1.city) == .orderedAscending
+    }.map { city in
+      let country = locale.localizedString(forRegionCode: city.countryCode) ?? city.countryCode
+      let searchString = [city.city, country, city.countryCode]
+        .joined(separator: " ")
+        .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: locale)
+      return CityRow(
+        city: city,
+        countryDisplayName: country,
+        gmtDisplay: TimeZone(identifier: city.name)?.gmtLabel ?? "",
+        searchString: searchString
+      )
+    }
   }
 
   func search() async {
     let trimmed = query.trimmingCharacters(in: .whitespaces)
-    if trimmed.count < 3 {
+    guard trimmed.count >= 3 else {
+      debouncedQuery = ""
       filtered = []
       return
     }
 
     do {
       try await Task.sleep(for: .milliseconds(150))
+      try Task.checkCancellation()
     } catch {
       return
     }
+    guard query.trimmingCharacters(in: .whitespaces) == trimmed else { return }
+    debouncedQuery = trimmed
+    apply(trimmed)
+  }
 
-    let q = trimmed.folding(
+  private func apply(_ text: String) {
+    guard text.count >= 3 else {
+      filtered = []
+      return
+    }
+    let normalized = text.folding(
       options: [.caseInsensitive, .diacriticInsensitive],
-      locale: .current
+      locale: locale
     )
-
-    filtered = allCities.filter { $0.searchString.contains(q) }
-  }
-
-  private static func getSearchableCities(_ cities: [CityTimeZone]) -> [CityRow] {
-    return
-      cities
-      .sorted {
-        $0.city.localizedCaseInsensitiveCompare($1.city) == .orderedAscending
-      }.map { city in
-        let countryDisplayName = countryName(city.countryCode)
-        let gmtDisplay = gmtLabel(for: city.name)
-        let searchString = [city.city, countryDisplayName, city.countryCode]
-          .joined(separator: " ")
-          .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
-
-        return CityRow(
-          city: city,
-          countryDisplayName: countryDisplayName,
-          gmtDisplay: gmtDisplay,
-          searchString: searchString
-        )
-      }
-  }
-
-  private static func countryName(_ code: String) -> String {
-    Locale.current.localizedString(forRegionCode: code) ?? code
-  }
-
-  private static func gmtLabel(for identifier: String) -> String {
-    TimeZone(identifier: identifier)?.gmtLabel ?? ""
+    filtered = allCities.filter { $0.searchString.contains(normalized) }
   }
 }

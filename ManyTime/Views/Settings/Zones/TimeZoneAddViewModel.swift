@@ -19,29 +19,28 @@ struct TimeZoneAddViewModel {
     }
   }
 
-  @MainActor
-  mutating func save(using timeZoneManager: TimeZoneManager) -> Bool {
+  var selection: (timeZone: TimeZone, displayName: String)? {
     let timeZone: TimeZone?
-
     switch mode {
     case .city:
       timeZone = selectedCity.flatMap { TimeZone(identifier: $0.name) }
     case .offset:
       timeZone = TimeZone(secondsFromGMT: offsetMinutes * 60)
     }
+    guard let timeZone else { return nil }
+    return (timeZone, displayName.isEmpty ? defaultDisplayName : displayName)
+  }
 
-    guard let timeZone else {
-      print("Failed to build TimeZone for mode \(mode)")
-      return false
-    }
+  @MainActor
+  mutating func save(using timeZoneManager: TimeZoneManager) -> Bool {
+    guard let selection else { return false }
+    timeZoneManager.addTimeZone(selection.timeZone, displayName: selection.displayName)
+    resetAfterSave()
+    return true
+  }
 
-    timeZoneManager.addTimeZone(
-      timeZone,
-      displayName: displayName.isEmpty ? defaultDisplayName : displayName
-    )
-
+  private mutating func resetAfterSave() {
     displayName = ""
     selectedCity = nil
-    return true
   }
 }
