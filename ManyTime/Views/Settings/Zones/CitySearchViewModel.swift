@@ -91,6 +91,15 @@ final class CitySearchViewModel {
       options: [.caseInsensitive, .diacriticInsensitive],
       locale: locale
     )
-    filtered = allCities.filter { $0.searchString.contains(normalized) }
+    var prefixMatches: [CityRow] = []
+    var otherMatches: [CityRow] = []
+    for row in allCities {
+      if row.searchString.hasPrefix(normalized) {
+        prefixMatches.append(row)
+      } else if row.searchString.contains(normalized) {
+        otherMatches.append(row)
+      }
+    }
+    filtered = prefixMatches + otherMatches
   }
 }

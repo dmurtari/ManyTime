@@ -24,6 +24,18 @@ struct CitySearchViewModelTests {
     #expect(viewModel.filtered.isEmpty)
   }
 
+  @Test func cityPrefixMatchesAppearBeforeOtherMatches() async {
+    let viewModel = CitySearchViewModel(locale: Locale(identifier: "en_US"))
+    let nishiTokyo = CityTimeZone(
+      id: "nishi-tokyo", city: "Nishi-Tokyo-shi", countryCode: "JP",
+      name: "Asia/Tokyo", rawOffsetInMinutes: 540
+    )
+    await viewModel.load(cities: cities + [nishiTokyo])
+    viewModel.query = "  TOKYO "
+    await viewModel.search()
+    #expect(viewModel.filtered.map(\.city.id) == ["tokyo", "nishi-tokyo"])
+  }
+
   @Test func loadingAfterSearchUpdatesResults() async {
     let viewModel = CitySearchViewModel()
     viewModel.query = "tok"
