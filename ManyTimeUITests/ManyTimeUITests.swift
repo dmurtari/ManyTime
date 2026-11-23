@@ -22,14 +22,37 @@ final class ManyTimeUITests: XCTestCase {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
   }
 
+  #if os(macOS)
   @MainActor
-  func testExample() throws {
-    // UI tests must launch the application that they test.
+  func testAddCityTimeZone() throws {
     let app = XCUIApplication()
+    app.launchEnvironment["MANYTIME_UI_TEST_SAVE_KEY"] = "UITest-\(UUID().uuidString)"
     app.launch()
 
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
+    let statusItem = app.statusItems.firstMatch
+    XCTAssertTrue(statusItem.waitForExistence(timeout: 10))
+    statusItem.click()
+    app.descendants(matching: .any)["Options"].firstMatch.click()
+    app.menuItems["Preferences"].click()
+    let zonesTab = app.descendants(matching: .any)["Time Zones"].firstMatch
+    XCTAssertTrue(zonesTab.waitForExistence(timeout: 10))
+    zonesTab.click()
+    app.buttons["City"].click()
+
+    let search = app.textFields["Search for a city"]
+    XCTAssertTrue(search.waitForExistence(timeout: 10))
+    search.click()
+    search.typeText("Tokyo")
+    let city = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Tokyo,")).firstMatch
+    XCTAssertTrue(city.waitForExistence(timeout: 10))
+    city.click()
+
+    let add = app.buttons["Add"]
+    XCTAssertTrue(add.isEnabled)
+    add.click()
+    XCTAssertTrue(app.staticTexts["Tokyo"].waitForExistence(timeout: 10))
   }
+  #endif
 
   @MainActor
   func testLaunchPerformance() throws {

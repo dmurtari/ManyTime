@@ -4,7 +4,9 @@ import SwiftUI
 @main
 struct TimeZonesApp: App {
   @State private var timeManager = TimeManager()
-  @StateObject private var timeZoneManager = TimeZoneManager()
+  @StateObject private var timeZoneManager = TimeZoneManager(
+    saveKey: ProcessInfo.processInfo.environment["MANYTIME_UI_TEST_SAVE_KEY"] ?? "SavedTimeZones"
+  )
 
   var body: some Scene {
 #if os(macOS)
