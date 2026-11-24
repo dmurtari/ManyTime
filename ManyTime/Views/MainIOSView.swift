@@ -18,6 +18,7 @@ import SwiftUI
     @State private var showingAbout = false
     @State private var showingSettings = false
     @State private var editMode: EditMode = .inactive
+    @State private var editingTimeZoneID: UUID?
 
     var body: some View {
       NavigationStack {
@@ -33,9 +34,12 @@ import SwiftUI
             }
           } else {
             Section {
-              ForEach(timeZoneManager.displayedTimeZones.enumerated(), id: \.offset) { index, timeZone in
+              ForEach(timeZoneManager.displayedTimeZones.enumerated(), id: \.element.id) { index, timeZone in
                 TimeView(
-                  isEditing: .constant(false),
+                  isEditing: Binding(
+                    get: { editingTimeZoneID == timeZone.id },
+                    set: { editingTimeZoneID = $0 ? timeZone.id : nil }
+                  ),
                   timeZone: timeZone,
                   index: index
                 )
@@ -43,13 +47,17 @@ import SwiftUI
                   Button("Delete", systemImage: "trash", role: .destructive) {
                     timeZoneManager.removeTimeZone(id: timeZone.id)
                   }
+                  Button("Edit Name", systemImage: "pencil") {
+                    editingTimeZoneID = timeZone.id
+                  }
+                  .tint(.blue)
                 }
               }
               .onMove { offsets, destination in
-                _ = timeZoneManager.moveTimeZone(from: offsets, to: destination)
+                timeZoneManager.moveDisplayedTimeZones(from: offsets, to: destination)
               }
               .onDelete { offsets in
-                _ = timeZoneManager.removeTimeZoneAt(at: offsets)
+                timeZoneManager.removeDisplayedTimeZones(at: offsets)
               }
             }
           }

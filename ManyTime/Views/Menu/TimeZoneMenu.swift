@@ -28,7 +28,7 @@ struct TimeZoneMenu: View {
         .padding()
       } else {
         VStack(spacing: 16) {
-          ForEach(timeZoneManager.displayedTimeZones.enumerated(), id: \.offset) { index, timeZone in
+          ForEach(timeZoneManager.displayedTimeZones.enumerated(), id: \.element.id) { index, timeZone in
             TimeView(timeZone: timeZone, index: index)
           }
 

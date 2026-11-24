@@ -41,6 +41,49 @@ class MockTimeZoneProvider: TimeZoneProviding {
 @Suite("TimeZoneManager Tests")
 struct TimeZoneManagerTests {
 
+  @Test("Device time zone follows the provider and preserves edits")
+  func deviceTimeZoneFollowsProvider() throws {
+    let preferences = AppPreferences.shared
+    let previous = preferences.showDeviceTimeZone
+    defer { preferences.showDeviceTimeZone = previous }
+    preferences.showDeviceTimeZone = false
+    
+    let provider = MockTimeZoneProvider()
+    let defaults = MockUserDefaults()
+    let london = try #require(TimeZone(identifier: "Europe/London"))
+    let tokyo = try #require(TimeZone(identifier: "Asia/Tokyo"))
+
+    let manager = TimeZoneManager(userDefaults: defaults, timeZoneProvider: provider)
+    manager.addTimeZone(london, displayName: "London")
+    manager.setDeviceTimeZoneVisible(true)
+    let device = try #require(manager.displayedTimeZones.first)
+
+    #expect(device.normalizedDisplayName == "Current")
+
+    manager.updateDisplayName(for: device.id, newName: "Home")
+    manager.moveDisplayedTimeZones(from: IndexSet(integer: 0), to: 2)
+    provider.mockCurrent = tokyo
+
+    #expect(manager.displayedTimeZones.last?.id == device.id)
+    #expect(manager.displayedTimeZones.last?.timeZone == tokyo.identifier)
+    #expect(manager.displayedTimeZones.last?.displayName == "Home")
+
+    manager.setDeviceTimeZoneVisible(false)
+
+    #expect(manager.displayedTimeZones.map(\.timeZone) == [london.identifier])
+
+    manager.setDeviceTimeZoneVisible(true)
+    let restored = TimeZoneManager(userDefaults: defaults, timeZoneProvider: provider)
+
+    #expect(restored.displayedTimeZones.last?.id == device.id)
+    #expect(restored.displayedTimeZones.last?.displayName == "Home")
+
+    restored.removeTimeZone(id: device.id)
+
+    #expect(!preferences.showDeviceTimeZone)
+    #expect(restored.displayedTimeZones.count == 1)
+  }
+
   @Test("Initial state should be empty")
   func testInitialState() {
     let mockUserDefaults = MockUserDefaults()

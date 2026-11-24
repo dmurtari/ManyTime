@@ -12,17 +12,20 @@ struct TimeZoneItem: Identifiable, Codable, Equatable {
   let id: UUID
   let timeZone: String
   var displayName: String?
+  var isDeviceTimeZone: Bool?
 
   init(timeZone: TimeZone, displayName: String?) {
     self.id = UUID()
     self.timeZone = timeZone.identifier
     self.displayName = displayName
+    self.isDeviceTimeZone = nil
   }
 
-  init(id: UUID = UUID(), timeZoneIdentifier: String, displayName: String? = nil) {
+  init(id: UUID = UUID(), timeZoneIdentifier: String, displayName: String? = nil, isDeviceTimeZone: Bool? = nil) {
     self.id = id
     self.timeZone = timeZoneIdentifier
     self.displayName = displayName
+    self.isDeviceTimeZone = isDeviceTimeZone
   }
 
   var timeZoneObject: TimeZone {
@@ -82,6 +85,9 @@ class TimeZoneManager: ObservableObject, Observable {
     self.timeZoneProvider = timeZoneProvider
     self.saveKey = saveKey
     loadTimeZones()
+    if AppPreferences.shared.showDeviceTimeZone {
+      ensureDeviceTimeZone()
+    }
     addListeners()
   }
 
@@ -117,6 +123,9 @@ class TimeZoneManager: ObservableObject, Observable {
 
   @discardableResult
   func removeTimeZoneAt(at offsets: IndexSet) -> Bool {
+    if offsets.contains(where: { savedTimeZones.indices.contains($0) && savedTimeZones[$0].isDeviceTimeZone == true }) {
+      AppPreferences.shared.showDeviceTimeZone = false
+    }
     savedTimeZones.remove(atOffsets: offsets)
     return saveTimeZones()
   }
@@ -127,6 +136,9 @@ class TimeZoneManager: ObservableObject, Observable {
       return false
     }
 
+    if savedTimeZones[index].isDeviceTimeZone == true {
+      AppPreferences.shared.showDeviceTimeZone = false
+    }
     savedTimeZones.remove(at: index)
     return saveTimeZones()
   }
@@ -135,6 +147,41 @@ class TimeZoneManager: ObservableObject, Observable {
   func moveTimeZone(from source: IndexSet, to destination: Int) -> Bool {
     savedTimeZones.move(fromOffsets: source, toOffset: destination)
     return saveTimeZones()
+  }
+
+  func setDeviceTimeZoneVisible(_ visible: Bool) {
+    if visible {
+      ensureDeviceTimeZone()
+    }
+    AppPreferences.shared.showDeviceTimeZone = visible
+  }
+
+  private func ensureDeviceTimeZone() {
+    guard !savedTimeZones.contains(where: { $0.isDeviceTimeZone == true }) else { return }
+    savedTimeZones.insert(
+      TimeZoneItem(timeZoneIdentifier: timeZoneProvider.current.identifier, displayName: "Current", isDeviceTimeZone: true),
+      at: 0
+    )
+    saveTimeZones()
+  }
+
+  func moveDisplayedTimeZones(from source: IndexSet, to destination: Int) {
+    var visibleIDs = displayedTimeZones.map(\.id)
+    visibleIDs.move(fromOffsets: source, toOffset: destination)
+    let itemsByID = Dictionary(uniqueKeysWithValues: savedTimeZones.map { ($0.id, $0) })
+    var visibleItems = visibleIDs.compactMap { itemsByID[$0] }.makeIterator()
+    savedTimeZones = savedTimeZones.map { item in
+      if item.isDeviceTimeZone == true && !AppPreferences.shared.showDeviceTimeZone { return item }
+      return visibleItems.next() ?? item
+    }
+    saveTimeZones()
+  }
+
+  func removeDisplayedTimeZones(at offsets: IndexSet) {
+    let items = displayedTimeZones
+    for offset in offsets {
+      removeTimeZone(id: items[offset].id)
+    }
   }
 
   @discardableResult
@@ -186,38 +233,25 @@ class TimeZoneManager: ObservableObject, Observable {
 }
 
 extension TimeZoneManager {
-  /// The timezones in display order, adjusted so the device's own timezone doesn't appear first in the list
   var displayedTimeZones: [TimeZoneItem] {
-    guard AppPreferences.shared.demoteCurrentTimezoneInList else {
-      return savedTimeZones
+    savedTimeZones.compactMap { item in
+      guard item.isDeviceTimeZone == true else { return item }
+      guard AppPreferences.shared.showDeviceTimeZone else { return nil }
+      return TimeZoneItem(
+        id: item.id,
+        timeZoneIdentifier: timeZoneProvider.current.identifier,
+        displayName: item.displayName ?? "Current",
+        isDeviceTimeZone: true
+      )
     }
-
-    let deviceIdentifier = timeZoneProvider.current.identifier
-
-    guard let first = savedTimeZones.first,
-          first.timeZone == deviceIdentifier,
-          let nextIndex = savedTimeZones.firstIndex(where: { $0.timeZone != deviceIdentifier })
-    else {
-      return savedTimeZones
-    }
-
-    var reordered = savedTimeZones
-    let promoted = reordered.remove(at: nextIndex)
-    reordered.insert(promoted, at: 0)
-    return reordered
   }
 
   var menuBarTimezoneItem: TimeZoneItem? {
     guard AppPreferences.shared.showNonDeviceTimezoneInMenuBar else {
-      return savedTimeZones.first
+      return displayedTimeZones.first
     }
 
     let deviceIdentifier = timeZoneProvider.current.identifier
-
-    if let firstNonDevice = savedTimeZones.first(where: { $0.timeZone != deviceIdentifier }) {
-      return firstNonDevice
-    } else {
-      return savedTimeZones.first
-    }
+    return displayedTimeZones.first(where: { $0.timeZone != deviceIdentifier }) ?? displayedTimeZones.first
   }
 }

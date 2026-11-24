@@ -15,13 +15,13 @@ struct TimeZoneListView: View {
   @State private var timeViewPosition: TimeViewPosition = .init()
 
   var body: some View {
-    if timeZoneManager.savedTimeZones.isEmpty {
+    if timeZoneManager.displayedTimeZones.isEmpty {
       VStack(alignment: .leading, spacing: 16) {
         Text("Add a Time Zone below!")
           .font(.callout)
 
         Text(
-          "Time zones that you have added will be shown here.\nThe first time zone will be shown in the Menu Bar."
+          "Time zones that you have added will be shown here.\nThe first time zone will be shown in the Menu Bar"
         )
         .font(.callout)
         .foregroundStyle(.secondary)
@@ -30,13 +30,13 @@ struct TimeZoneListView: View {
     } else {
       VStack(alignment: .leading, spacing: 16) {
         Text(
-          "Reorder Time Zones by dragging.\nThe first Time Zone will be shown in the Menu Bar.\nRight click to edit or delete."
+          "Reorder Time Zones by dragging\nThe first Time Zone will be shown in the Menu Bar\nRight click to edit or delete"
         )
         .font(.callout)
         .foregroundStyle(.secondary)
 
         List {
-          ForEach(timeZoneManager.savedTimeZones.enumerated(), id: \.offset) { index, timeZone in
+          ForEach(timeZoneManager.displayedTimeZones.enumerated(), id: \.element.id) { index, timeZone in
             TimeView(
               isEditing: Binding(
                 get: { editingTimeZoneId == timeZone.id },
@@ -77,7 +77,7 @@ struct TimeZoneListView: View {
         .clipShape(Rectangle())
         .frame(
           height: CGFloat(
-            timeZoneManager.savedTimeZones.count
+            timeZoneManager.displayedTimeZones.count
               * (preferences.showTimeBar ? 90 : 50)
           )
         )
@@ -90,7 +90,7 @@ struct TimeZoneListView: View {
   }
 
   private func onMove(_ indices: IndexSet, to destination: Int) {
-    timeZoneManager.moveTimeZone(from: indices, to: destination)
+    timeZoneManager.moveDisplayedTimeZones(from: indices, to: destination)
   }
 }
 

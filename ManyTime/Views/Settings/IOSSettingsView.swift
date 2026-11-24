@@ -10,6 +10,7 @@ import SwiftUI
 #if os(iOS)
 struct IOSSettingsView: View {
   @StateObject private var preferences = AppPreferences.shared
+  @EnvironmentObject private var timeZoneManager: TimeZoneManager
 
   @State private var selectedPresetFormat: String = ""
 
@@ -42,10 +43,14 @@ struct IOSSettingsView: View {
       }
 
       Section {
-        Toggle("Non-device time zone first", isOn: $preferences.demoteCurrentTimezoneInList)
+        Toggle("Show device time zone", isOn: Binding(
+          get: { preferences.showDeviceTimeZone },
+          set: { timeZoneManager.setDeviceTimeZoneVisible($0) }
+        ))
       } footer: {
-        Text("When the device time zone is first in the list, move it down so the next time zone is first.")
+        Text("Add the device’s current time zone to the list.")
       }
+
     }
     .onAppear {
       if presetFormats.contains(preferences.dropdownTimeFormat) {
@@ -60,6 +65,7 @@ struct IOSSettingsView: View {
     IOSSettingsView()
       .navigationTitle("Settings")
       .navigationBarTitleDisplayMode(.inline)
+      .environmentObject(TimeZoneManager())
   }
 }
 #endif

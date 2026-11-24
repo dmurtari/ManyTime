@@ -27,7 +27,7 @@ import ServiceManagement
 
   @AppStorage("showRockerControls") var showRockerControls = true
 
-  @AppStorage("demoteCurrentTimezoneInList") var demoteCurrentTimezoneInList = false
+  @AppStorage("showDeviceTimeZone") var showDeviceTimeZone = false
 
   @AppStorage("showNonDeviceTimezoneInMenuBar") var showNonDeviceTimezoneInMenuBar = true
 
