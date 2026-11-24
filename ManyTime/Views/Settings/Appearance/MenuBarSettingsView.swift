@@ -53,13 +53,16 @@ struct MenuBarSettingsView: View {
               TextField("Format", text: $preferences.menuBarTimeFormat)
             }
           }
-          Text("The time format to use in the Popup Window (use `{name}` to include the timezone name)")
+          Text("The time format shown in the menu bar (use `{name}` to include the time zone name)")
             .font(.callout)
             .foregroundStyle(.secondary)
 
           VStack(alignment: .leading, spacing: 8) {
-            Toggle("Always show a non-device timezone in the Menu Bar", isOn: $preferences.showNonDeviceTimezoneInMenuBar)
-            Text("Show the first, non-device timezone in the Menu Bar, if the device timezone is first in the list")
+            Picker("Time zone", selection: $preferences.showNonDeviceTimezoneInMenuBar) {
+              Text("First in list").tag(false)
+              Text("First non-device device time zone").tag(true)
+            }
+            Text("Whether to show the first time in the list in the menu, or to prefer a non-device timezone")
               .font(.callout)
               .foregroundStyle(.secondary)
           }

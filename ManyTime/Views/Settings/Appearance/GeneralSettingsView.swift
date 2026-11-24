@@ -17,7 +17,7 @@ struct GeneralSettingsView: View {
   var body: some View {
     VStack(spacing: 16) {
       VStack(alignment: .leading) {
-        Text("Timezone Menu")
+        Text("Time Zone List")
           .font(.system(size: 14, weight: .bold))
         Divider()
 
@@ -39,7 +39,7 @@ struct GeneralSettingsView: View {
             }
           }
 
-          Text("The time format to use in the Popup Window (use `{name}` to include the timezone name)")
+          Text("The time format shown in the time zone list (use `{name}` to include the time zone name)")
             .font(.callout)
             .foregroundStyle(.secondary)
         }

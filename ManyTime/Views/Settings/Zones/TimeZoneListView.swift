@@ -21,7 +21,7 @@ struct TimeZoneListView: View {
           .font(.callout)
 
         Text(
-          "Time zones that you have added will be shown here.\nThe first time zone will be shown in the Menu Bar"
+          "Time zones that you add will be shown here"
         )
         .font(.callout)
         .foregroundStyle(.secondary)
@@ -30,7 +30,7 @@ struct TimeZoneListView: View {
     } else {
       VStack(alignment: .leading, spacing: 16) {
         Text(
-          "Reorder Time Zones by dragging\nThe first Time Zone will be shown in the Menu Bar\nRight click to edit or delete"
+          "Reorder time zones by dragging, right click to edit or delete"
         )
         .font(.callout)
         .foregroundStyle(.secondary)
