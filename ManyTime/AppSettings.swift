@@ -23,6 +23,10 @@ import ServiceManagement
     }
   }
 
+  @AppStorage("menuResetEnabled") var menuResetEnabled = true
+
+  @AppStorage("menuResetDelayMinutes") var menuResetDelayMinutes = 2
+
   @AppStorage("showTimeBar") var showTimeBar = true
 
   @AppStorage("showRockerControls") var showRockerControls = true

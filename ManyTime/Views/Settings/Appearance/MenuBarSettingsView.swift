@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MenuBarSettingsView: View {
   @StateObject private var preferences = AppPreferences.shared
+  @Environment(TimeManager.self) private var timeManager
 
   @State private var selectedPresetFormat: String = ""
 
@@ -68,16 +69,46 @@ struct MenuBarSettingsView: View {
           }
           .padding([.top], 6)
 
+          VStack(alignment: .leading, spacing: 8) {
+            Toggle("Reset to current time when the menu is closed", isOn: $preferences.menuResetEnabled)
+            HStack {
+              TextField("Delay", value: Binding(
+                get: { preferences.menuResetDelayMinutes },
+                set: { preferences.menuResetDelayMinutes = min(max(0, $0), Int.max / 60) }
+              ), format: .number.grouping(.never))
+              .frame(width: 70)
+              Text("minutes")
+            }
+            .disabled(!preferences.menuResetEnabled)
+            Text("How long to wait before resetting to current time")
+              .font(.callout)
+              .foregroundStyle(.secondary)
+          }
+          .padding([.top], 6)
+
         }
         .padding([.top], 6)
         .padding([.bottom], 12)
       }
+    }
+    .onChange(of: preferences.menuResetEnabled) { _, _ in
+      updateMenuReset()
+    }
+    .onChange(of: preferences.menuResetDelayMinutes) { _, _ in
+      updateMenuReset()
     }
     .onAppear {
       if presetFormats.contains(preferences.menuBarTimeFormat) {
         selectedPresetFormat = preferences.menuBarTimeFormat
       }
     }
+  }
+
+  private func updateMenuReset() {
+    let delay = preferences.menuResetEnabled
+      ? TimeInterval(max(0, preferences.menuResetDelayMinutes)) * 60
+      : nil
+    timeManager.updateMenuReset(after: delay)
   }
 }
 

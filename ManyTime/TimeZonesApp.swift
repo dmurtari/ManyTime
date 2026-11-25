@@ -14,6 +14,16 @@ struct TimeZonesApp: App {
       TimeZoneMenu()
         .environment(timeManager)
         .environmentObject(timeZoneManager)
+        .onAppear {
+          timeManager.cancelMenuReset()
+        }
+        .onDisappear {
+          let preferences = AppPreferences.shared
+          let delay = preferences.menuResetEnabled
+            ? TimeInterval(max(0, preferences.menuResetDelayMinutes)) * 60
+            : nil
+          timeManager.scheduleMenuReset(after: delay)
+        }
     } label: {
       MenuBarView()
         .environment(timeManager)

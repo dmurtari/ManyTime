@@ -108,6 +108,26 @@ struct TimeManagerTests {
     #expect(timeManager.isShowingCurrentTime == expected)
   }
 
+  @Test("A closed menu resets the time after the delay")
+  func testScheduledMenuReset() async throws {
+    let fixedDate = Date(timeIntervalSince1970: 1000)
+    timeManager.setFixedTime(fixedDate)
+    timeManager.scheduleMenuReset(after: 0.05)
+    #expect(timeManager.timeMode == .fixed(fixedDate))
+    try await Task.sleep(for: .milliseconds(200))
+    #expect(timeManager.timeMode == .current)
+  }
+
+  @Test("Reopening the menu cancels the scheduled reset")
+  func testCancelMenuReset() async throws {
+    let fixedDate = Date(timeIntervalSince1970: 1000)
+    timeManager.setFixedTime(fixedDate)
+    timeManager.scheduleMenuReset(after: 0.05)
+    timeManager.cancelMenuReset()
+    try await Task.sleep(for: .milliseconds(200))
+    #expect(timeManager.timeMode == .fixed(fixedDate))
+  }
+
   @Test("TimeMode equality")
   func testTimeModeEquality() {
     let date1 = Date(timeIntervalSince1970: 1000)
